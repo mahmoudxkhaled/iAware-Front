@@ -1,0 +1,106 @@
+:host ::ng-deep .p-dataview-emptymessage{
+    display: none !important;;
+}
+
+.avatar {
+    vertical-align: middle;
+    width: 150px;
+    height: 150px;
+    border: 1px solid black;
+}
+
+.image-preview img.preview-image {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid #ddd;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.image-preview img.preview-image:hover {
+    transform: scale(1.05);
+    border-color: #007ad9;
+}
+
+.object-cover {
+    transition: transform 0.3s ease-in-out;
+}
+
+.object-cover:hover {
+    transform: scale(1.05);
+}
+
+
+
+// .truncate-text {
+//     display: -webkit-box;
+//     -webkit-line-clamp: 1; /* Limits to 2 lines */
+//     -webkit-box-orient: vertical;
+//     overflow: hidden;
+//     text-overflow: ellipsis;
+//     white-space: normal;
+// }
+
+
+
+@media only screen and (min-width: 767px)  {
+    .wall-see-more {
+        h1, h2, h3, h4, h5, p {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: var(--transition);
+            -webkit-line-clamp: 2;
+            min-height: calc(1.2em * 2); /* Ensures minimum 2 lines height */
+            line-height: 1.2;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-weight: bold;
+            height: calc(1.2em * 2); /* Fixed height for 2 lines */
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            word-break: break-word;
+        }
+        
+        &:hover {
+            transform: translateY(-5px);
+            transition: transform 1s ease-in-out;
+
+            h1, h2, h3, h4, h5, p {
+                -webkit-line-clamp: unset;
+                overflow: visible;
+                height: auto;
+                min-height: 40px;
+                transition: var(--transition, all 0.8s ease-in-out);
+            }
+        }
+    }
+}
+
+
+
+.wall-image-container {
+    position: relative;
+    width: 100%; /* Makes the image container responsive */
+    padding-top: 66.67%; /* Aspect ratio 16:9 (change if needed) */
+    overflow: hidden;
+    border-radius: 8px; /* Optional: add rounded corners */
+    background-color: #f4f4f4; /* Fallback background color */
+  }
+  
+  .wall-image-container img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: fill; /* Ensures the image covers the container without distortion */
+    border-radius: 8px; /* Optional: match the container's rounded corners */
+  }

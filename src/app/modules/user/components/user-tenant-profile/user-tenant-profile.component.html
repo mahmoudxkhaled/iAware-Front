@@ -1,0 +1,474 @@
+<p-card>
+    <p-toast></p-toast>
+    <p-tabView [(activeIndex)]="activeTabIndex" class="w-full h-full">
+        <p-tabPanel [header]="
+                user.isDefaultTenantUser
+                    ? ('user.user-tenant-profile.AdminProfile' | translate)
+                    : ('user.user-tenant-profile.userProfile' | translate)
+            ">
+            <div class="grid">
+                <div class="col-12 md:col-4">
+                    <div class="card points-card positive-points">
+                        <div class="card-content text-center">
+                            <i class="pi pi-thumbs-up-fill" style="font-size: 2rem; color: #28a745"></i>
+                            <h2>{{ userPoints.positivePoints }}</h2>
+                            <p class="points-text">{{ 'user.user-tenant-profile.positivePoints' | translate }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 md:col-4">
+                    <div class="card points-card negative-points">
+                        <div class="card-content text-center">
+                            <i class="pi pi-thumbs-down-fill" style="font-size: 2rem; color: #dc3545"></i>
+                            <h2>{{ userPoints.negativePoints }}</h2>
+                            <p class="points-text">{{ 'user.user-tenant-profile.negativePoints' | translate }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 md:col-4">
+                    <div class="card points-card total-points">
+                        <div class="card-content text-center">
+                            <i class="pi pi-star-fill" style="font-size: 2rem; color: #ffc107"></i>
+                            <h2>{{ userPoints.totalSumPoints }}</h2>
+                            <p class="points-text">{{ 'user.user-tenant-profile.totalPoints' | translate }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+                <div class="col-12 md:flex md:justify-content-between">
+                    <div class="col-12 md:col-6">
+                        <!-- <div class="field col-12">
+                            <label for="firstName" class="font-medium text-900"
+                                >{{ 'user.user-tenant-profile.firstName' | translate }}:</label
+                            >
+                            <input id="firstName" type="text" pInputText formControlName="firstName" class="w-full" />
+                            <div
+                                *ngIf="
+                                    userForm.get('firstName')?.invalid &&
+                                    (userForm.get('firstName')?.dirty || userForm.get('firstName')?.touched)
+                                 "
+                                class="p-error">
+                                {{ 'user.user-tenant-profile.firstNameValidation' | translate }}
+                            </div>
+                        </div>
+                        <div class="field col-12">
+                            <label for="lastName" class="font-medium text-900"
+                                >{{ 'user.user-tenant-profile.lastName' | translate }}:</label
+                            >
+                            <input id="lastName" type="text" pInputText formControlName="lastName" class="w-full" />
+                            <div
+                                *ngIf="
+                                    userForm.get('lastName')?.invalid &&
+                                    (userForm.get('lastName')?.dirty || userForm.get('lastName')?.touched)
+                                "
+                                class="p-error">
+                                {{ 'user.user-tenant-profile.lastNameValidation' | translate }}
+                            </div>
+                        </div> -->
+
+                        <div class="field col-12">
+                            <label for="firstName" class="font-medium text-900">
+                                {{ 'user.user-tenant-profile.firstName' | translate }}:
+                            </label>
+                            <input id="firstName" type="text" pInputText formControlName="firstName" class="w-full"
+                                (input)="trimAndUpdateField('firstName')" />
+                            <div *ngIf="firstName?.invalid && (firstName?.dirty || firstName?.touched)" class="p-error">
+                                <span *ngIf="firstName?.errors?.['required']">
+                                    {{ 'user.user-tenant-profile.firstNameValidation' | translate }}
+                                </span>
+                                <span *ngIf="firstName?.errors?.['minlength']">
+                                    {{ 'user.user-tenant-profile.minLengthValidation' | translate }}
+                                </span>
+                                <span *ngIf="firstName?.errors?.['maxlength']">
+                                    {{ 'user.user-tenant-profile.maxLengthValidation' | translate }}
+                                </span>
+                                <span *ngIf="firstName?.errors?.['pattern']">
+                                    {{ 'user.user-tenant-profile.onlyLettersValidation' | translate }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="field col-12">
+                            <label for="lastName" class="font-medium text-900">
+                                {{ 'user.user-tenant-profile.lastName' | translate }}:
+                            </label>
+                            <input id="lastName" type="text" pInputText formControlName="lastName" class="w-full"
+                                (input)="trimAndUpdateField('lastName')" />
+                            <div *ngIf="lastName?.invalid && (lastName?.dirty || lastName?.touched)" class="p-error">
+                                <span *ngIf="lastName?.errors?.['required']">
+                                    {{ 'user.user-tenant-profile.lastNameValidation' | translate }}
+                                </span>
+                                <span *ngIf="lastName?.errors?.['minlength']">
+                                    {{ 'user.user-tenant-profile.minLengthValidation' | translate }}
+                                </span>
+                                <span *ngIf="lastName?.errors?.['maxlength']">
+                                    {{ 'user.user-tenant-profile.maxLengthValidation' | translate }}
+                                </span>
+                                <span *ngIf="lastName?.errors?.['pattern']">
+                                    {{ 'user.user-tenant-profile.onlyLettersValidation' | translate }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="p-fluid field col-12">
+                            <label class="font-medium text-900" htmlFor="timeZone">
+                                {{ 'user.user-tenant-profile.timeZone' | translate }}
+                            </label>
+                            <p-dropdown [options]="timeZonesList" optionLabel="name" optionValue="id"
+                                formControlName="timeZoneId" [filter]="true"></p-dropdown>
+                        </div>
+
+                        <!-- <div class="field col-12">
+                            <label for="phone" class="font-medium text-900"
+                                >{{ 'user.user-tenant-profile.phone' | translate }}:</label
+                            >
+                            <ngx-intl-tel-input
+                                class="p-inputtext w-full telInput"
+                                style="display: block; padding: 0px !important"
+                                [preferredCountries]="[CountryISO.UnitedStates, CountryISO.UnitedKingdom]"
+                                [enableAutoCountrySelect]="false"
+                                [enablePlaceholder]="true"
+                                [searchCountryFlag]="true"
+                                [searchCountryField]="[SearchCountryField.Iso2, SearchCountryField.Name]"
+                                [selectFirstCountry]="false"
+                                [selectedCountryISO]="selectedCountryISO"
+                                [maxLength]="15"
+                                [separateDialCode]="true"
+                                [phoneValidation]="false"
+                                name="phone"
+                                formControlName="phone"></ngx-intl-tel-input>
+                        </div> -->
+
+                        <div class="col-12 m-auto text-center">
+                            <button pButton pRipple [label]="'shared.actions.update' | translate"
+                                [disabled]="userForm.invalid" class="w-auto" type="submit"></button>
+                        </div>
+                    </div>
+
+                    <!-- <div class="col-12 md:col-6 flex flex-column">
+                        <div class="logo-container">
+                            <img [src]="imageUrl" alt="Company Logo" class="avatar" (click)="onUploadClick()" />
+                        </div>
+                        <div class="flex align-items-center justify-content-center mt-3">
+                            <p-button
+                                (click)="onUploadClick()"
+                                label="Upload Image"
+                                pTooltip="upload new profile image"></p-button>
+                        </div>
+                        <input type="file" id="myFile" style="display: none" (change)="onFileSelected($event)" />
+                    </div> -->
+
+                    <div class="col-12 md:col-6 flex flex-column align-items-center">
+                        <div class="logo-container">
+                            <img [src]="imageUrl" alt="Profile Image" class="avatar" (click)="onUploadClick()" />
+                        </div>
+                        <div class="flex align-items-center justify-content-center mt-3">
+                            <p-button (click)="onUploadClick()"
+                                label="{{ 'shared.actions.upload' | translate }}"></p-button>
+                        </div>
+                        <input type="file" id="myFile" style="display: none" (change)="onFileSelected($event)"
+                            accept="image/jpeg, image/png, image/webp" />
+                        <small class="text-center block m-2">{{ 'shared.messages.recommendedDimensions' | translate }}
+                            <strong>{{ 'shared.messages.600x600' | translate }}</strong>
+                            {{ 'shared.messages.pixels' | translate }}</small>
+                        <p *ngIf="fileError" class="error-message">{{ fileError }}</p>
+                    </div>
+                </div>
+            </form>
+        </p-tabPanel>
+
+        <p-tabPanel *ngIf="hasPermission(actions.tenantProfile)"
+            [header]="'user.user-tenant-profile.tenantProfile' | translate" class="h-full">
+            <app-settings></app-settings>
+        </p-tabPanel>
+
+        <p-tabPanel *ngIf="hasPermission(actions.subscription)"
+            [header]="'user.user-tenant-profile.subscription' | translate">
+            <app-subscription-details></app-subscription-details>
+        </p-tabPanel>
+
+        <p-tabPanel *ngIf="hasPermission(actions.ad)"
+            [header]="'user.user-tenant-profile.activeDirectorySettings' | translate">
+            <app-ad-settings></app-ad-settings>
+        </p-tabPanel>
+
+        <!-- <p-tabPanel header="Theme Settings">
+            <app-color-scema-settings></app-color-scema-settings>
+        </p-tabPanel> -->
+
+        <p-tabPanel *ngIf="hasPermission(actions.administrators)"
+            [header]="'user.user-tenant-profile.administrators' | translate">
+            <p-card>
+                <div class="iAware-loading-table-container" style="position: relative">
+                    <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                    <p-table #dt [value]="tenantAdministrators" [paginator]="true" [rows]="10"
+                        [showCurrentPageReport]="true" responsiveLayout="scroll" [rowsPerPageOptions]="[10, 25, 50]"
+                        [globalFilterFields]="['firstName', 'lastName', 'email', 'isEmailConfirmed', 'status']">
+                        <ng-template pTemplate="caption">
+                            <div class="flex flex-wrap gap-2 align-items-center justify-content-between">
+                                <span class="p-input-icon-left w-full sm:w-20rem flex-order-1 sm:flex-order-0">
+                                    <i class="pi pi-search"></i>
+                                    <input pInputText type="text" (input)="onGlobalFilter(dt, $event)"
+                                        placeholder="{{ 'user.user-listing.actions.globalSearch' | translate }}"
+                                        class="w-full" />
+                                </span>
+                                <p-button (click)="navigateToCreateNewAdministrator()"
+                                    class="p-button-outlined w-full sm:w-auto flex-order-0 sm:flex-order-1"
+                                    icon="pi pi-user-plus" label="{{
+                                        'user.user-tenant-profile.dialogs.addNewAdministratorDialog.header' | translate
+                                    }}"></p-button>
+                            </div>
+                        </ng-template>
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th pSortableColumn="firstName" class="white-space-nowrap rtl-layout"
+                                    style="width: 25%">
+                                    {{ 'user.user-listing.usersTable.fields.firstName' | translate
+                                    }}<p-sortIcon field="firstName"></p-sortIcon>
+                                </th>
+                                <th pSortableColumn="lastName" class="white-space-nowrap" style="width: 25%">
+                                    {{ 'user.user-listing.usersTable.fields.lastName' | translate }}
+                                    <p-sortIcon field="lastName"></p-sortIcon>
+                                </th>
+                                <th class="white-space-nowrap" style="width: 25%">
+                                    {{ 'user.user-listing.usersTable.fields.email' | translate }}
+                                </th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-user>
+                            <tr>
+                                <td>{{ user.firstName }}</td>
+                                <td>{{ user.lastName }}</td>
+                                <td>{{ user.email }}</td>
+                                <td>
+                                    <p-button *ngIf="!user.isDefaultTenantUser" icon="pi pi-reply"
+                                        (onClick)="openReturnAdminDialog(user)"></p-button>
+                                </td>
+                                <td>
+                                    <button *ngIf="menuItems.length > 0 && !user.isDefaultTenantUser" pButton pRipple type="button"
+                                        icon="pi pi-ellipsis-v"
+                                        class="p-button-rounded p-button-text p-button-plain ml-3"
+                                        (click)="menu.toggle($event); assigneCurrentSelect(user)"></button>
+                                    <p-menu #menu [model]="menuItems" [appendTo]="'body'" [popup]="true"></p-menu>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </p-card>
+        </p-tabPanel>
+
+        <p-tabPanel [header]="'user.user-tenant-profile.badges' | translate">
+            <div class="badge-container">
+                <p *ngIf="userBadges.length === 0" class="text-center text-xl text-indigo-300 font-bold">
+                    {{ 'user.user-tenant-profile.nobadgesearned' | translate }}
+                </p>
+
+                <div *ngIf="userBadges.length > 0" class="badge-list">
+                    <div *ngFor="let badge of userBadges" class="badge-card relative"
+                        [ngClass]="{ disabled: badge.badgeEarnedCount === 0 }">
+                        <img [src]="badge.badgeImageURL" alt="{{ badge.name }}" class="badge-image" />
+                        <div class="badge-info">
+                            <!-- <h3 class="badge-name">{{ badge.name }}</h3> -->
+                            <p class="badge-name" *ngIf="badge.name">{{ badge.name }}</p>
+                            <p class="badge-description" *ngIf="badge.descriptionName">{{ badge.descriptionName }}</p>
+                            <p class="badge-earned-count">
+                                {{
+                                'user.user-tenant-profile.earnedTimes'
+                                | translate : { times: badge.badgeEarnedCount }
+                                }}
+                            </p>
+                        </div>
+
+                        <div *ngIf="!badge.isUserEarnedThisBadge" class="lock-overlay">
+                            <div class="lock-background"></div>
+                            <img loading="lazy" [src]="'/assets/media/Locker.png'" alt="Locked" class="lock-icon" />
+
+                            <!-- Upgrade Overlay -->
+                            <div class="upgrade-overlay">
+                                <div class="upgrade-content">
+                                    <p class="upgrade-title text-lg font-bold">
+                                        {{ badge.name }}
+                                    </p>
+                                    <p class="upgrade-description">
+                                        {{ badge.descriptionName }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </p-tabPanel>
+    </p-tabView>
+</p-card>
+
+<p-dialog [(visible)]="returnAdminDialog"
+    header="{{ 'user.user-tenant-profile.dialogs.returnAdminDialog.header' | translate }}" [modal]="true"
+    [style]="{ width: '450px' }">
+    <div class="flex align-items-center justify-content-center">
+        <app-iAware-info description="{{ 'user.user-tenant-profile.dialogs.returnAdminDialog.message' | translate }}"
+            icon="fa fa-solid fa-circle-info text-3xl" severity="info"></app-iAware-info>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="returnAdminDialog = false"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text"
+            label="{{ 'shared.actions.confirm' | translate }}" (click)="backSpecificAdminToUser()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="addNewAdministratorDialog" [style]="{ width: '50%', height: '80%' }"
+    (onHide)="hideAdministatorsDialog()"
+    header="{{ 'user.user-tenant-profile.dialogs.addNewAdministratorDialog.header' | translate }}" [modal]="true"
+    class="p-fluid">
+    <ng-template pTemplate="content">
+        <div class="grid">
+            <div class="col-12">
+                <app-iAware-info
+                    description="{{ 'user.user-tenant-profile.dialogs.addNewAdministratorDialog.message' | translate }}"
+                    icon="fa fa-solid fa-circle-info text-3xl" severity="info"></app-iAware-info>
+            </div>
+            <div class="col-12">
+                <div class="grid formgrid p-fluid">
+                    <div class="field mb-4 col-12 md:col-6">
+                        <label for="userId" class="font-medium text-900">
+                            {{ 'user.user-tenant-profile.dialogs.addNewAdministratorDialog.user' | translate }}
+                        </label>
+                        <span>
+                            <p-dropdown inputId="userId" [(ngModel)]="newAdministrator.userId" [options]="tenantUsers"
+                                (onChange)="onSelectUserToAddAdministator($event)" optionLabel="name" optionValue="id"
+                                [filter]="true" placeholder="{{
+                                    'user.user-tenant-profile.dialogs.addNewAdministratorDialog.userPlaceholder'
+                                        | translate
+                                }}" [required]="true">
+                            </p-dropdown>
+                        </span>
+                        <div *ngIf="isFormSubmitted && !newAdministrator.userId" class="p-error">
+                            {{
+                            'user.user-tenant-profile.dialogs.addNewAdministratorDialog.userValidation' | translate
+                            }}
+                        </div>
+                    </div>
+                    <div class="field mb-4 col-12 md:col-6">
+                        <label for="rolesIds" class="font-medium text-900">
+                            {{ 'user.user-tenant-profile.dialogs.addNewAdministratorDialog.roles' | translate }}
+                        </label>
+                        <span>
+                            <p-multiSelect inputId="rolesIds" [(ngModel)]="newAdministrator.rolesIds"
+                                [options]="administratorRoles" optionLabel="name" optionValue="id" [filter]="true"
+                                placeholder="{{
+                                    'user.user-tenant-profile.dialogs.addNewAdministratorDialog.rolesPlaceholder'
+                                        | translate
+                                }}" [required]="true">
+                            </p-multiSelect>
+                        </span>
+                        <div *ngIf="isFormSubmitted && !newAdministrator.rolesIds.length" class="p-error">
+                            {{
+                            'user.user-tenant-profile.dialogs.addNewAdministratorDialog.rolesValidation' | translate
+                            }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text"
+            (click)="hideAdministatorsDialog()"></button>
+        <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text" (click)="addNewAdministrator()"
+            [disabled]="!isFormValid()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="editDialog" [style]="{ width: '50%', height: '60%' }"
+    header="{{ 'user.user-listing.dialogs.editeUserDialog.header' | translate }}" [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <form [formGroup]="userEditForm" (ngSubmit)="editeUser()">
+            <div class="grid">
+                <div class="col-12">
+                    <div class="grid formgrid p-fluid">
+                        <div class="field mb-4 col-12 md:col-6">
+                            <label for="groupsIds" class="font-medium text-900">{{ 'Department' | translate }}</label>
+                            <span>
+                                <p-dropdown inputId="tenantUnitId" [options]="tenantUnits" optionLabel="unitName"
+                                    optionValue="id" formControlName="tenantUnitId" [filter]="true"
+                                    placeholder="{{ 'Select a Department' | translate }}">
+                                </p-dropdown>
+                            </span>
+                        </div>
+
+                        <div class="field mb-4 col-12 md:col-6">
+                            <label for="firstName" class="font-medium text-900">{{
+                                'user.user-listing.dialogs.editeUserDialog.fields.firstName' | translate
+                                }}</label>
+                            <input id="firstName" type="text" pInputText formControlName="firstName" placeholder="{{
+                                    'user.user-listing.dialogs.editeUserDialog.placeHolders.firstName' | translate
+                                }}" />
+                            <div *ngIf="
+                                    userForm.get('firstName')?.invalid &&
+                                    (userForm.get('firstName')?.dirty || userForm.get('firstName')?.touched)
+                                " class="p-error">
+                                <div *ngIf="userForm.get('firstName')?.errors?.['required']">
+                                    {{ 'user.user-listing.dialogs.editeUserDialog.validations.firstName' | translate }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field mb-4 col-12 md:col-6">
+                            <label for="lastName" class="font-medium text-900">{{
+                                'user.user-listing.dialogs.editeUserDialog.fields.lastName' | translate
+                                }}</label>
+                            <input id="lastName" type="text" pInputText formControlName="lastName" placeholder="{{
+                                    'user.user-listing.dialogs.editeUserDialog.placeHolders.lastName' | translate
+                                }}" />
+                            <div *ngIf="
+                                    userForm.get('lastName')?.invalid &&
+                                    (userForm.get('lastName')?.dirty || userForm.get('lastName')?.touched)
+                                " class="p-error">
+                                <div *ngIf="userForm.get('lastName')?.errors?.['required']">
+                                    {{ 'user.user-listing.dialogs.editeUserDialog.validations.lastName' | translate }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field mb-4 col-12 md:col-6">
+                            <label for=" languageId" class="font-medium text-900">{{
+                                'user.user-listing.dialogs.editeUserDialog.fields.language' | translate
+                                }}</label>
+                            <span>
+                                <p-dropdown formControlName="languageId" [options]="languages" [filter]="true"
+                                    optionLabel="name" optionValue="id" placeholder="{{
+                                        'user.user-listing.dialogs.editeUserDialog.placeHolders.language' | translate
+                                    }}">
+                                </p-dropdown>
+                                <div *ngIf="
+                                        userForm.get('languageId')?.invalid &&
+                                        (userForm.get('languageId')?.dirty || userForm.get('languageId')?.touched)
+                                    " class="p-error">
+                                    <div *ngIf="userForm.get('languageId')?.errors?.['required']">
+                                        {{
+                                        'user.user-listing.dialogs.editeUserDialog.validations.language' | translate
+                                        }}
+                                    </div>
+                                </div>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+            class="p-button-text" (click)="editDialog = false"></button>
+        <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check" class="p-button-text"
+            (click)="editeUser()"></button>
+    </ng-template>
+</p-dialog>

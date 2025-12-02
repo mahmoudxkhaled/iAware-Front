@@ -1,0 +1,94 @@
+<p-card header="{{ 'dashboards.training.header' | translate }}">
+    <div class="grid">
+        <div class="col-12">
+            <app-training-campaigns-dashboard></app-training-campaigns-dashboard>
+        </div>
+        <div class="col-12 md:col-6 animation-duration-1000 animation-ease-in-out" pAnimateOnScroll enterClass="fadein"
+            leaveClass="fadeoutleft">
+            <p-card>
+                <h3 style="text-align: center">
+                    {{ 'dashboards.training.securityAwarenessChartTitle' | translate }}
+                    <span>
+                        <p-dropdown [options]="months" optionLabel="name" optionValue="id" [ngModel]="selectedMonth"
+                            (onChange)="onMonthsDropdownChange($event)" />
+                        {{ 'dashboards.training.months' | translate }}
+                    </span>
+                </h3>
+                <p-chart type="bar" [data]="data" [options]="options" [responsive]="true" width="100%" height="300"/>
+            </p-card>
+        </div>
+        <div class="col-12 md:col-6 animation-duration-1000 animation-ease-in-out" pAnimateOnScroll enterClass="fadeinup"
+            leaveClass="fadeoutleft">
+            <p-card>
+                <div class="col-12 campaign-dashboard-button campaign-dashboard-button-miniscreen">
+                    <p-button label="{{ 'dashboards.training.seeAllCampaignsButton' | translate }}" icon="pi pi-eye"
+                        [outlined]="true" class="p-button-info" (onClick)="navigateToAllCampaigns()"
+                        [style]="{'margin-right': '0.5rem'}"></p-button>
+                    <p-button label="{{ 'dashboards.training.newCampaignButton' | translate }}" icon="pi pi-plus"
+                        class="p-button-primary" (onClick)="navigateToNewCampaign()"></p-button>
+                </div>
+    
+                <h3 style="text-align: center" *ngIf="campaigns.length > 0">
+                    {{ 'dashboards.training.recentCampaignsTitle' | translate }}
+                </h3>
+                <h3 style="text-align: center" *ngIf="campaigns.length == 0">
+                    <i class="pi pi-inbox" style="font-size: 3rem; color: var(--text-secondary-color)"></i>
+                    <br>
+                    {{ 'dashboards.training.noRecentCampaignsTitle' | translate }}
+                </h3>
+                <p-button *ngIf="campaigns.length == 0"
+                    label="{{ 'dashboards.training.newCampaignButton' | translate }}" icon="pi pi-plus"
+                    class="p-button-outlined" (onClick)="navigateToNewCampaign()"
+                    [style]="{display: 'block', margin: '1rem auto'}"></p-button>
+
+                <div class="campaign-table" *ngIf="campaigns.length > 0">
+                    <p-scrollPanel [style]="{ height: '38vh' }">
+                        <div class="col-12">
+                            <div *ngFor="let campaign of campaigns" class="campaign-row grid campaign-row-hover"
+                                (click)="navigateToCampaignDetails(campaign.campaignId)">
+                                <div class="hidden md:block md:col-2">
+                                    <i class="pi pi-folder-open"
+                                        style="font-size: 2rem; color: var(--primary-color)"></i>
+                                </div>
+                                <div class="m-auto md:col-6">
+                                    <i class="inline md:hidden mr-2 md:mr-0 pi pi-folder-open"
+                                        style="font-size: 2rem; color: var(--primary-color)"></i>
+                                    <a class="campaign-name" pTooltip="{{ campaign.campaignName }}"
+                                        tooltipPosition="top">
+                                        {{ campaign.campaignName }}
+                                    </a>
+                                </div>
+                                <div class="col-12 md:col-4">
+                                    <p class="text-center">
+                                        {{ campaign.campaignCompelationPersentage }}%
+                                        {{ 'dashboards.training.completedPercentage' | translate }}
+                                    </p>
+                                    <p-progressBar [value]="campaign.campaignCompelationPersentage" [showValue]="false"
+                                        styleClass="custom-progress-bar"></p-progressBar>
+                                </div>
+                            </div>
+                        </div>
+                    </p-scrollPanel>
+                </div>
+            </p-card>
+        </div> 
+    </div>
+</p-card>
+
+<app-user-training-list-dialog [dialogHeader]="'dashboards.training.completedUsersDialogHeader' | translate"
+    [displayDialog]="displayCompletedCampaignDialog" [userStatus]="'Completed'" [campaignType]="'completed'"
+    [campaignUsers]="campaignUsers" [filteredCampaignUsers]="getTrainingCampaignUsers()"
+    (onHide)="displayCompletedCampaignDialog = false">
+</app-user-training-list-dialog>
+
+<app-user-training-list-dialog [dialogHeader]="'dashboards.training.notStartedUsersDialogHeader' | translate"
+    [displayDialog]="displayNotStartedCampaignDialog" [userStatus]="'Not Started'" [campaignType]="'completed'"
+    [campaignUsers]="campaignUsers" [filteredCampaignUsers]="getTrainingCampaignUsers()"
+    (onHide)="displayNotStartedCampaignDialog = false">
+</app-user-training-list-dialog>
+
+<app-user-training-list-dialog [dialogHeader]="'dashboards.training.failedUsersDialogHeader' | translate"
+    [displayDialog]="displayFailedCampaignDialog" [userStatus]="'Failed'" [campaignType]="'completed'"
+    [campaignUsers]="campaignUsers" [filteredCampaignUsers]="getTrainingCampaignUsers()"
+    (onHide)="displayFailedCampaignDialog = false">
+</app-user-training-list-dialog>

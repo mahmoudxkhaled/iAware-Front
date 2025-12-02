@@ -1,0 +1,27 @@
+.invoice-card {
+    padding: 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    // background-color: #fff;
+    // max-width: 1400px;
+    // margin: auto;
+}
+.avatar {
+    vertical-align: middle;
+    width: 200px;
+    height: 200px;
+    border: 1px solid black;
+}
+.correct-answer {
+    color: green;
+    font-weight: 600;
+}
+
+.incorrect-answer {
+    color: red;
+}
+
+:host ::ng-deep .p-dataview-emptymessage{
+    display: none !important;;
+}

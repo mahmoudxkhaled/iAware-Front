@@ -1,0 +1,366 @@
+<div class="card">
+    <p-toast></p-toast>
+
+    <div class="iAware-loading-table-container" style="position: relative">
+        <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+        <p-table (onLazyLoad)="lazyLoadNotificationTypes($event)" #dt [value]="notificationTypes"
+            responsiveLayout="scroll" [rows]="10" [paginator]="true" [rowsPerPageOptions]="[10, 20, 30]"
+            [totalRecords]="totalRecords" [lazy]="true" [loading]="tableLoadingSpinner" styleClass="p-datatable-striped"
+            [globalFilterFields]="['title']">
+            <ng-template pTemplate="caption">
+                <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                    <h5 class="m-0">{{ 'notification-settings.notification-type-list.title' | translate }}</h5>
+                    <div class="my-1">
+                        <button *ngIf="hasPermission(actions.add)" pButton pRipple
+                            label="{{ 'shared.actions.add' | translate }}" icon="pi pi-plus"
+                            class="p-button-success mr-2" (click)="CreateNotificationType()"></button>
+                        <span class="mt-2 md:mt-0 p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)"
+                                placeholder="{{ 'shared.actions.search' | translate }}" class="w-full sm:w-auto" />
+                        </span>
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="header">
+                <tr>
+                    <th style="text-align: center">
+                        {{ 'notification-settings.notification-type-list.id' | translate }}
+                    </th>
+                    <th pSortableColumn="name">
+                        {{ 'notification-settings.notification-type-list.name' | translate }}
+                        <p-sortIcon field="name"> </p-sortIcon>
+                        <p-columnFilter type="text" field="title" display="menu"></p-columnFilter>
+                    </th>
+                    <th>{{ 'notification-settings.notification-type-list.notificationLogo' | translate }}</th>
+                    <th style="text-align: center">
+                        {{ 'notification-settings.notification-type-list.notificationIcon' | translate }}
+                    </th>
+                    <th style="text-align: center">
+                        {{ 'notification-settings.notification-type-list.redirectPageUrl' | translate }}
+                    </th>
+                    <th style="text-align: center">
+                        {{ 'notification-settings.notification-type-list.notificationParameterKey1' | translate }}
+                    </th>
+                    <th style="text-align: center">
+                        {{ 'notification-settings.notification-type-list.notificationParameterKey2' | translate }}
+                    </th>
+                    <th style="text-align: center">
+                        {{ 'notification-settings.notification-type-list.status' | translate }}
+                    </th>
+                    <th colspan="2" style="text-align: right"></th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-type>
+                <tr>
+                    <th style="text-align: center" pSortableColumn="id">{{ type.id }}</th>
+                    <td>
+                        <a [routerLink]="['/notifications', type.id]">{{ type.title }}</a>
+                    </td>
+                    <td style="text-align: center">
+                        <p-image [src]="type.notificationLogoUrl" alt="Image" width="100" [preview]="true" />
+                    </td>
+                    <td style="text-align: center"><i [class]="'pi ' + type.notificationIcon"></i></td>
+                    <td style="text-align: center">
+                        <a style="cursor: pointer">
+                            <i class="pi pi-file-o" (click)="openContent(type, 'RedirectPageUrl')"></i>
+                        </a>
+                    </td>
+                    <td style="text-align: center">{{ type.notificationParameterKey1 }}</td>
+                    <td style="text-align: center">{{ type.notificationParameterKey2 }}</td>
+                    <td style="text-align: center">
+                        <p-inputSwitch *ngIf="hasPermission(actions.active)" [ngModel]="type.isActive"
+                            (onChange)="switchActivation(type)" />
+                    </td>
+                    <td>
+                        <button *ngIf="menuItems.length > 0" pButton pRipple type="button" icon="pi pi-ellipsis-v"
+                            class="p-button-rounded p-button-text p-button-plain ml-3"
+                            (click)="menu.toggle($event); assigneCurrentSelect(type)"></button>
+                        <p-menu #menu [model]="menuItems" [appendTo]="'body'" [popup]="true"></p-menu>
+                    </td>
+                    <!-- <td style="text-align: center;">
+                    <button *ngIf="hasPermission(actions.edit)" pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"
+                        (click)="editNotificationType(type)"></button>
+                </td>
+                <td style="text-align: center;">
+                    <button *ngIf="hasPermission(actions.delete)" pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger"
+                        (click)="deleteNotificationType(type)">
+                    </button>
+                </td> -->
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+
+<p-dialog [(visible)]="addNotificationTypeDialog" [style]="{ width: '800px', heigth: '900px' }"
+    header="{{ 'notification-settings.notification-type-list.addHeader' | translate }}" [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <form [formGroup]="addNotificationTypeForm" (ngSubmit)="saveAddNotificationType()">
+            <div class="field">
+                <label for="languageId" class="font-medium text-900">{{
+                    'notification-settings.notification-type-list.id' | translate
+                    }}</label>
+                <input type="number" pInputText id="id" formControlName="id" required
+                    [ngClass]="{ 'ng-invalid ng-dirty': submitted && !addNotificationTypeForm.controls['id'].valid }" />
+                <small *ngIf="submitted && !addNotificationTypeForm.controls['id'].valid"
+                    class="ng-dirty ng-invalid text-red-500">{{
+                    'notification-settings.notification-type-list.validations.id' | translate }}</small>
+            </div>
+            <div class="field">
+                <label for="languageId" class="font-medium text-900">{{
+                    'notification-settings.notification-type-list.language' | translate
+                    }}</label>
+                <p-dropdown formControlName="languageId" [options]="defaultLanguage" optionLabel="name"
+                    placeholder="{{ 'notification-settings.notification-type-list.languagePlaceholder' | translate }}"
+                    optionValue="id">
+                </p-dropdown>
+            </div>
+            <div class="field">
+                <label for="title" class="font-medium text-900">{{
+                    'notification-settings.notification-type-list.name' | translate
+                    }}</label>
+                <input type="text" pInputText id="title" formControlName="title" required [ngClass]="{
+                        'ng-invalid ng-dirty': submitted && !addNotificationTypeForm.controls['title'].valid
+                    }" />
+                <small *ngIf="submitted && !addNotificationTypeForm.controls['title'].valid"
+                    class="ng-dirty ng-invalid text-red-500">{{
+                    'notification-settings.notification-type-list.validations.name' | translate }}</small>
+            </div>
+            <div class="field">
+                <label for="redirectPageUrl" class="font-medium text-900">{{
+                    'notification-settings.notification-type-list.redirectPageUrl' | translate
+                    }}</label>
+                <input type="text" pInputText id="redirectPageUrl" formControlName="redirectPageUrl" required [ngClass]="{
+                        'ng-invalid ng-dirty': submitted && !addNotificationTypeForm.controls['redirectPageUrl'].valid
+                    }" />
+                <small *ngIf="submitted && !addNotificationTypeForm.controls['redirectPageUrl'].valid"
+                    class="ng-dirty ng-invalid text-red-500">{{
+                    'notification-settings.notification-type-list.validations.redirectPageUrl' | translate }}</small>
+            </div>
+            <div class="field">
+                <label for="notificationParameterKey1" class="font-medium text-900">{{
+                    'notification-settings.notification-type-list.notificationParameterKey1' | translate
+                    }}</label>
+                <input type="text" pInputText id="notificationParameterKey1" formControlName="notificationParameterKey1"
+                    required [ngClass]="{
+                        'ng-invalid ng-dirty':
+                            submitted && !addNotificationTypeForm.controls['notificationParameterKey1'].valid
+                    }" />
+                <small *ngIf="submitted && !addNotificationTypeForm.controls['notificationParameterKey1'].valid"
+                    class="ng-dirty ng-invalid text-red-500">{{
+                    'notification-settings.notification-type-list.validations.notificationParameterKey1' | translate
+                    }}</small>
+            </div>
+            <div class="field">
+                <label for="notificationParameterKey2" class="font-medium text-900">{{
+                    'notification-settings.notification-type-list.notificationParameterKey2' | translate
+                    }}</label>
+                <input type="text" pInputText id="notificationParameterKey2" formControlName="notificationParameterKey2"
+                    required [ngClass]="{
+                        'ng-invalid ng-dirty':
+                            submitted && !addNotificationTypeForm.controls['notificationParameterKey2'].valid
+                    }" />
+                <small *ngIf="submitted && !addNotificationTypeForm.controls['notificationParameterKey2'].valid"
+                    class="ng-dirty ng-invalid text-red-500">{{
+                    'notification-settings.notification-type-list.validations.notificationParameterKey2' | translate
+                    }}</small>
+            </div>
+            <div class="field">
+                <label for="notificationIcon" class="font-medium text-900">{{
+                    'notification-settings.notification-type-list.notificationIcon' | translate
+                    }}</label>
+                <p-dropdown formControlName="notificationIcon" [options]="icons" placeholder="{{
+                        'notification-settings.notification-type-list.notificationIconPlaceholder' | translate
+                    }}">
+                    <ng-template let-icon pTemplate="item">
+                        <i [class]="'pi ' + icon.value"></i>
+                    </ng-template>
+                </p-dropdown>
+            </div>
+            <div class="field">
+                <label class="font-medium text-900" for="notificationMessage">{{
+                    'notification-settings.notification-type-list.notificationMessage' | translate
+                    }}</label>
+                <textarea id="notificationMessage" name="notificationMessage" formControlName="notificationMessage"
+                    pInputTextarea required [ngClass]="{
+                        'ng-invalid ng-dirty':
+                            submitted && !addNotificationTypeForm.controls['notificationMessage'].valid
+                    }" rows="3" cols="50"></textarea>
+                <small *ngIf="submitted && !addNotificationTypeForm.controls['notificationMessage'].valid"
+                    class="ng-dirty ng-invalid text-red-500">{{
+                    'notification-settings.notification-type-list.validations.notificationMessage' | translate
+                    }}</small>
+            </div>
+            <div class="flex justify-content-center flex-wrap">
+                <div class="md:col-6 flex flex-column">
+                    <div class="flex align-items-center justify-content-center">
+                        <img [src]="imageUrl" alt="Avatar" class="avatar" style="cursor: pointer"
+                            (click)="onUploadNotificationLogoClick()" />
+                    </div>
+                    <label class="flex justify-content-center">{{
+                        'notification-settings.notification-type-list.notificationLogo' | translate
+                        }}</label>
+                    <div class="flex align-items-center justify-content-center mt-2" style="display: none">
+                        <p-button label="{{ 'shared.actions.upload' | translate }}" icon="pi pi-upload"
+                            (click)="onUploadNotificationLogoClick()"></p-button>
+                        <input type="file" id="NotificationLogo" style="display: none"
+                            (change)="onNotificationLogoSelected($event)" />
+                    </div>
+                </div>
+            </div>
+        </form>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+            class="p-button-text" (click)="declineAddNotificationTypeDialog()"></button>
+        <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check" class="p-button-text"
+            (click)="saveAddNotificationType()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="editNotificationTypeDialog" [style]="{ width: '500px', heigth: '900px' }"
+    header="{{ 'notification-settings.notification-type-list.addHeader' | translate }}" [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <form [formGroup]="editNotificationTypeForm" (ngSubmit)="saveEditnotificationType()">
+            <div class="field">
+                <label for="languageId" class="font-medium text-900">{{
+                    'notification-settings.notification-type-list.id' | translate
+                    }}</label>
+                <input type="number" pInputText id="id" formControlName="id" required
+                    [ngClass]="{ 'ng-invalid ng-dirty': submitted && !addNotificationTypeForm.controls['id'].valid }" />
+                <small *ngIf="submitted && !addNotificationTypeForm.controls['id'].valid"
+                    class="ng-dirty ng-invalid text-red-500">{{
+                    'notification-settings.notification-type-list.validations.id' | translate }}</small>
+            </div>
+            <div class="field">
+                <label for="title" class="font-medium text-900">{{
+                    'notification-settings.notification-type-list.name' | translate
+                    }}</label>
+                <input type="text" pInputText id="title" formControlName="title" required [ngClass]="{
+                        'ng-invalid ng-dirty': submitted && !addNotificationTypeForm.controls['title'].valid
+                    }" />
+                <small *ngIf="submitted && !addNotificationTypeForm.controls['title'].valid"
+                    class="ng-dirty ng-invalid text-red-500">{{
+                    'notification-settings.notification-type-list.validations.name' | translate }}</small>
+            </div>
+            <div class="field">
+                <label for="redirectPageUrl" class="font-medium text-900">{{
+                    'notification-settings.notification-type-list.redirectPageUrl' | translate
+                    }}</label>
+                <input type="text" pInputText id="redirectPageUrl" formControlName="redirectPageUrl" required [ngClass]="{
+                        'ng-invalid ng-dirty': submitted && !addNotificationTypeForm.controls['redirectPageUrl'].valid
+                    }" />
+                <small *ngIf="submitted && !addNotificationTypeForm.controls['redirectPageUrl'].valid"
+                    class="ng-dirty ng-invalid text-red-500">{{
+                    'notification-settings.notification-type-list.validations.redirectPageUrl' | translate }}</small>
+            </div>
+            <div class="field">
+                <label for="notificationParameterKey1" class="font-medium text-900">{{
+                    'notification-settings.notification-type-list.notificationParameterKey1' | translate
+                    }}</label>
+                <input type="text" pInputText id="notificationParameterKey1" formControlName="notificationParameterKey1"
+                    required [ngClass]="{
+                        'ng-invalid ng-dirty':
+                            submitted && !addNotificationTypeForm.controls['notificationParameterKey1'].valid
+                    }" />
+                <small *ngIf="submitted && !addNotificationTypeForm.controls['notificationParameterKey1'].valid"
+                    class="ng-dirty ng-invalid text-red-500">{{
+                    'notification-settings.notification-type-list.validations.notificationParameterKey1' | translate
+                    }}</small>
+            </div>
+            <div class="field">
+                <label for="notificationParameterKey2" class="font-medium text-900">{{
+                    'notification-settings.notification-type-list.notificationParameterKey2' | translate
+                    }}</label>
+                <input type="text" pInputText id="notificationParameterKey2" formControlName="notificationParameterKey2"
+                    required [ngClass]="{
+                        'ng-invalid ng-dirty':
+                            submitted && !addNotificationTypeForm.controls['notificationParameterKey2'].valid
+                    }" />
+                <small *ngIf="submitted && !addNotificationTypeForm.controls['notificationParameterKey2'].valid"
+                    class="ng-dirty ng-invalid text-red-500">{{
+                    'notification-settings.notification-type-list.validations.notificationParameterKey2' | translate
+                    }}</small>
+            </div>
+            <div class="field">
+                <label for="notificationIcon" class="font-medium text-900">{{
+                    'notification-settings.notification-type-list.notificationIcon' | translate
+                    }}</label>
+                <p-dropdown formControlName="notificationIcon" [options]="icons" placeholder="{{
+                        'notification-settings.notification-type-list.notificationIconPlaceholder' | translate
+                    }}">
+                    <ng-template let-icon pTemplate="item">
+                        <i [class]="'pi ' + icon.value"></i>
+                    </ng-template>
+                </p-dropdown>
+            </div>
+            <div class="flex justify-content-center flex-wrap">
+                <div class="md:col-6 flex flex-column">
+                    <div class="flex align-items-center justify-content-center">
+                        <img [src]="imageUrl" alt="Avatar" class="avatar" style="cursor: pointer"
+                            (click)="onUploadNotificationLogoClick()" />
+                    </div>
+                    <label class="flex justify-content-center">{{
+                        'notification-settings.notification-type-list.notificationLogo' | translate
+                        }}</label>
+                    <div class="flex align-items-center justify-content-center mt-2" style="display: none">
+                        <p-button label="{{ 'shared.actions.upload' | translate }}" icon="pi pi-upload"
+                            (click)="onUploadNotificationLogoClick()"></p-button>
+                        <input type="file" id="NotificationLogo" style="display: none"
+                            (change)="onNotificationLogoSelected($event)" />
+                    </div>
+                </div>
+            </div>
+        </form>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+            class="p-button-text" (click)="declineEditNotificationType()"></button>
+        <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check" class="p-button-text"
+            (click)="saveEditnotificationType()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="switchActivationNotificationTypeDialog" header="{{ 'shared.headers.active' | translate }}"
+    [modal]="true" [style]="{ width: '450px' }">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        @if (notificationType && notificationType.isActive) {
+        <span>{{ 'shared.messages.deactive' | translate }} <b>{{ notificationType.title }}</b></span>
+        }@else {
+        <span>{{ 'shared.messages.active' | translate }} <b>{{ notificationType.title }}</b></span>
+        }
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="declineActivation()"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{ 'shared.actions.save' | translate }}"
+            (click)="confirmtActivation()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="deletionNotificationTypeDialog" header="{{ 'shared.headers.delete' | translate }}" [modal]="true"
+    [style]="{ width: '450px' }">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="notificationType">{{ 'shared.messages.delete' | translate }} <b> {{ notificationType.title
+                }}</b></span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="declineDeletion()"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{ 'shared.actions.save' | translate }}"
+            (click)="confirmDeletion()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="openRedirectPageUrlDialog" [modal]="true" [style]="{ width: '450px' }">
+    <div class="flex align-items-center justify-content-center">
+        <span [innerHTML]="notificationType.redirectPageUrl"></span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="hideRedirectPageUrlDialog()"></button>
+    </ng-template>
+</p-dialog>

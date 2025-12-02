@@ -1,0 +1,307 @@
+<div class="card">
+    <p-toast></p-toast>
+    <div class="iAware-loading-table-container" style="position: relative;">
+        <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+
+        <p-table #dt [value]="badges" [paginator]="true" [rows]="10" [showCurrentPageReport]="true"
+            responsiveLayout="scroll" [rowsPerPageOptions]="[10, 25, 50]" [globalFilterFields]="['name']">
+            <ng-template pTemplate="caption">
+                <div class="flex flex-wrap gap-2 align-items-center justify-content-between">
+                    <span class="p-input-icon-left w-full sm:w-20rem flex-order-1 sm:flex-order-0">
+                        <i class="pi pi-search"></i>
+                        <input pInputText type="text" (input)="onGlobalFilter(dt, $event)"
+                            placeholder="{{ 'shared.actions.search' | translate }}" class="w-full" />
+                    </span>
+                    <button *ngIf="hasPermission(actions.add)" (click)="navigateToCreate()" pButton
+                        class="p-button-outlined w-full sm:w-auto flex-order-0 sm:flex-order-1" icon="pi pi-user-plus"
+                        label="{{ 'badge.badge-listing.actions.add' | translate }}"></button>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="header">
+                <tr>
+                    <th style="width: 30% " pSortableColumn="name" class="white-space-nowrap">{{
+                        'badge.badge-listing.fields.name' | translate }}<p-sortIcon field="name"></p-sortIcon></th>
+                    <th style="width: 30% " pSortableColumn="name" class="white-space-nowrap">{{
+                        'badge.badge-listing.fields.image' | translate }} </th>
+                    <th style="width: 30% ">{{ 'badge.badge-listing.fields.status' | translate }}</th>
+                    <th style="width: 1% " class="text-right"></th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-badge>
+                <tr>
+                    <td>{{ badge.name }}</td>
+                    <td>
+                        @if (badge.badgeImageURL) {
+                        <p-image src="{{badge.badgeImageURL}}" width="50" alt="Image" [preview]="true"></p-image>
+                        }@else {
+                        <i class="mb-2 pi pi-eye-slash text-1xl"></i>
+                        }
+                    </td>
+                    <td><p-inputSwitch *ngIf="hasPermission(actions.active)" [ngModel]="badge.isActive"
+                            (onChange)="openActivationDialog(badge)"></p-inputSwitch></td>
+                    <td>
+                        <button *ngIf="menuItems.length > 0" pButton pRipple type="button" icon="pi pi-ellipsis-v"
+                            class="p-button-rounded p-button-text p-button-plain ml-3"
+                            (click)="menu.toggle($event); assigneCurrentSelect(badge)"></button>
+                        <p-menu #menu [model]="menuItems" [appendTo]="'body'" [popup]="true"></p-menu>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+
+<!-- <p-dialog [(visible)]="editeDialog" [style]="{ width: '450px' }"
+    header="{{ 'badge.badge-listing.dialogs.editDialog.header' | translate }}" [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <form [formGroup]="badgeEditForm" (ngSubmit)="edit()">
+            <div class="grid">
+                <div class="col-12">
+                    <div class="grid formgrid p-fluid">
+                        <div class="field mb-4 col-12">
+                            <label for="name" class="font-medium text-900">{{
+                                'badge.badge-listing.dialogs.editDialog.fields.name' | translate }} : </label>
+                            <input id="name" type="text" pInputText formControlName="nameBadgeToEdit">
+                        </div>
+                        <div class="field mb-4 col-12">
+                            <label class="font-medium text-900">{{ 'badge.badge-listing.dialogs.editDialog.fields.image'
+                                | translate }} : </label>
+                            <button type="button" class="bbbutton" (click)="fileInputBadgeImageToEdit.click()">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                                    stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M13.5 3H12H8C6.34315 3 5 4.34315 5 6V18C5 19.6569 6.34315 21 8 21H11M13.5 3L19 8.625M13.5 3V7.625C13.5 8.17728 13.9477 8.625 14.5 8.625H19M19 8.625V11.8125"
+                                        stroke="#ffffff" stroke-width="2"></path>
+                                    <path d="M17 15V18M17 21V18M17 18H14M17 18H20" stroke="#ffffff" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round"></path>
+                                </svg>
+                            </button>
+                            <input #fileInputBadgeImageToEdit type="file" accept="video/*" style="display: none;"
+                                type="file" accept="image/*" (change)="onBadgeImageToEditChange($event)" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+            class="p-button-text" (click)="hideEditDialog()"></button>
+        <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check" class="p-button-text"
+            (click)="edit()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="addDialog" [style]="{ width: '450px' }"
+    header="{{ 'badge.badge-listing.dialogs.addDialog.header' | translate }}" [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <form [formGroup]="badgeAddForm" (ngSubmit)="onSubmit()">
+            <div class="grid">
+                <div class="col-12">
+                    <div class="grid formgrid p-fluid">
+                        <div class="field mb-4 col-12">
+                            <label for="name" class="font-medium text-900">{{
+                                'badge.badge-listing.dialogs.addDialog.fields.name' | translate }} : </label>
+                            <input id="name" type="text" pInputText formControlName="nameBadgeToAdd">
+                        </div>
+                        <div class="field mb-4 col-12">
+                            <label class="font-medium text-900">{{ 'badge.badge-listing.dialogs.addDialog.fields.name' |
+                                translate }} : </label>
+                            <button type="button" class="bbbutton" (click)="fileInputBadgeImageToAdd.click()">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                                    stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M13.5 3H12H8C6.34315 3 5 4.34315 5 6V18C5 19.6569 6.34315 21 8 21H11M13.5 3L19 8.625M13.5 3V7.625C13.5 8.17728 13.9477 8.625 14.5 8.625H19M19 8.625V11.8125"
+                                        stroke="#ffffff" stroke-width="2"></path>
+                                    <path d="M17 15V18M17 21V18M17 18H14M17 18H20" stroke="#ffffff" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round"></path>
+                                </svg>
+                            </button>
+                            <input #fileInputBadgeImageToAdd type="file" accept="video/*" style="display: none;"
+                                type="file" accept="image/*" (change)="onBadgeImageToAddChange($event)" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+            class="p-button-text" (click)="hideAddDialog()"></button>
+        <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check" class="p-button-text"
+            (click)="onSubmit()"></button>
+    </ng-template>
+</p-dialog> -->
+
+<p-dialog [(visible)]="editeDialog" [style]="{ width: '450px' }"
+    header="{{ 'badge.badge-listing.dialogs.editDialog.header' | translate }}" [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <form [formGroup]="badgeEditForm" (ngSubmit)="edit()">
+            <div class="grid">
+                <div class="col-12">
+                    <div class="grid formgrid p-fluid">
+                        <!-- Name Field -->
+                        <div class="field mb-4 col-12">
+                            <label for="name" class="font-medium text-900">{{
+                                'badge.badge-listing.dialogs.editDialog.fields.name' | translate }} : </label>
+                            <!-- <input id="name" type="text" pInputText formControlName="nameBadgeToEdit"> -->
+                            <p-dropdown optionLabel="label" optionValue="value" [options]="badgeOptions"
+                                formControlName="nameBadgeToEdit"
+                                placeholder="{{ 'Select Badge' | translate }}"></p-dropdown>
+                            <div *ngIf="badgeEditForm.get('nameBadgeToEdit')?.invalid && badgeEditForm.get('nameBadgeToEdit')?.touched"
+                                class="p-error">
+                                {{ 'badge.badge-listing.dialogs.editDialog.fields.nameRequired' | translate }}
+                            </div>
+                        </div>
+
+                        <!-- Description Field -->
+                        <div class="field mb-4 col-12">
+                            <label for="description" class="font-medium text-900">{{
+                                'badge.badge-listing.dialogs.editDialog.fields.description' | translate }} : </label>
+                            <textarea id="description" pInputTextarea
+                                formControlName="descriptionNameToEdit"></textarea>
+                            <div *ngIf="badgeEditForm.get('descriptionNameToEdit')?.invalid && badgeEditForm.get('descriptionNameToEdit')?.touched"
+                                class="p-error">
+                                {{ 'badge.badge-listing.dialogs.editDialog.fields.descriptionRequired' | translate }}
+                            </div>
+                        </div>
+
+                        <!-- Image Field OLD -->
+                        <!-- <div class="field mb-4 col-12">
+                            <label class="font-medium text-900">{{ 'badge.badge-listing.dialogs.editDialog.fields.image'
+                                | translate }} : </label>
+                            <button type="button" class="bbbutton" (click)="fileInputBadgeImageToEdit.click()">
+                            </button>
+                            <input #fileInputBadgeImageToEdit type="file" accept="image/*" style="display: none;"
+                                (change)="onBadgeImageToEditChange($event)" />
+                        </div> -->
+
+                        <!-- Image Field New -->
+                        <div class="col-12 flex flex-column">
+                            <label class="font-medium text-900">{{ 'badge.badge-listing.dialogs.addDialog.fields.image'
+                                | translate }} : </label>
+                            <div class="logo-container">
+                                <img [src]="badgeImageUrl" class="avatar" (click)="onUploadClick()">
+                            </div>
+                            <div class="flex align-items-center justify-content-center mt-3">
+                                <p-button (click)="onUploadClick()" label="Upload Badge Image"></p-button>
+                            </div>
+                            <input type="file" id="badgeImageUrl" style="display: none;"
+                                (change)="onFileSelected($event)">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+            class="p-button-text" (click)="hideEditDialog()"></button>
+        <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check" class="p-button-text"
+            (click)="edit()" [disabled]="badgeEditForm.invalid"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="addDialog" [style]="{ width: '450px' }"
+    header="{{ 'badge.badge-listing.dialogs.addDialog.header' | translate }}" [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <form [formGroup]="badgeAddForm" (ngSubmit)="onSubmit()">
+            <div class="grid">
+                <div class="col-12">
+                    <div class="grid formgrid p-fluid">
+                        <!-- Name Field -->
+                        <div class="field mb-4 col-12">
+                            <label for="name" class="font-medium text-900">{{
+                                'badge.badge-listing.dialogs.addDialog.fields.name' | translate }} : </label>
+                            <!-- <input id="name" type="text" pInputText formControlName="nameBadgeToAdd"> -->
+                            <p-dropdown optionLabel="label" optionValue="value" [options]="badgeOptions"
+                                formControlName="nameBadgeToAdd"
+                                placeholder="{{ 'Select Badge' | translate }}"></p-dropdown>
+                            <div *ngIf="badgeAddForm.get('nameBadgeToAdd')?.invalid && badgeAddForm.get('nameBadgeToAdd')?.touched"
+                                class="p-error">
+                                {{ 'badge.badge-listing.dialogs.addDialog.fields.nameRequired' | translate }}
+                            </div>
+                        </div>
+
+                        <!-- Description Field -->
+                        <div class="field mb-4 col-12">
+                            <label for="description" class="font-medium text-900">{{
+                                'badge.badge-listing.dialogs.addDialog.fields.description' | translate }} : </label>
+                            <textarea id="description" pInputTextarea formControlName="descriptionNameToAdd"></textarea>
+                        </div>
+
+                        <!-- Image Field OLD -->
+                        <!-- <div class="field mb-4 col-12">
+                            <label class="font-medium text-900">{{ 'badge.badge-listing.dialogs.addDialog.fields.image'
+                                | translate }} : </label>
+                            <button type="button" class="bbbutton" (click)="fileInputBadgeImageToAdd.click()">
+                            </button>
+                            <input #fileInputBadgeImageToAdd type="file" accept="image/*" style="display: none;"
+                                (change)="onBadgeImageToAddChange($event)" />
+                            <div *ngIf="badgeAddForm.get('imageBadgeToAdd')?.invalid && badgeAddForm.get('imageBadgeToAdd')?.touched" class="p-error">
+                                {{ 'badge.badge-listing.dialogs.addDialog.fields.imageRequired' | translate }}
+                            </div>
+                        </div> -->
+
+                        <!-- Image Field New -->
+                        <div class="col-12 flex flex-column">
+                            <label class="font-medium text-900">{{ 'badge.badge-listing.dialogs.addDialog.fields.image'
+                                | translate }} : </label>
+                            <div class="logo-container">
+                                <img [src]="badgeImageUrl" class="avatar" (click)="onUploadClick()">
+                            </div>
+                            <div class="flex align-items-center justify-content-center mt-3">
+                                <p-button (click)="onUploadClick()" label="Upload Badge Image"></p-button>
+                            </div>
+                            <input type="file" id="badgeImageUrl" style="display: none;"
+                                (change)="onFileSelected($event)">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+            class="p-button-text" (click)="hideAddDialog()"></button>
+        <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check" class="p-button-text"
+            (click)="onSubmit()" [disabled]="badgeAddForm.invalid || !this.selectedBadgeImageFile"></button>
+    </ng-template>
+</p-dialog>
+
+
+<p-dialog [(visible)]="deleteDialog" header="{{ 'shared.headers.delete' | translate }}" [modal]="true"
+    [style]="{ width: '450px' }">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="currentSelected">{{ 'shared.messages.delete' | translate }}
+            <b> {{ currentSelected.name }} </b>?</span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="deleteDialog = false"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{ 'shared.actions.delete' | translate }}"
+            (click)="delete()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="activationDialog" header="{{ 'shared.headers.active' | translate }}" [modal]="true"
+    [style]="{width:'450px'}">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        @if (currentSelected.isActive) {
+        <span> {{ 'shared.messages.deactive' | translate }} <b>{{currentSelected.name}}</b></span>
+        }@else {
+        <span>{{ 'shared.messages.active' | translate }} <b>{{currentSelected.name}}</b></span>
+        }
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="activationDialog = false"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{ 'shared.actions.save' | translate }}"
+            (click)="currentSelected.isActive ? activation(false) : activation(true)"></button>
+    </ng-template>
+</p-dialog>

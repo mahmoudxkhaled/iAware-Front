@@ -1,0 +1,160 @@
+<div class="card">
+    <p-toast></p-toast>
+    <p-dataView #dv [paginator]="true" [rows]="12" layout="grid" [value]="games">
+        <ng-template let-games pTemplate="gridItem">
+            <div class=" ">
+                <div class="full-width-image-container">
+                    <img src="../../../../../assets/images/gamification-banner.jpg" />
+                </div>
+                <hr />
+                <p-button *ngIf="hasPermission(actions.add)" (onClick)="openAddNewGameDialog()" [raised]="true"
+                    class=" m-4 flex align-items-center justify-content-center"
+                    label="{{'gamification.game_list.add_game_button' | translate}}" severity="success"></p-button>
+
+                <div class="iAware-loading-table-container" style="position: relative;">
+                    <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                    <div class="grid -mt-3 -ml-3 -mr-3">
+                        <div class="col-12 md:col-6 lg:col-4" *ngFor="let game of games">
+                            <div class="p-2 hh">
+
+                                <div class="shadow-2 p-4 surface-card border-round game-card">
+
+                                    <div class="relative mb-3">
+                                        <img [src]="game.imageUrl" class="w-full h-60 object-cover rounded-lg"
+                                            alt="{{ game.name }}" />
+                                    </div>
+
+                                    <div class="flex justify-content-between align-items-center mb-3">
+                                        <span class="text-900 font-medium text-xl">{{ game.name }}</span>
+                                    </div>
+
+                                    <div class="lesson-description-container">
+                                        <div [ngClass]="{'expanded-description': game.isExpanded}" class="lesson-description">
+                                            {{ game.isExpanded ? game.description : (game.description | slice:0:90) }}
+                                            
+                                            <span *ngIf="game.description.length > 90" class="show-more">
+                                                <a *ngIf="game.isExpanded" (click)="toggleDescription(game)">
+                                                    {{ 'shared.actions.showLess' | translate }}
+                                                </a>
+                                                <a *ngIf="!game.isExpanded" (click)="toggleDescription(game)">
+                                                    ... {{ 'shared.actions.showMore' | translate }}
+                                                </a>
+                                            </span>
+                                        </div>
+                                    </div>                                    
+
+                                    <div class="flex justify-content-between flex-wrap mt-4">
+                                        <a *ngIf="hasPermission(actions.play)"
+                                            [href]="game.layoutUrl + '/' + userId + '/' + gamificationEnvironment" target="_blank"
+                                            class="game-link play-now">
+                                            <i class="pi pi-play-circle"></i>
+                                            {{ 'gamification.game_list.play_now_button' | translate }}
+                                        </a>
+
+                                        <a *ngIf="hasPermission(actions.edit)" (click)="openEditDialog(game)"
+                                            class="game-link edit-link">
+                                            <i class="pi pi-pencil"></i>
+                                            {{ 'gamification.game_list.edit_button' | translate }}
+                                        </a>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+    </p-dataView>
+</div>
+
+<p-dialog [(visible)]="editGameDialog" *ngIf="selectedGame" [header]="selectedGame.name" [modal]="true"
+    [closable]="false" [style]="{width:'98%', height:'100vh'}" [closable]="true">
+    <app-game-edit [game]="selectedGame"></app-game-edit>
+</p-dialog>
+
+<p-dialog [(visible)]="addGameDialog" [style]="{width: '98%', height:'100vh'}" header="Add New Game Language"
+    [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <form [formGroup]="addGameForm" (ngSubmit)="saveAddNewGame()">
+            <!-- Language Dropdown -->
+            <div class="grid">
+                <div class="col-12">
+                    <label for="languageId"
+                        class="font-medium text-900">{{'gamification.game_list.dialog.add_game_header' |
+                        translate}}</label>
+                    <span class="float-label">
+                        <p-dropdown formControlName="languageId" [options]="activeLanguages" optionLabel="name"
+                            optionValue="id" placeholder="{{'gamification.game_list.choose_language' | translate}}">
+                        </p-dropdown>
+                    </span>
+                </div>
+
+                <!-- ID and Name in One Row -->
+                <div class="col-6">
+                    <label for="id" class="font-medium text-900">{{'gamification.game_list.dialog.id_label' |
+                        translate}}</label>
+                    <p-inputNumber id="id" formControlName="id"></p-inputNumber>
+                </div>
+                <div class="col-6">
+                    <label for="name" class="font-medium text-900">{{'gamification.game_list.dialog.name_label' |
+                        translate}}</label>
+                    <input type="text" pInputText id="name" formControlName="name" />
+                </div>
+
+                <!-- Description Field -->
+                <div class="col-12">
+                    <label for="description"
+                        class="font-medium text-900">{{'gamification.game_list.dialog.description_label' |
+                        translate}}</label>
+                    <textarea id="description" pInputTextarea formControlName="description" required rows="3"
+                        cols="20"></textarea>
+                </div>
+
+                <!-- Layout URL and Question Count in One Row -->
+                <div class="col-6">
+                    <label for="layoutUrl"
+                        class="font-medium text-900">{{'gamification.game_list.dialog.layout_url_label' |
+                        translate}}</label>
+                    <input type="text" pInputText id="layoutUrl" formControlName="layoutUrl" />
+                </div>
+                <div class="col-6">
+                    <label for="questionCount"
+                        class="font-medium text-900">{{'gamification.game_list.dialog.question_count_label' |
+                        translate}}</label>
+                    <p-inputNumber id="questionCount" formControlName="questionCount"></p-inputNumber>
+                </div>
+
+                <!-- Checkboxes in One Row -->
+                <div class="col-6 mt-4">
+                    <p-checkbox class="font-medium text-900" formControlName="autoNextAllowed" [binary]="true"
+                        label="{{'gamification.game_list.dialog.auto_next_allowed_label' | translate}}"></p-checkbox>
+                </div>
+                <div class="col-6 mt-4">
+                    <p-checkbox class="font-medium text-900" formControlName="previousAllowed" [binary]="true"
+                        label="{{'gamification.game_list.dialog.previous_allowed_label' | translate}}"></p-checkbox>
+                </div>
+
+                <!-- Image Upload -->
+                <div class="col-12 flex justify-content-center flex-wrap mt-4">
+                    <div class="flex flex-column align-items-center">
+                        <img [src]="imageUrl" alt="Avatar" class="avatar" style="cursor: pointer;"
+                            (click)="onUploadGameImageClick()">
+                        <label
+                            class="flex justify-content-center font-medium text-900">{{'gamification.game_list.dialog.game_image_label'
+                            | translate}}</label>
+                        <p-button label="Upload" icon="pi pi-upload" (click)="onUploadGameImageClick()"></p-button>
+                        <input type="file" id="GameImage" style="display: none;" (change)="onGameImageSelected($event)">
+                    </div>
+                </div>
+            </div>
+        </form>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{'shared.actions.cancel' | translate}}" icon="pi pi-times" class="p-button-text"
+            (click)="declineAddNewGame()"></button>
+        <button pButton pRipple label="{{'shared.actions.save' | translate}}" icon="pi pi-check" class="p-button-text"
+            (click)="saveAddNewGame()"></button>
+    </ng-template>
+</p-dialog>

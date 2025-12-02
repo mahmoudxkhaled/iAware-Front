@@ -1,0 +1,37 @@
+<p-card>
+    <div class="mb-4">
+        <div class="achievements-header">
+            <h2>{{'dashboards.user-dashboard.badges.header' | translate }}</h2>
+            <p>{{'dashboards.user-dashboard.badges.message' | translate }}</p>
+        </div>
+    </div>
+    <div class="mb-4">
+        <div class="achievement-item">
+            <div class="achievement-icon">🏅</div>
+            <div class="achievement-content">
+                <h2>{{'dashboards.user-dashboard.badges.badgesEarned' | translate }}</h2>
+                <p
+                    [innerHTML]="'dashboards.user-dashboard.badges.youhaveearned' | translate:{number:usersBadgesEarnedNumber}">
+                </p>
+                <div class="learn-text text-right">
+                    <a (click)="navigateToHowLearnBadge()">{{'dashboards.user-dashboard.badges.learn' | translate}}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <div class="achievement-item">
+            <div class="achievement-icon">📊</div>
+            <div class="achievement-content">
+                <h2>{{'dashboards.user-dashboard.groupRanking.header' | translate }}</h2>
+                <p
+                    [innerHTML]="'dashboards.user-dashboard.groupRanking.message' | translate:{number:userTeanatUnitRankedNumber}">
+                </p>
+                
+                <div class="learn-text text-right">
+                    <a (click)="navigateToLeaderboard()">{{'dashboards.user-dashboard.buttons.viewLeaderboard' | translate}}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-card>

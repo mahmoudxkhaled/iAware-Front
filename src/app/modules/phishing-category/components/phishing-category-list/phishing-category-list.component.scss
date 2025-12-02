@@ -1,0 +1,48 @@
+.icon-button {
+    background-color: #883cae; /* Customize button background color */
+    border: none;
+    border-radius: 50%;
+    width: 30px; /* Adjust size */
+    height: 30px; /* Adjust size */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 5px; /* Adjust spacing between buttons */
+    cursor: pointer; /* Optional: make buttons look clickable */
+    color: white; /* Icon color */
+    font-size: 14px; /* Adjust icon size */
+}
+
+.icon-button i {
+    margin: 0; /* Remove any default margin from icons */
+}
+
+.avatar {
+    vertical-align: middle;
+    width: 150px;
+    height: 150px;
+    border: 1px solid black;
+}
+
+input[type='file'] {
+    display: none;
+}
+
+:host ::ng-deep .note-editable {
+    padding: 10px;
+    overflow: auto;
+    word-wrap: break-word;
+    height: 200px;
+}
+
+:host ::ng-deep .p-dataview-emptymessage{
+    display: none !important;;
+}
+
+.object-cover {
+    transition: transform 0.3s ease-in-out;
+}
+
+.object-cover:hover {
+    transform: scale(1.05);
+}

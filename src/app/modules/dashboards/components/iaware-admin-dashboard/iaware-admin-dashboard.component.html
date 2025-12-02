@@ -1,0 +1,234 @@
+<p-card styleClass="p-mt-4">
+    <div class="dashboard-header">
+        {{'dashboards.iAwareAdminDashboard.header' | translate}}
+    </div>
+
+    <!-- Metric Cards -->
+    <div class="grid">
+        <div class="col-12 md:col-4 cursor-pointer">
+            <div class="metric-card" style="--metric-color: #007ad9;">
+                <div class="metric-title">{{'dashboards.iAwareAdminDashboard.totalClients' | translate}}</div>
+                <div class="metric-value">{{tenantsStatistics.totalClients}}</div>
+            </div>
+        </div>
+        <div class="col-12 md:col-4 cursor-pointer">
+            <div class="metric-card" style="--metric-color: #28a745;">
+                <div class="metric-title">{{'dashboards.iAwareAdminDashboard.activeClients' | translate}}</div>
+                <div class="metric-value">{{tenantsStatistics.activeClients}}</div>
+            </div>
+        </div>
+        <div class="col-12 md:col-4 cursor-pointer">
+            <div class="metric-card" style="--metric-color: #ffc107;">
+                <div class="metric-title">{{'dashboards.iAwareAdminDashboard.expiringSubscriptions' | translate}}</div>
+                <div class="metric-value">{{tenantsStatistics.expiringSubscriptions}}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- filter section -->
+    <div class="filter-card advanced-filter floating-glass">
+        <div class="formgrid p-fluid grid">
+
+            <!-- <div class="col-12 md:col-6 lg:col-3">
+                <label htmlFor="industryFilter" class="filter-label">
+                    <i class="pi pi-briefcase"></i> {{'dashboards.iAwareAdminDashboard.industry' | translate}}
+                </label>
+                <p-dropdown id="industryFilter" [options]="['All', 'Technology', 'Finance']"
+                    placeholder="Select Industry" [showClear]="true"></p-dropdown>
+            </div> -->
+
+            <div class="field col-12 md:col-6">
+                <label htmlFor="statusFilter" class="filter-label">
+                    <i class="pi pi-user"></i> {{'dashboards.iAwareAdminDashboard.status' | translate}}
+                </label>
+                <p-dropdown id="statusFilter" [(ngModel)]="statusFilter" (onChange)="onStatusFilterChange($event)"
+                    [options]="status"
+                    [placeholder]="'dashboards.iAwareAdminDashboard.selectStatus' | translate"></p-dropdown>
+            </div>
+
+            <div class="field col-12 md:col-6">
+                <label htmlFor="subscriptionFilter" class="filter-label">
+                    <i class="pi pi-book"></i> {{'dashboards.iAwareAdminDashboard.subscriptionPlan' | translate}}
+                </label>
+                <p-dropdown id="subscriptionFilter" [(ngModel)]="subscriptionFilter" (onChange)="onSubscriptionFilterChange($event)"
+                    [options]="subscriptions" optionValue="id" optionLabel="title" [placeholder]="'dashboards.iAwareAdminDashboard.selectPlan' | translate"></p-dropdown>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Table -->
+     <p-tabView>
+       
+        <p-tabPanel header="Active Clients">
+            <div class="col-12">
+                <div class="iAware-loading-table-container" style="position: relative">
+                    <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                    <p-table #dt [value]="filteredActiveClients" styleClass="p-datatable-striped" [scrollable]="true" scrollHeight="500px"
+                        [paginator]="true" [rows]="10" [showCurrentPageReport]="true" responsiveLayout="scroll"
+                        [rowsPerPageOptions]="[10, 25, 50]"
+                        [globalFilterFields]="['companyName', 'manager', 'email', 'licenses', 'expiryDate']"
+                        [rowHover]="true">
+        
+                        <ng-template pTemplate="caption">
+                            <div class="flex flex-wrap gap-2 align-items-center justify-content-between">
+                                <span class="p-input-icon-left w-full sm:w-20rem flex-order-1 sm:flex-order-0">
+                                    <i class="pi pi-search"></i>
+                                    <input pInputText type="text" (input)="onGlobalFilter(dt, $event)"
+                                        placeholder="{{ 'dashboards.iAwareAdminDashboard.searchclients' | translate }}"
+                                        class="w-full" />
+                                </span>
+        
+                                <p-button [label]="'shared.actions.csv' | translate" icon="pi pi-file-excel"
+                                    styleClass="p-button-sm p-button-success" (click)="exportActiveExcel()"></p-button>
+                            </div>
+                        </ng-template>
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th>{{'dashboards.iAwareAdminDashboard.clientName' | translate}}</th>
+                                <th>{{'dashboards.iAwareAdminDashboard.manager' | translate}}</th>
+                                <th>{{'dashboards.iAwareAdminDashboard.contact' | translate}}</th>
+                                <th>{{'dashboards.iAwareAdminDashboard.plan' | translate}}</th>
+                                <th>{{'dashboards.iAwareAdminDashboard.licenses' | translate}}</th>
+                                <th>{{'dashboards.iAwareAdminDashboard.expiryDate' | translate}}</th>
+                                <th>{{'dashboards.iAwareAdminDashboard.statuss' | translate}}</th>
+                                <th></th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-client>
+                            <tr>
+                                <td>{{client.companyName}}</td>
+                                <td>{{client.manager}}</td>
+                                <td>{{client.email}}</td>
+                                <td>{{getsubscriptionPlanById(client.subscriptionPlanId)}}</td>
+                                <td>{{client.licenses}}</td>
+                                <td>{{client.expiryDate | date:'MMM dd, yyyy'}}</td>
+                                <td><p-inputSwitch [ngModel]="client.isActive" (onChange)="openActivationDialog(client)"></p-inputSwitch></td>
+                                <td>
+                                    <button *ngIf="menuItems.length > 0" pButton pRipple type="button" icon="pi pi-ellipsis-v"
+                                        class="p-button-rounded p-button-text p-button-plain ml-3"
+                                        (click)="menu.toggle($event); assigneCurrentSelect(client)"></button>
+                                    <p-menu #menu [model]="menuItems" [appendTo]="'body'" [popup]="true"></p-menu>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </div>
+        </p-tabPanel>
+
+        <p-tabPanel header="Deleted Clients">
+            <div class="col-12">
+                <div class="iAware-loading-table-container" style="position: relative">
+                    <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                    <p-table #dt [value]="filteredDeletedClients" styleClass="p-datatable-striped" [scrollable]="true" scrollHeight="500px"
+                        [paginator]="true" [rows]="10" [showCurrentPageReport]="true" responsiveLayout="scroll"
+                        [rowsPerPageOptions]="[10, 25, 50]"
+                        [globalFilterFields]="['companyName', 'manager', 'email', 'licenses', 'expiryDate']"
+                        [rowHover]="true">
+        
+                        <ng-template pTemplate="caption">
+                            <div class="flex flex-wrap gap-2 align-items-center justify-content-between">
+                                <span class="p-input-icon-left w-full sm:w-20rem flex-order-1 sm:flex-order-0">
+                                    <i class="pi pi-search"></i>
+                                    <input pInputText type="text" (input)="onGlobalFilter(dt, $event)"
+                                        placeholder="{{ 'dashboards.iAwareAdminDashboard.searchclients' | translate }}"
+                                        class="w-full" />
+                                </span>
+        
+                                <p-button [label]="'shared.actions.csv' | translate" icon="pi pi-file-excel"
+                                    styleClass="p-button-sm p-button-success" (click)="exportDeletedExcel()"></p-button>
+                            </div>
+                        </ng-template>
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th>{{'dashboards.iAwareAdminDashboard.clientName' | translate}}</th>
+                                <th>{{'dashboards.iAwareAdminDashboard.manager' | translate}}</th>
+                                <th>{{'dashboards.iAwareAdminDashboard.contact' | translate}}</th>
+                                <th>{{'dashboards.iAwareAdminDashboard.plan' | translate}}</th>
+                                <th>{{'dashboards.iAwareAdminDashboard.licenses' | translate}}</th>
+                                <th>{{'dashboards.iAwareAdminDashboard.expiryDate' | translate}}</th>
+                                <th></th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-client>
+                            <tr>
+                                <td>{{client.companyName}}</td>
+                                <td>{{client.manager}}</td>
+                                <td>{{client.email}}</td>
+                                <td>{{getsubscriptionPlanById(client.subscriptionPlanId)}}</td>
+                                <td>{{client.licenses}}</td>
+                                <td>{{client.expiryDate | date:'MMM dd, yyyy'}}</td>
+                                <td class="text-right">
+                                    <p-button icon="pi pi-replay" (onClick)="openUnDeletedClientDialog(client)"></p-button>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </div>
+        </p-tabPanel>
+
+     </p-tabView>
+    
+</p-card>
+
+<p-dialog [(visible)]="deleteUserDialog" header="{{ 'shared.headers.delete' | translate }}" [modal]="true"
+    [style]="{ width: '450px' }">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="currentUserSelected">{{ 'shared.messages.delete' | translate }}<b> {{ currentUserSelected.companyName
+                }} </b>?</span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="deleteUserDialog = false"></button>
+        <!-- <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{ 'shared.actions.save' | translate }}"
+            (click)="confirmDelete()"></button> -->
+
+            <button (click)="confirmDelete()"
+            pButton pRipple icon="pi pi-check" class="p-button-text">
+                <ng-container *ngIf="isLoading$ | async">
+                    <span class="indicator-progress" [style.display]="'block'">
+                        {{ 'auth.login.pleaseWait' | translate }}
+                        <i class="pi pi-spin pi-spinner" style="font-size: 1rem"></i>
+                    </span>
+                </ng-container>
+                <ng-container *ngIf="(isLoading$ | async) === false">
+                    <span>{{ 'shared.actions.confirm' | translate }}</span>
+                </ng-container>
+            </button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="activationUserDialog" header="{{ 'shared.headers.active' | translate }}" [modal]="true"
+    [style]="{ width: '450px' }">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        @if (currentUserSelected.isActive) {
+        <span>
+            {{ 'shared.messages.deactive' | translate }} <b>{{ currentUserSelected.companyName }}</b></span>
+        }@else {
+        <span>{{ 'shared.messages.active' | translate }} <b>{{ currentUserSelected.companyName }}</b></span>
+        }
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="activationUserDialog = false"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{ 'shared.actions.save' | translate }}"
+            (click)="currentUserSelected.isActive ? activation(false) : activation(true)"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="unDeleteUserDialog" [showHeader]="false" [modal]="true"
+    [style]="{ width: '450px' }">
+    <div class="flex align-items-center justify-content-center">
+        <app-iAware-info sevirty="info" description="you are about return client from deleted status!"></app-iAware-info>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="unDeleteUserDialog = false"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{ 'shared.actions.confirm' | translate }}"
+            (click)="unDeletedClient()"></button>
+    </ng-template>
+</p-dialog>

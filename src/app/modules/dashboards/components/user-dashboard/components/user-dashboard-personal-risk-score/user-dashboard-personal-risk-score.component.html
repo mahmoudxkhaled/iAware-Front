@@ -1,0 +1,18 @@
+<p-card>
+    <div class="grid">
+        <div class="userDashboard-Personal-Risk-Score-header col-12">
+            <h2>{{'dashboards.user-dashboard.riskScore.header' | translate }}</h2>
+            <p>{{'dashboards.user-dashboard.riskScore.description' | translate }}</p>
+        </div>
+        <div class="col-12 md:col-6">
+            <app-iaware-points [points]="userPoints" [showInCard]="false" class="h-full"></app-iaware-points>
+        </div>
+        <div class="col-12 md:col-6">
+            <div class="border-round-lg shadow-md flex-grow-1 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                <app-gauge-chart needleChartTitle="{{ 'dashboards.user-dashboard.riskScore.title' | translate }}"
+                    [chartWidth]="250" [isTextCentered]="false" [showTitle]="false" [showInCard]="false" [needleValue]="getTheNeedleValue()">
+                </app-gauge-chart>
+            </div>
+        </div>
+    </div>
+</p-card>

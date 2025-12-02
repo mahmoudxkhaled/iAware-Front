@@ -1,0 +1,22 @@
+<p-card styleClass="c">
+    <ng-template pTemplate="title">
+        <app-iAware-info *ngIf="pageTitle" [isDynamic]="true" severity="info"
+            [description]="pageTitle"></app-iAware-info>
+    </ng-template>
+
+    <ng-template pTemplate="content">
+        <p-card styleClass="cc"
+            [style]="{ border: '2px solid rgb(136 60 174 / 26%)', borderRadius: '8px', margin: '1rem' }">
+            <div class="iAware-loading-table-container" style="position: relative">
+                <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                <app-iaware-pdf [pdfUrl]="bookUrl" (lastPageReached)="handleLastPageReached()"></app-iaware-pdf>
+            </div>
+        </p-card>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <div class="grid grid-nogutter justify-content-end">
+            <p-button label="{{ 'campaign.campaignDetails.actions.next' | translate }}" (onClick)="nextPage()"
+                [disabled]="!isLastPage" icon="pi pi-angle-right" iconPos="right"></p-button>
+        </div>
+    </ng-template>
+</p-card>

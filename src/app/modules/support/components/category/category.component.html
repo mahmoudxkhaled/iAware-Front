@@ -1,0 +1,219 @@
+<div class="card">
+    <p-toast></p-toast>
+
+    <div class="iAware-loading-table-container" style="position: relative;">
+        <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+        <p-table #dt [value]="categories" [paginator]="true" [rows]="10" [showCurrentPageReport]="true"
+            responsiveLayout="scroll" [rowsPerPageOptions]="[10, 25, 50]"
+            [globalFilterFields]="['title', 'description']">
+            <ng-template pTemplate="caption">
+                <div class="flex flex-wrap gap-2 align-items-center justify-content-between">
+                    <span class="p-input-icon-left w-full sm:w-20rem flex-order-1 sm:flex-order-0">
+                        <i class="pi pi-search"></i>
+                        <input pInputText type="text" (input)="onGlobalFilter(dt, $event)"
+                            placeholder="{{ 'shared.actions.search' | translate }}" class="w-full" />
+                    </span>
+                    <button *ngIf="hasPermission(actions.add)" (click)="navigateToCreate()" pButton
+                        class="p-button-outlined w-full sm:w-auto flex-order-0 sm:flex-order-1" icon="pi pi-user-plus"
+                        label="{{ 'support.category.actions.add' | translate }}"></button>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="header">
+                <tr>
+                    <th pSortableColumn="title" class="white-space-nowrap" style="width: 25%">{{
+                        'support.category.fields.title' | translate }}<p-sortIcon field="title"></p-sortIcon></th>
+                    <th pSortableColumn="description" class="white-space-nowrap" style="width: 25%">{{
+                        'support.category.fields.description' | translate }}<p-sortIcon
+                            field="description"></p-sortIcon>
+                    </th>
+                    <th class="white-space-nowrap" style="width: 25%">{{ 'support.category.fields.members' | translate
+                        }}
+                    </th>
+                    <th style="width: 25% ">{{ 'support.category.fields.status' | translate }}</th>
+                    <th class="text-right"></th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-dept>
+                <tr>
+                    <td>{{ dept?.title }}</td>
+                    <td>{{ dept?.description }}</td>
+                    <td>{{ dept?.helpCategoryMembers?.length }} <i (click)="openUsersDialog(dept)"
+                            class="mb-2 pi pi-eye text-1xl"></i></td>
+                    <td><p-inputSwitch *ngIf="hasPermission(actions.active)" [ngModel]="dept?.isActive"
+                            (onChange)="openActivationDialog(dept)"></p-inputSwitch></td>
+                    <td>
+                        <button *ngIf="menuItems.length > 0" pButton pRipple type="button" icon="pi pi-ellipsis-v"
+                            class="p-button-rounded p-button-text p-button-plain ml-3"
+                            (click)="menu.toggle($event); assigneCurrentSelect(dept)"></button>
+                        <p-menu #menu [model]="menuItems" [appendTo]="'body'" [popup]="true"></p-menu>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+
+    </div>
+</div>
+
+<p-dialog [(visible)]="editeDialog" [style]="{ width: '50%', height:'70%' }"
+    header="{{ 'support.category.dialogs.editDialog.header' | translate }}" [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <form [formGroup]="editForm" (ngSubmit)="edit()">
+            <div class="grid">
+                <div class="col-12">
+                    <div class="grid formgrid p-fluid">
+                        <div class="field mb-4 col-12">
+                            <label class="font-medium text-900">{{ 'support.category.dialogs.editDialog.fields.members'
+                                | translate }} :</label>
+                            <span class="p-float-label">
+                                <div class="mb-3">
+                                    <p-multiSelect [options]="usersTenant" formControlName="helpCategoryMembers"
+                                        optionLabel="name" optionValue="id"
+                                        placeholder="{{ 'support.category.dialogs.editDialog.placeholders.members' | translate }}">
+                                    </p-multiSelect>
+                                </div>
+                            </span>
+                        </div>
+                        <div class="field mb-4 col-12">
+                            <label for="title" class="font-medium text-900">{{
+                                'support.category.dialogs.editDialog.fields.title' | translate }} :</label>
+                            <input id="title" type="text" pInputText formControlName="title">
+                        </div>
+                        <div class="field mb-4 col-12">
+                            <label class="font-medium text-900">{{
+                                'support.category.dialogs.editDialog.fields.description' | translate }} :</label>
+                            <textarea id="description" type="text" pInputText name="description"
+                                formControlName="description"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+            class="p-button-text" (click)="hideDialog()"></button>
+        <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check" class="p-button-text"
+            (click)="edit()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="addDialog" [style]="{ width: '50%', height:'70%' }"
+    header="{{ 'support.category.dialogs.addDialog.header' | translate }}" [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <form [formGroup]="addForm" (ngSubmit)="add()">
+            <div class="grid">
+                <div class="col-12">
+                    <div class="grid formgrid p-fluid">
+                        <div class="field mb-4 col-12">
+                            <label class="font-medium text-900">{{ 'support.category.dialogs.addDialog.fields.members' |
+                                translate }} :</label>
+                            <span class="p-float-label">
+                                <div class="mb-3">
+                                    <p-multiSelect [options]="usersTenant" formControlName="helpCategoryMembers"
+                                        optionLabel="name" optionValue="id"
+                                        placeholder="{{ 'support.category.dialogs.addDialog.placeholders.members' | translate }}">
+                                    </p-multiSelect>
+                                </div>
+                            </span>
+                        </div>
+                        <div class="field mb-4 col-12">
+                            <label for="title" class="font-medium text-900">{{
+                                'support.category.dialogs.addDialog.fields.title' | translate }} :</label>
+                            <input id="title" type="text" pInputText formControlName="title">
+                        </div>
+                        <div class="field mb-4 col-12">
+                            <label for="description" class="font-medium text-900">{{
+                                'support.category.dialogs.addDialog.fields.description' | translate }} :</label>
+                            <textarea id="description" type="text" pInputText name="description"
+                                formControlName="description"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+            class="p-button-text" (click)="hideDialog()"></button>
+        <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check" class="p-button-text"
+            (click)="add()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="deleteDialog" header="{{ 'shared.headers.delete' | translate }}" [modal]="true"
+    [style]="{width:'450px'}">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="currentSelected">{{ 'shared.messages.delete' | translate }} <b> {{currentSelected?.title}}
+            </b>?</span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="deleteDialog = false"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{ 'shared.actions.delete' | translate }}"
+            (click)="delete()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="activationDialog" header="{{ 'shared.headers.active' | translate }}" [modal]="true"
+    [style]="{width:'450px'}">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        @if (currentSelected?.isActive) {
+        <span>{{ 'shared.messages.deactive' | translate }} <b>{{currentSelected?.title}}</b></span>
+        }@else {
+        <span>{{ 'shared.messages.active' | translate }} <b>{{currentSelected?.title}}</b></span>
+        }
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="activationDialog = false"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{ 'shared.actions.save' | translate }}"
+            (click)="currentSelected?.isActive ? activate(false) : activate(true)"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="usersWithinDeptDialog" [style]="{ width: '50%', height:'70%'}"
+    header="{{ 'support.category.dialogs.usersWithinDeptDialog.header' | translate }}" [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <div class="card">
+            <div class="iAware-loading-table-container" style="position: relative;">
+                <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                <p-table #dt [value]="users" [paginator]="true" [rows]="10" [showCurrentPageReport]="true"
+                    responsiveLayout="scroll" [rowsPerPageOptions]="[10,25,50]"
+                    [globalFilterFields]="['firstName','lastName', 'email']">
+                    <ng-template pTemplate="caption">
+                        <div class="flex flex-wrap gap-2 align-items-center justify-content-between">
+                            <span class="p-input-icon-left w-full sm:w-20rem flex-order-1 sm:flex-order-0">
+                                <i class="pi pi-search"></i>
+                                <input pInputText type="text" (input)="onGlobalFilter(dt, $event)"
+                                    placeholder="{{ 'shared.actions.search' | translate }}" class="w-full" />
+                            </span>
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th pSortableColumn="firstName" class="white-space-nowrap" style="width:25%">{{
+                                'support.category.dialogs.usersWithinDeptDialog.fields.firstName' | translate
+                                }}<p-sortIcon field="firstName"></p-sortIcon></th>
+                            <th pSortableColumn="lastName" class="white-space-nowrap" style="width:25%">{{
+                                'support.category.dialogs.usersWithinDeptDialog.fields.lastName' | translate
+                                }}<p-sortIcon field="lastName"></p-sortIcon></th>
+                            <th pSortableColumn="email" class="white-space-nowrap" style="width:25%">{{
+                                'support.category.dialogs.usersWithinDeptDialog.fields.email' | translate }}<p-sortIcon
+                                    field="email"></p-sortIcon></th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-user>
+                        <tr>
+                            <td>{{user.firstName}}</td>
+                            <td>{{user.lastName}}</td>
+                            <td>{{user.email}}</td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+    </ng-template>
+</p-dialog>

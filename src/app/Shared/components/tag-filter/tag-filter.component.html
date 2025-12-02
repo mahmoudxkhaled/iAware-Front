@@ -1,0 +1,43 @@
+<!-- <div class="row align-items-center flex flex-wrap">
+
+    <div class="col-8 p-0">
+        <p-multiSelect class="p-fluid" [options]="tags" [(ngModel)]="selectedTags" placeholder="Select Tags"
+            optionLabel="tagName" display="chip" styleClass="custom-multiSelect w-100" [disabled]="isLoading"
+            [maxSelectedLabels]="5" [panelStyle]="{ 'max-height': '300px', 'overflow-y': 'auto' }"
+            [showToggleAll]="true">
+        </p-multiSelect>
+    </div>
+
+    <div class="col-4 d-flex justify-content-end gap-4">
+        <button pButton label="Apply Filter" class="mx-2 p-button-primary"
+            [disabled]="isLoading || selectedTags.length === 0" (click)="onFilterApply()">
+        </button>
+
+        <button pButton label="Reset Filter" class="mx-2 p-button-secondary" [disabled]="isLoading"
+            (click)="onFilterReset()">
+        </button>
+    </div>
+</div> -->
+
+<div class="card p-3 filter-by-tag-container">
+    <div class="grid">
+        
+        <div class="col-12">
+            <app-iAware-info severity="info" [description]="'shared.messages.filterMessages' | translate:{componentName:componentName}"></app-iAware-info>
+        </div>
+
+        <div class="col-6 md:col-4 lg:col-2 mb-3" *ngFor="let tag of tags">
+            <p-checkbox [(ngModel)]="tag.selected" [label]="tag.tagName" [disabled]="isLoading" [binary]="true"></p-checkbox>
+        </div>
+        
+    </div>
+
+    <div class="flex justify-content-end gap-3 mt-4">
+        <button pButton label="Apply Filter" class="p-button-primary"
+            [disabled]="isLoading" (click)="onFilterApply()">
+        </button>
+        <button pButton label="Reset Filter" class="p-button-secondary" [disabled]="isLoading"
+            (click)="onFilterReset()">
+        </button>
+    </div>
+</div>

@@ -1,0 +1,272 @@
+<div class="card">
+    <p-toast></p-toast>
+    <div class="iAware-loading-table-container" style="position: relative;">
+        <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+        <p-table (onLazyLoad)="lazyLoadTags($event)" [totalRecords]="totalRecords" [lazy]="true"
+            [loading]="tableLoadingSpinner" #dt [value]="tages" [paginator]="true" [rows]="10"
+            [showCurrentPageReport]="true" responsiveLayout="scroll" [rowsPerPageOptions]="[10, 25, 50]"
+            [globalFilterFields]="['tagName', 'priorityNumber']">
+            <ng-template pTemplate="caption">
+                <div class="flex flex-wrap gap-2 align-items-center justify-content-between">
+                    <span class="p-input-icon-left w-full sm:w-20rem flex-order-1 sm:flex-order-0">
+                        <i class="pi pi-search"></i>
+                        <input pInputText type="text" (input)="onGlobalFilter(dt, $event)"
+                            placeholder="{{ 'shared.actions.search' | translate }}" class="w-full" />
+                    </span>
+                    <button (click)="navigateToCreate()" pButton
+                        class="p-button-outlined w-full sm:w-auto flex-order-0 sm:flex-order-1" icon="pi pi-user-plus"
+                        label="{{ 'tag.add' | translate }} "></button>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="header">
+                <tr>
+                    <th pSortableColumn="tagName" class="white-space-nowrap" style="width: 25%">{{
+                        'tag.tagName' | translate }} <p-sortIcon field="tagName"></p-sortIcon></th>
+                    <th pSortableColumn="value" class="white-space-nowrap" style="width: 25%">{{
+                        'tag.priorityNumber' | translate }}<p-sortIcon field="priorityNumber"></p-sortIcon>
+                    </th>
+                    <th style="width: 25% " class="text-center">{{ 'shared.actions.action' | translate }}</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-tag>
+                <tr>
+                    <td>{{ tag?.tagName }}</td>
+                    <td>{{ tag?.priorityNumber }}</td>
+                    <td>
+                        <div class="flex align-items-center justify-content-around">
+                            <div>
+                                <button pButton pRipple icon="pi pi-pencil"
+                                    class="p-button-rounded p-button-success mr-2"
+                                    (click)="openEditDialog(tag)"></button>
+                            </div>
+                            <div>
+                                <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger"
+                                    (click)="openDeleteDialog(tag)"></button>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+
+<p-dialog [(visible)]="editeDialog" [style]="{ width: '65%', height: '79%' }"
+    header="{{ 'industry.editHeader' | translate }}" [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <form [formGroup]="editForm" (ngSubmit)="editTag()">
+            <div class="grid">
+                <div class="col-12">
+                    <div class="grid formgrid p-fluid">
+                        <!-- Tag Name Field -->
+                        <div class="field mb-4 col-12 md:col-6">
+                            <label for="tagName" class="font-medium text-900">{{ 'tag.tagName' | translate }}:</label>
+                            <input id="tagName" type="text" pInputText formControlName="tagName">
+                            <div *ngIf="editForm.get('tagName')?.invalid && editForm.get('tagName')?.touched"
+                                class="p-error">
+                                {{ 'tag.tagNameValidation' | translate }}
+                            </div>
+                        </div>
+
+                        <!-- Priority Number Field -->
+                        <div class="field mb-4 col-12 md:col-6">
+                            <label for="priorityNumber" class="font-medium text-900">
+                                {{ 'tag.priorityNumber' | translate }}:
+                            </label>
+                            <p-inputNumber mode="decimal" [useGrouping]="false"
+                                formControlName="priorityNumber"></p-inputNumber>
+                        </div>
+
+                        <!-- Permissions Section -->
+                        <div class="field mb-4 col-12">
+                            <label class="font-medium text-900 mr-3">Permissions:</label>
+                            <div class="flex flex-wrap gap-3">
+                                <div class="field-checkbox">
+                                    <p-checkbox formControlName="blogAllowed" [binary]="true"></p-checkbox>
+                                    <label>{{ 'tag.blogAllowed' | translate }}</label>
+                                </div>
+
+                                <div class="field-checkbox">
+                                    <p-checkbox formControlName="gameAllowed" [binary]="true"></p-checkbox>
+                                    <label>{{ 'tag.gameAllowed' | translate }}</label>
+                                </div>
+
+                                <div class="field-checkbox">
+                                    <p-checkbox formControlName="newsAllowed" [binary]="true"></p-checkbox>
+                                    <label>{{ 'tag.newsAllowed' | translate }}</label>
+                                </div>
+
+                                <div class="field-checkbox">
+                                    <p-checkbox formControlName="phishingAllowed" [binary]="true"></p-checkbox>
+                                    <label>{{ 'tag.phishingAllowed' | translate }}</label>
+                                </div>
+
+                                <div class="field-checkbox">
+                                    <p-checkbox formControlName="trainingAllowed" [binary]="true"></p-checkbox>
+                                    <label>{{ 'tag.trainingAllowed' | translate }}</label>
+                                </div>
+
+                                <div class="field-checkbox">
+                                    <p-checkbox formControlName="wallpaperAllowed" [binary]="true"></p-checkbox>
+                                    <label>{{ 'tag.wallpaperAllowed' | translate }}</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Update the languages section in both dialogs -->
+                        <div class="field mb-4 col-12">
+                            <label class="font-medium text-900">{{ 'tag.languages' | translate }}</label>
+                            <div *ngIf="editForm.get('tagLanguages')?.errors?.['duplicateLanguages']"
+                                class="p-error m-1 p-1">
+                                {{ 'tag.duplicateLanguages' | translate }}
+                            </div>
+
+                            <div formArrayName="tagLanguages">
+                                <div *ngFor="let lang of editTagLanguagesArray.controls; let i = index; trackBy: trackByIndex"
+                                    [formGroupName]="i" class="flex gap-2 mb-2">
+                                    <input pInputText formControlName="tagName"
+                                        placeholder="{{ 'tag.tagName' | translate }}">
+                                    <p-dropdown [options]="languages" formControlName="languageId" optionLabel="name"
+                                        optionValue="id" [style]="{ 'min-width': '120px' }"></p-dropdown>
+                                    <button pButton type="button" icon="pi pi-times" class="p-button-danger p-button-sm"
+                                        (click)="removeTagLanguage(editForm, i)"></button>
+                                </div>
+                            </div>
+
+                            <button pButton type="button" icon="pi pi-plus" class="p-button-secondary mt-2"
+                                [disabled]="!canAddMoreLanguages(editForm)" (click)="addTagLanguage(editForm)"
+                                *ngIf="canAddMoreLanguages(editForm)">
+                                {{ 'tag.addLanguage' | translate }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+            class="p-button-text" (click)="hideDialog()"></button>
+        <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check" class="p-button-text"
+            [disabled]="editForm.invalid" (click)="editTag()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="addDialog" [style]="{ width: '65%', height: '79%' }" header="{{ 'tag.addHeader' | translate }}"
+    [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <form [formGroup]="addForm" (ngSubmit)="addTag()">
+            <div class="grid">
+                <div class="col-12">
+                    <div class="grid formgrid p-fluid">
+                        <!-- Tag Name Field -->
+                        <div class="field mb-4 col-12 md:col-6">
+                            <label for="tagName" class="font-medium text-900">{{ 'tag.tagName' | translate }}:</label>
+                            <input id="tagName" type="text" pInputText formControlName="tagName">
+                            <div *ngIf="addForm.get('tagName')?.invalid && addForm.get('tagName')?.touched"
+                                class="p-error">
+                                {{ 'tagName.tagNameValidation' | translate }}
+                            </div>
+                        </div>
+
+                        <!-- Priority Number Field -->
+                        <div class="field mb-4 col-12 md:col-6">
+                            <label for="priorityNumber" class="font-medium text-900">
+                                {{ 'tag.priorityNumber' | translate }}:
+                            </label>
+                            <p-inputNumber mode="decimal" [useGrouping]="false"
+                                formControlName="priorityNumber"></p-inputNumber>
+                        </div>
+
+                        <!-- Permissions Section -->
+                        <div class="field mb-4 col-12">
+                            <label class="font-medium text-900 mr-3">Permissions:</label>
+                            <div class="flex flex-wrap gap-3">
+                                <div class="field-checkbox">
+                                    <p-checkbox formControlName="blogAllowed" [binary]="true"></p-checkbox>
+                                    <label>{{ 'tag.blogAllowed' | translate }}</label>
+                                </div>
+
+                                <div class="field-checkbox">
+                                    <p-checkbox formControlName="gameAllowed" [binary]="true"></p-checkbox>
+                                    <label>{{ 'tag.gameAllowed' | translate }}</label>
+                                </div>
+
+                                <div class="field-checkbox">
+                                    <p-checkbox formControlName="newsAllowed" [binary]="true"></p-checkbox>
+                                    <label>{{ 'tag.newsAllowed' | translate }}</label>
+                                </div>
+
+                                <div class="field-checkbox">
+                                    <p-checkbox formControlName="phishingAllowed" [binary]="true"></p-checkbox>
+                                    <label>{{ 'tag.phishingAllowed' | translate }}</label>
+                                </div>
+
+                                <div class="field-checkbox">
+                                    <p-checkbox formControlName="trainingAllowed" [binary]="true"></p-checkbox>
+                                    <label>{{ 'tag.trainingAllowed' | translate }}</label>
+                                </div>
+
+                                <div class="field-checkbox">
+                                    <p-checkbox formControlName="wallpaperAllowed" [binary]="true"></p-checkbox>
+                                    <label>{{ 'tag.wallpaperAllowed' | translate }}</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Languages Section -->
+                        <div class="field mb-4 col-12">
+                            <label class="font-medium text-900">{{ 'tag.languages' | translate }}</label>
+                            <div *ngIf="addForm.get('tagLanguages')?.errors?.['duplicateLanguages']"
+                                class="p-error m-1 p-1">
+                                {{ 'tag.duplicateLanguages' | translate }}
+                            </div>
+
+                            <div formArrayName="tagLanguages">
+                                <div *ngFor="let lang of tagLanguagesArray.controls; let i = index; trackBy: trackByIndex"
+                                    [formGroupName]="i" class="flex gap-2 mb-2">
+                                    <input pInputText formControlName="tagName"
+                                        placeholder="{{ 'tag.tagName' | translate }}">
+                                    <p-dropdown [options]="availableLanguagesCache[i]" formControlName="languageId"
+                                        optionLabel="name" optionValue="id"
+                                        [style]="{ 'min-width': '120px' }"></p-dropdown>
+                                    <button pButton type="button" icon="pi pi-times" class="p-button-danger p-button-sm"
+                                        (click)="removeTagLanguage(addForm, i)"></button>
+                                </div>
+                            </div>
+
+                            <button pButton type="button" icon="pi pi-plus" class="p-button-secondary mt-2"
+                                [disabled]="!canAddMoreLanguages(addForm)" (click)="addTagLanguage(addForm)"
+                                *ngIf="canAddMoreLanguages(addForm)">
+                                {{ 'tag.addLanguage' | translate }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+            class="p-button-text" (click)="hideDialog()"></button>
+        <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check" class="p-button-text"
+            [disabled]="addForm.invalid" (click)="addTag()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="deleteDialog" header="{{ 'shared.headers.delete' | translate }}" [modal]="true"
+    [style]="{width:'50%'}">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="currentSelected">{{ 'shared.messages.delete' | translate }} <b> {{currentSelected.tagName}}
+            </b>?</span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="deleteDialog = false"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text"
+            label="{{ 'shared.actions.delete' | translate }}" (click)="deleteTag()"></button>
+    </ng-template>
+</p-dialog>

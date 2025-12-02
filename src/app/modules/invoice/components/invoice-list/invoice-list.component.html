@@ -1,0 +1,717 @@
+<p-card>
+    <p-toast></p-toast>
+    <p-tabView [(activeIndex)]="activeTabIndex" class="w-full h-full">
+        <p-tabPanel header="{{'invoice.inProgressInvoices' | translate}}">
+            <div class="col-12">
+                <div class="card">
+                    <p-toast></p-toast>
+                    <div class="iAware-loading-table-container" style="position: relative;">
+                        <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                        <p-table #dt [value]="inProgressInvoices" dataKey="id"
+                            [expandedRowKeys]=" expandedRowsInProgress" [tableStyle]="{'min-width': '65rem'}"
+                            styleClass="p-datatable-striped" [globalFilterFields]="['subscriptionPlanName',
+                            'tenantName',
+                            'subscriptionTypeName','totalAmount','remainingAmount','formattedIssueDate']">
+                            <ng-template pTemplate="caption">
+                                <div class="flex flex-wrap justify-content-between align-items-center">
+                                    <h5 class="m-0">{{'invoice.management' | translate}}</h5>
+                                    <div class="flex flex-wrap">
+                                        <button class="mx-3" pButton
+                                            icon="pi pi-fw {{isExpandedInProgress ? 'pi-minus' : 'pi-plus'}}"
+                                            label="{{isExpandedInProgress ? ('invoice.collapseAll' | translate) : ('invoice.expandAll' | translate)}}"
+                                            (click)="expandAllInProgress()"></button>
+                                        <span class="block mt-2 md:mt-0 p-input-icon-left">
+                                            <i class="pi pi-search"></i>
+                                            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)"
+                                                placeholder="{{'shared.actions.search' | translate}}"
+                                                class="w-full sm:w-auto" />
+                                        </span>
+                                    </div>
+                                </div>
+                            </ng-template>
+
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th style="width: 3rem"></th>
+                                    <th pSortableColumn="tenantName">{{'invoice.company' | translate}}<p-sortIcon
+                                            field="tenantName"></p-sortIcon> </th>
+                                    <th style="text-align: center;" pSortableColumn="subscriptionPlanName">
+                                        {{'invoice.subscriptionPlan' | translate}}<p-sortIcon
+                                            field="subscriptionPlanName"></p-sortIcon></th>
+                                    <th style="text-align: center;" pSortableColumn="price">{{'invoice.invoiceType' |
+                                        translate}}<p-sortIcon field="subscriptionTypeName"></p-sortIcon></th>
+                                    <th style="text-align: center;" pSortableColumn="price">{{'invoice.total' |
+                                        translate}}<p-sortIcon field="price"></p-sortIcon></th>
+                                    <th style="text-align: center;" pSortableColumn="remainingAmount">
+                                        {{'invoice.amountDue' | translate}} <p-sortIcon field="price"></p-sortIcon>
+                                    </th>
+                                    <th style="text-align: center;" pSortableColumn="issueDate">{{'invoice.issueDate' |
+                                        translate}}<p-sortIcon field="issueDate"></p-sortIcon> </th>
+                                    <th *ngIf="showPaymentRequest" style="text-align: center;">
+                                        {{'invoice.paymentRequest' | translate}}</th>
+                                </tr>
+                            </ng-template>
+
+                            <ng-template pTemplate="body" let-invoice let-expanded="expanded">
+                                <tr [ngStyle]="{
+                                'border': invoice.payment && invoice.paymentRequests?.length > 0 ? '5px solid #007bff' : 'none'
+                            }">
+                                    <td>
+                                        <button type="button" pButton pRipple [pRowToggler]="invoice"
+                                            class="p-button-text p-button-rounded p-button-plain"
+                                            [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+                                    </td>
+                                    <td>{{ invoice.tenantName }}</td>
+                                    <td style="text-align: center;">{{ invoice.subscriptionPlanName }}</td>
+                                    <td style="text-align: center;">{{ invoice.subscriptionTypeName }}</td>
+
+                                    <td style="text-align: center;">{{ invoice.totalAmount | currency }}</td>
+                                    <td style="text-align: center;">{{ invoice.remainingAmount | currency }}</td>
+
+                                    <td style="text-align: center;">{{ invoice.issueDate | date :'MM/dd/yyyy' }}</td>
+                                    <td *ngIf="invoice && !invoice.canEdit " style="text-align: center;">
+                                        <a *ngIf="!invoice.isPaid" style="cursor: pointer;"
+                                            (click)="openAddPaymentRequestDialog(invoice)">
+                                            <p-button [raised]="true" severity="help"
+                                                label="{{'invoice.payButton' | translate}}"
+                                                (click)="openAddPaymentRequestDialog(invoice)"></p-button>
+                                        </a>
+
+                                        <span [ngStyle]="{ 'background-color':  'var(--green-200)' ,
+                                    'color':'var(--green-800)'  ,
+                                    'border-radius': 'var(--border-radius)',
+                                    'padding': '0.25em 0.5rem',
+                                    'text-transform': 'uppercase',
+                                    'font-weight': '700',
+                                    'font-size': '12px',
+                                    'letter-spacing': '0.3px'}" *ngIf="invoice.isPaid">{{'invoice.paidLabel' |
+                                            translate}}</span>
+                                    </td>
+
+                                </tr>
+                            </ng-template>
+
+                            <ng-template pTemplate="rowexpansion" let-invoice>
+                                <tr>
+                                    <td colspan="12">
+                                        <div class="p-3">
+                                            <p-table [value]="invoice.paymentRequests" dataKey="id">
+                                                <ng-template pTemplate="header">
+                                <tr>
+                                    <th style="width: 3rem"></th>
+                                    <th style="text-align: center;" pSortableColumn="requestTime">
+                                        {{'invoice.requestTime' | translate}}</th>
+                                    <th style="text-align: center;" pSortableColumn="requestAmount">
+                                        {{'invoice.requestAmount' | translate}} </th>
+                                    <th style="text-align: center;" pSortableColumn="requestReferenceKey">
+                                        {{'invoice.referenceKey' | translate}} </th>
+                                    <th style="text-align: center;">{{'invoice.referenceImage' | translate}} </th>
+                                    <th style="text-align: center;">{{'invoice.paymentNote' | translate}} </th>
+                                    <th style="text-align: center;" pSortableColumn="isConfirmed">{{'invoice.confirmed'
+                                        | translate}} </th>
+                                    <th *ngIf="invoice.canEdit" pSortableColumn="confirmationUserId"
+                                        style="text-align: center;"> {{'invoice.confirmationUserId' | translate}} </th>
+                                    <th *ngIf="invoice.canEdit" pSortableColumn="confirmationTime"
+                                        style="text-align: center;"> {{'invoice.confirmationTime' | translate}} </th>
+                                    <th *ngIf="invoice.canEdit" style="text-align: center;"> {{'invoice.confirmButton' |
+                                        translate}}</th>
+                                </tr>
+                            </ng-template>
+
+                            <ng-template pTemplate="body" let-request let-expanded="expanded">
+                                <tr [ngStyle]="{'background-color': request.isConfirmed ? '#d4edda' : 'inherit'}">
+
+                                    <td style="text-align: center;">
+                                        <button *ngIf="request.isConfirmed" type="button" pButton pRipple
+                                            [pRowToggler]="request"
+                                            class="p-button-text p-button-rounded p-button-plain"
+                                            [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+                                    </td>
+                                    <td style="text-align: center;">{{ request.requestTime | date :'MM/dd/yyyy'}}</td>
+                                    <td style="text-align: center;">{{ request.requestAmount | currency }}</td>
+                                    <td style="text-align: center;">{{ request.requestReferenceKey }}</td>
+                                    <td style="text-align: center;">
+
+                                        <p-image [src]="request.requestReferenceImageUrl" alt="Reference Image"
+                                            width="50" [preview]="true" />
+                                    </td>
+                                    <td style=" text-align: center;">
+                                        <a style="cursor: pointer;">
+
+                                            <i class="pi pi-file-o" (click)="openContent(request)"></i>
+                                        </a>
+                                    </td>
+                                    <td style="text-align: center;">
+                                        <span [ngStyle]="{
+                                            'background-color': request.isConfirmed ? 'var(--green-200)' : 'var(--yellow-200)',
+                                            'color': request.isConfirmed ? 'var(--green-800)' : 'var(--yellow-800)',
+                                            'border-radius': 'var(--border-radius)',
+                                            'padding': '0.25em 0.5rem',
+                                            'text-transform': 'uppercase',
+                                            'font-weight': '700',
+                                            'font-size': '12px',
+                                            'letter-spacing': '0.3px'
+                                        }">
+                                            {{ request.isConfirmed ? ('invoice.confirmedLabel' | translate) :
+                                            ('invoice.pendingLabel' | translate) }}
+                                        </span>
+                                    </td>
+
+                                    <td style="text-align: center;" *ngIf="invoice.canEdit">{{
+                                        request.confirmationUserId }}
+                                    </td>
+                                    <td style="text-align: center;" *ngIf="invoice.canEdit">{{ request.confirmationTime
+                                        |
+                                        date
+                                        :'MM/dd/yyyy'
+                                        }}</td>
+
+                                    <td style="text-align: center;" *ngIf="invoice.canEdit">
+                                        <a style="cursor: pointer;" *ngIf="!request.isConfirmed"
+                                            (click)="openEditPaymentRequestDialog(request)">
+                                            <p-button severity="warning" [raised]="true" label="Confirm"
+                                                (click)="openEditPaymentRequestDialog(request)"></p-button>
+                                        </a>
+                                        <span *ngIf=" request.isConfirmed" [ngStyle]="{ 'background-color':  'var(--green-200)' ,
+                                    'color':'var(--green-800)'  ,
+                                    'border-radius': 'var(--border-radius)',
+                                    'padding': '0.25em 0.5rem',
+                                    'text-transform': 'uppercase',
+                                    'font-weight': '700',
+                                    'font-size': '12px',
+                                    'letter-spacing': '0.3px'}">{{'invoice.doneLabel' | translate}} </span>
+
+                                    </td>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="rowexpansion" let-request>
+
+                                <td colspan="12">
+                                    <p-table *ngIf="request.payment" [value]="[request.payment]">
+                                        <ng-template pTemplate="header">
+                                            <tr>
+                                                <th style="text-align: center;">{{'invoice.paidAmount' | translate}}
+                                                </th>
+                                                <th style="text-align: center;">{{'invoice.paymentTime' | translate}}
+                                                </th>
+                                                <th style="text-align: center;">{{'invoice.paymentReferenceKey' |
+                                                    translate}} </th>
+                                                <th style="text-align: center;">{{'invoice.paymentType' | translate}}
+                                                </th>
+                                            </tr>
+                                        </ng-template>
+
+                                        <ng-template pTemplate="body" let-payment>
+                                            <tr>
+                                                <td style="text-align: center;">{{ payment.paidAmount | currency }}</td>
+                                                <td style="text-align: center;">{{ payment.paymentTime | date
+                                                    :'MM/dd/yyyy'}}</td>
+                                                <td style="text-align: center;">{{ payment.paymentReferenceKey }}</td>
+                                                <td style="text-align: center;">{{ payment.paymentType }}</td>
+                                            </tr>
+                                        </ng-template>
+                                    </p-table>
+
+                                </td>
+                            </ng-template>
+                            <ng-template pTemplate="emptymessage">
+                                <tr>
+                                    <td colspan="12" style="text-align: center;">{{'noPaymentRequestsMessage' |
+                                        translate}} </td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </div>
+                    </td>
+                    </tr>
+                    </ng-template>
+                    </p-table>
+                </div>
+            </div>
+            </div>
+        </p-tabPanel>
+
+        <p-tabPanel header="{{'invoice.completedInvoices' | translate}}">
+            <div class="col-12">
+                <div class="card">
+                    <p-toast></p-toast>
+                    <div class="iAware-loading-table-container" style="position: relative;">
+                        <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                        <p-table #dv [value]="completedInvoices" dataKey="id" [expandedRowKeys]="expandedRowsCompleted"
+                            [tableStyle]="{'min-width': '65rem'}" styleClass="p-datatable-striped" [globalFilterFields]="['subscriptionPlanName',
+                            'tenantName',
+                            'subscriptionTypeName','totalAmount','remainingAmount','formattedIssueDate']">
+                            <ng-template pTemplate="caption">
+                                <div class="flex flex-wrap  justify-content-between align-items-center">
+                                    <h5 class="m-0">Invoices Management</h5>
+                                    <div class="flex flex-wrap">
+                                        <button class="mx-3" pButton
+                                            icon="pi pi-fw {{isExpandedCompleted ? 'pi-minus' : 'pi-plus'}}"
+                                            label="{{isExpandedCompleted ? ('invoice.collapseAll' | translate) : ('invoice.expandAll' | translate)}}"
+                                            (click)="expandAllCompleted()"></button>
+                                        <span class="block mt-2 md:mt-0 p-input-icon-left">
+                                            <i class="pi pi-search"></i>
+                                            <input pInputText type="text" (input)="onGlobalFilter(dv, $event)"
+                                                placeholder="{{'shared.actions.search' | translate}}"
+                                                class="w-full sm:w-auto" />
+                                        </span>
+                                    </div>
+                                </div>
+                            </ng-template>
+
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th style="width: 3rem"></th>
+                                    <th pSortableColumn="tenantName">{{'invoice.company' | translate}}<p-sortIcon
+                                            field="tenantName"></p-sortIcon>
+                                    </th>
+                                    <th style="text-align: center;" pSortableColumn="subscriptionPlanName">
+                                        {{'invoice.subscriptionPlan' | translate}}<p-sortIcon
+                                            field="subscriptionPlanName"></p-sortIcon></th>
+                                    <th style="text-align: center;" pSortableColumn="price">{{'invoice.invoiceType' |
+                                        translate}}<p-sortIcon field="subscriptionTypeName"></p-sortIcon></th>
+                                    <th style="text-align: center;" pSortableColumn="price">{{'invoice.total' |
+                                        translate}}<p-sortIcon field="price"></p-sortIcon></th>
+                                    <th style="text-align: center;" pSortableColumn="remainingAmount">
+                                        {{'invoice.amountDue' | translate}} <p-sortIcon field="price"></p-sortIcon>
+                                    </th>
+                                    <th style="text-align: center;" pSortableColumn="issueDate">{{'invoice.issueDate' |
+                                        translate}}<p-sortIcon field="issueDate"></p-sortIcon> </th>
+                                    <th *ngIf="showPaymentRequest" style="text-align: center;">
+                                        {{'invoice.paymentRequest' | translate}}</th>
+                                </tr>
+                            </ng-template>
+
+                            <ng-template pTemplate="body" let-invoice let-expanded="expanded">
+                                <tr [ngStyle]="{
+                                'border': invoice.payment && invoice.paymentRequests?.length > 0 ? '5px solid #007bff' : 'none'
+                            }">
+                                    <td>
+                                        <button type="button" pButton pRipple [pRowToggler]="invoice"
+                                            class="p-button-text p-button-rounded p-button-plain"
+                                            [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+                                    </td>
+                                    <td>{{ invoice.tenantName }}</td>
+                                    <td style="text-align: center;">{{ invoice.subscriptionPlanName }}</td>
+                                    <td style="text-align: center;">{{ invoice.subscriptionTypeName }}</td>
+                                    <td style="text-align: center;">{{ invoice.totalAmount | currency }}</td>
+                                    <td style="text-align: center;">{{ invoice.remainingAmount | currency }}</td>
+                                    <td style="text-align: center;">{{ invoice.issueDate | date :'MM/dd/yyyy' }}</td>
+                                    <td *ngIf="invoice && !invoice.canEdit " style="text-align: center;">
+                                        <a *ngIf="!invoice.isPaid" style="cursor: pointer;"
+                                            (click)="openAddPaymentRequestDialog(invoice)">
+                                            <p-button [raised]="true" severity="help"
+                                                label="{{'invoice.payButton' | translate}}"
+                                                (click)="openAddPaymentRequestDialog(invoice)"></p-button>
+                                        </a>
+
+                                        <span [ngStyle]="{ 'background-color':  'var(--green-200)' ,
+                                    'color':'var(--green-800)'  ,
+                                    'border-radius': 'var(--border-radius)',
+                                    'padding': '0.25em 0.5rem',
+                                    'text-transform': 'uppercase',
+                                    'font-weight': '700',
+                                    'font-size': '12px',
+                                    'letter-spacing': '0.3px'}" *ngIf="invoice.isPaid">{{'invoice.paidLabel' |
+                                            translate}}</span>
+                                    </td>
+
+                                </tr>
+                            </ng-template>
+
+                            <ng-template pTemplate="rowexpansion" let-invoice>
+                                <tr>
+                                    <td colspan="12">
+                                        <div class="p-3">
+                                            <p-table [value]="invoice.paymentRequests" dataKey="id">
+                                                <ng-template pTemplate="header">
+                                <tr>
+                                    <th style="width: 3rem"></th>
+                                    <th style="text-align: center;" pSortableColumn="requestTime">
+                                        {{'invoice.requestTime' | translate}}</th>
+                                    <th style="text-align: center;" pSortableColumn="requestAmount">
+                                        {{'invoice.requestAmount' | translate}} </th>
+                                    <th style="text-align: center;" pSortableColumn="requestReferenceKey">
+                                        {{'invoice.referenceKey' | translate}}</th>
+                                    <th style="text-align: center;">{{'invoice.referenceImage' | translate}}</th>
+                                    <th style="text-align: center;">{{'invoice.paymentNote' | translate}}</th>
+                                    <th style="text-align: center;" pSortableColumn="isConfirmed">{{'invoice.confirmed'
+                                        | translate}}</th>
+                                    <th *ngIf="invoice.canEdit" pSortableColumn="confirmationUserId"
+                                        style="text-align: center;"> {{'invoice.confirmationUserId' | translate}} </th>
+                                    <th *ngIf="invoice.canEdit" pSortableColumn="confirmationTime"
+                                        style="text-align: center;"> {{'invoice.confirmationTime' | translate}} </th>
+                                    <th *ngIf="invoice.canEdit" style="text-align: center;"> {{'invoice.confirmButton' |
+                                        translate}} </th>
+                                </tr>
+                            </ng-template>
+
+                            <ng-template pTemplate="body" let-request let-expanded="expanded">
+                                <tr [ngStyle]="{'background-color': request.isConfirmed ? '#d4edda' : 'inherit'}">
+
+                                    <td style="text-align: center;">
+                                        <button *ngIf="request.isConfirmed" type="button" pButton pRipple
+                                            [pRowToggler]="request"
+                                            class="p-button-text p-button-rounded p-button-plain"
+                                            [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+                                    </td>
+                                    <td style="text-align: center;">{{ request.requestTime | date :'MM/dd/yyyy'}}</td>
+                                    <td style="text-align: center;">{{ request.requestAmount | currency }}</td>
+                                    <td style="text-align: center;">{{ request.requestReferenceKey }}</td>
+                                    <td style="text-align: center;">
+
+                                        <p-image [src]="request.requestReferenceImageUrl" alt="Reference Image"
+                                            width="50" [preview]="true" />
+                                    </td>
+                                    <td style=" text-align: center;">
+                                        <a style="cursor: pointer;">
+
+                                            <i class="pi pi-file-o" (click)="openContent(request)"></i>
+                                        </a>
+                                    </td>
+
+                                    <td style="text-align: center;">
+                                        <span [ngStyle]="{
+                                            'background-color': request.isConfirmed ? 'var(--green-200)' : 'var(--yellow-200)',
+                                            'color': request.isConfirmed ? 'var(--green-800)' : 'var(--yellow-800)',
+                                            'border-radius': 'var(--border-radius)',
+                                            'padding': '0.25em 0.5rem',
+                                            'text-transform': 'uppercase',
+                                            'font-weight': '700',
+                                            'font-size': '12px',
+                                            'letter-spacing': '0.3px'
+                                        }">
+                                            {{ request.isConfirmed ? ('invoice.confirmedLabel' | translate) :
+                                            ('invoice.pendingLabel' | translate) }}
+                                        </span>
+                                    </td>
+
+                                    <td style="text-align: center;" *ngIf="invoice.canEdit">{{
+                                        request.confirmationUserId }}
+                                    </td>
+                                    <td style="text-align: center;" *ngIf="invoice.canEdit">{{ request.confirmationTime
+                                        |
+                                        date
+                                        :'MM/dd/yyyy'
+                                        }}</td>
+
+                                    <td style="text-align: center;" *ngIf="invoice.canEdit">
+                                        <a style="cursor: pointer;" *ngIf="!request.isConfirmed"
+                                            (click)="openEditPaymentRequestDialog(request)">
+                                            <p-button severity="warning" [raised]="true" label="Confirm"
+                                                (click)="openEditPaymentRequestDialog(request)"></p-button>
+                                        </a>
+                                        <span *ngIf=" request.isConfirmed" [ngStyle]="{ 'background-color':  'var(--green-200)' ,
+                                    'color':'var(--green-800)'  ,
+                                    'border-radius': 'var(--border-radius)',
+                                    'padding': '0.25em 0.5rem',
+                                    'text-transform': 'uppercase',
+                                    'font-weight': '700',
+                                    'font-size': '12px',
+                                    'letter-spacing': '0.3px'}">{{'invoice.doneLabel' | translate}}</span>
+
+                                    </td>
+                                </tr>
+                            </ng-template>
+
+                            <ng-template pTemplate="rowexpansion" let-request>
+
+                                <td colspan="12">
+                                    <p-table *ngIf="request.payment" [value]="[request.payment]">
+                                        <ng-template pTemplate="header">
+                                            <tr>
+                                                <th style="text-align: center;">{{'invoice.paidAmount' | translate}}
+                                                </th>
+                                                <th style="text-align: center;">{{'invoice.paymentTime' | translate}}
+                                                </th>
+                                                <th style="text-align: center;">{{'invoice.paymentReferenceKey' |
+                                                    translate}}</th>
+                                                <th style="text-align: center;">{{'invoice.paymentType' | translate}}
+                                                </th>
+                                            </tr>
+                                        </ng-template>
+
+                                        <ng-template pTemplate="body" let-payment>
+                                            <tr>
+                                                <td style="text-align: center;">{{ payment.paidAmount | currency }}</td>
+                                                <td style="text-align: center;">{{ payment.paymentTime | date
+                                                    :'MM/dd/yyyy'}}</td>
+                                                <td style="text-align: center;">{{ payment.paymentReferenceKey }}</td>
+                                                <td style="text-align: center;">{{ payment.paymentType }}</td>
+                                            </tr>
+                                        </ng-template>
+                                    </p-table>
+
+                                </td>
+                            </ng-template>
+                            <ng-template pTemplate="emptymessage">
+                                <tr>
+                                    <td colspan="12" style="text-align: center;">{{'noPaymentRequestsMessage' |
+                                        translate}}</td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </div>
+                    </td>
+                    </tr>
+                    </ng-template>
+                    </p-table>
+                </div>
+            </div>
+            </div>
+        </p-tabPanel>
+    </p-tabView>
+</p-card>
+
+<p-dialog [(visible)]="switchInvoiceActivationDialog" header="{{ 'shared.headers.active' | translate }}" [modal]="true"
+    [style]="{width:'450px'}">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="invoice"><span style=color:red>{{ invoice.isActive ? ('shared.messages.deactive' | translate) :
+                ('shared.messages.deactive' | translate) }} ?</span>
+            <hr>
+        </span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="declineInvoiceActivation()"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{ 'shared.actions.save' | translate }}"
+            (click)="confirmtInvoiceActivation()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="editInvoiceDialog" header="{{'invoice.dialogs.editHeader' | translate}}" [modal]="true"
+    [style]="{width:'450px'}" class="p-fluid">
+    <ng-template pTemplate="content">
+        <div class="field ">
+            <label for="languageId" class="font-medium text-900">{{'invoice.dialogs.addLanguageLabel' |
+                translate}}</label>
+        </div>
+        <div class="field ">
+            <label for="quoteText" class="font-medium text-900">{{'invoice.dialogs.addTextLabel' | translate}}</label>
+            <div class="NgxEditor__Wrapper" style="height:300px">
+                <ngx-editor-menu [editor]="editor"></ngx-editor-menu>
+                <!-- <ngx-editor [editor]="editor" [(ngModel)]="invoice.quoteText" [disabled]="false"
+                    [placeholder]="'Type here...'"></ngx-editor> -->
+            </div>
+        </div>
+        <div class="col-12">
+            <!-- <small *ngIf="submitted && isQuoteTextEmpty(invoice.quoteText)" class="ng-dirty ng-invalid text-red-500">
+                Quote Text is required.
+            </small> -->
+        </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+
+        <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+            class="p-button-text" (click)="hideEditInvoiceDialog()"></button>
+        <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check" class="p-button-text"
+            (click)="saveEditInvoice()">
+        </button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="addInvoiceDialog" header="{{'invoice.dialogs.addHeader' | translate}}" [modal]="true"
+    [style]="{width:'450px'}" class="p-fluid">
+    <ng-template pTemplate="content">
+        <div class="field ">
+            <label for="languageId" class="font-medium text-900">{{'invoice.dialogs.addLanguageLabel' |
+                translate}}</label>
+            <!-- <p-dropdown [(ngModel)]="selectedLanguageId" [options]="selectedLanguageAdd" optionLabel="name"
+                placeholder="Select a Language" optionValue="id">
+            </p-dropdown> -->
+        </div>
+        <div class="field ">
+            <label for="quoteText" class="font-medium text-900">{{'invoice.dialogs.addTextLabel' | translate}}</label>
+            <div class="NgxEditor__Wrapper" style="height:300px">
+                <ngx-editor-menu [editor]="editor"></ngx-editor-menu>
+                <!-- <ngx-editor [editor]="editor" [(ngModel)]="quoteText" [disabled]="false"
+                    [placeholder]="'Type here...'"></ngx-editor> -->
+            </div>
+        </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+            class="p-button-text" (click)="hideNewInvoiceDialog()"></button>
+        <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check" class="p-button-text"
+            (click)="saveNewInvoice()">
+        </button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="addInvoicePaymentRequestDialog" [style]="{width: '800px', heigth:'900px'}"
+    header="{{'invoice.dialogs.paymentRequestHeader' | translate}}" [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+
+        <form [formGroup]="addInvoicePaymentRequestForm" (ngSubmit)="saveAddInvoicePaymentRequest()">
+
+            <div class="field">
+                <label for="SubscriptionTenantInvoiceId"> {{'invoice.dialogs.paymentRequestRefKeyLabel' | translate}}
+                </label>
+                <input type="text" pInputText id="SubscriptionTenantInvoiceId"
+                    formControlName="SubscriptionTenantInvoiceId" readonly />
+            </div>
+
+            <div class="field">
+                <label for="RequestAmount"> {{'invoice.dialogs.paymentRequestAmountLabel' | translate}} </label>
+                <p-inputNumber id="RequestAmount" formControlName="RequestAmount"></p-inputNumber>
+            </div>
+
+            <div class="field">
+                <label for="RequestReferenceKey"> {{'invoice.dialogs.paymentRequestRefKeyLabel' | translate}} </label>
+                <input type="text" pInputText id="RequestReferenceKey" formControlName="RequestReferenceKey" required />
+            </div>
+
+            <div class="field">
+                <label for="RequestPaymentNote"> {{'invoice.dialogs.paymentRequestNoteLabel' | translate}} </label>
+                <textarea id="RequestPaymentNote" pInputTextarea formControlName="RequestPaymentNote" required rows="3"
+                    cols="20"></textarea>
+            </div>
+
+            <div class="flex justify-content-center flex-wrap">
+                <div class="md:col-6 flex flex-column">
+                    <div class="flex align-items-center justify-content-center">
+                        <img [src]="imageUrl" alt="Avatar" class="avatar" style="cursor: pointer;"
+                            (click)="onUploadPaymentReuqestImageClick()">
+                    </div>
+                    <label class="flex justify-content-center"> {{'invoice.dialogs.paymentRequestImageLabel' |
+                        translate}} </label>
+                    <div class="flex align-items-center justify-content-center mt-2" style="display: none;">
+                        <p-button label="{{ 'shared.actions.upload' | translate }}" icon="pi pi-upload"
+                            (click)="onUploadPaymentReuqestImageClick()"></p-button>
+                        <input type="file" id="PaymentReuqestImage" style="display: none;"
+                            (change)="onPaymentReuqestImageSelected($event)">
+                    </div>
+                </div>
+            </div>
+
+
+        </form>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+            class="p-button-text" (click)="declineAddPaymentReuqestDialog()"></button>
+        <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check" class="p-button-text"
+            (click)="saveAddInvoicePaymentRequest()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="editInvoicePaymentRequestDialog" [style]="{width: '1200px', height:'100%'}"
+    header="{{'invoice.dialogs.paymentConfirmHeader' | translate}}" [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <form [formGroup]="editInvoicePaymentRequestForm" (ngSubmit)="saveEditInvoicePaymentRequest()">
+
+            <p-splitter [style]="{height:'100vh'}" styleClass="mb-5">
+                <ng-template pTemplate>
+
+                    <div class="col justify-content-center p-fluid">
+                        <div class="flex flex-wrap justify-content-center align-items-center"
+                            style="  text-align: center;">
+                            <label class="font-medium text-900 " style="font-size: 20px;">
+                                {{'invoice.dialogs.confirmClientLabel' | translate}} </label>
+                        </div>
+                        <hr>
+                        <div class="field mt-4">
+                            <label class="font-medium text-900"
+                                for="subscriptionTenantInvoiceId">{{'invoice.dialogs.invoicePaymentRefKeyLabel' |
+                                translate}}</label>
+                            <input type="text" pInputText id="subscriptionTenantInvoiceId"
+                                formControlName="subscriptionTenantInvoiceId" readonly style="width: 100%;" />
+                        </div>
+
+                        <div class="field mt-4">
+                            <label class="font-medium text-900"
+                                for="requestAmount">{{'invoice.dialogs.paymentRequestAmountLabel' | translate}}</label>
+                            <p-inputNumber id="requestAmount" formControlName="requestAmount"
+                                [style]="{width: '100%'}"></p-inputNumber>
+                        </div>
+
+                        <div class="field mt-4">
+                            <label class="font-medium text-900"
+                                for="requestReferenceKey">{{'invoice.dialogs.paymentRequestRefKeyLabel' |
+                                translate}}</label>
+                            <input type="text" pInputText id="requestReferenceKey" formControlName="requestReferenceKey"
+                                required style="width: 100%;" />
+                        </div>
+
+                        <div class="field mt-4">
+                            <label class="font-medium text-900"
+                                for="requestPaymentNote">{{'invoice.dialogs.paymentRequestNoteLabel' |
+                                translate}}</label>
+                            <textarea id="requestPaymentNote" pInputTextarea formControlName="requestPaymentNote"
+                                required rows="3" cols="20" style="width: 100%;"></textarea>
+                        </div>
+
+                        <div class="flex justify-content-center mt-3">
+                            <div class="flex flex-column align-items-center">
+                                <div class="avatar">
+                                    <p-image [src]="imageUrl" alt="Image" width="200" height="250" [preview]="true" />
+                                </div>
+                                <label
+                                    class="font-medium text-900 flex justify-content-center mt-4 mb-4">{{'invoice.dialogs.paymentRequestImageLabel'
+                                    | translate}}</label>
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+
+                <ng-template pTemplate>
+                    <div class=" col justify-content-center p-fluid">
+
+                        <div class="flex flex-wrap justify-content-center align-items-center"
+                            style="  text-align: center;">
+                            <label class="font-medium text-900" style="font-size: 20px;">{{'invoice.requestAmount' |
+                                translate}}</label>
+                        </div>
+                        <hr>
+
+                        <div class="field mt-4">
+                            <label class="font-medium text-900" for="paidAmount">{{'invoice.paidAmount' |
+                                translate}}</label>
+                            <p-inputNumber id="paidAmount" formControlName="paidAmount"
+                                [style]="{width: '100%'}"></p-inputNumber>
+                        </div>
+
+                        <div class="field mt-4">
+                            <label class="font-medium text-900"
+                                for="paymentReferenceKey">{{'invoice.paymentReferenceKey' | translate}}</label>
+                            <input type="text" pInputText id="paymentReferenceKey" formControlName="paymentReferenceKey"
+                                style="width: 100%;" />
+                        </div>
+
+                        <div class="field mt-4">
+                            <label class="font-medium text-900" for="paymentType">{{'invoice.paymentType' |
+                                translate}}</label>
+                            <p-dropdown [options]="paymentTypes" formControlName="paymentType" optionLabel="label"
+                                optionValue="value" placeholder="Select Payment Type">
+                            </p-dropdown>
+
+                        </div>
+
+                        <div class="field mt-4">
+                            <p-checkbox class="font-bold" formControlName="isConfirmed" [binary]="true"
+                                label="{{'invoice.confirmed' | translate}}"></p-checkbox>
+                        </div>
+                    </div>
+                </ng-template>
+            </p-splitter>
+
+        </form>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+            class="p-button-text" (click)="declineEditPaymentReuqestDialog()"></button>
+        <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check" class="p-button-text"
+            (click)="saveEditInvoicePaymentRequest()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="openPaymentNotelDialog" [modal]="true" [style]="{width:'450px'}">
+    <div class="flex align-items-center justify-content-center">
+        <span *ngIf="invoicePaymentRequest" [innerHTML]="invoicePaymentRequest.requestPaymentNote"></span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text" label="{{ 'shared.actions.hide' | translate }}"
+            (click)="hideRedirectPageUrlDialog()"></button>
+    </ng-template>
+</p-dialog>

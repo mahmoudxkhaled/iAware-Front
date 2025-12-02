@@ -1,0 +1,82 @@
+.selected-correct .text-success {
+    color: green;
+}
+
+.selected-incorrect .text-danger {
+    color: red;
+}
+
+.correct .text-info {
+    color: green;
+}
+
+.celebration-title {
+    font-size: 20px; /* Font size for title */
+    color: var(--primary-color); /* Green color for title */
+    margin-bottom: 10px; /* Space below the title */
+}
+
+.celebration-message {
+    font-size: 18px; /* Font size for messages */
+    color: var(--primary-color); /* Darker text color for readability */
+    margin: 10px 0; /* Space above and below the message */
+}
+
+.celebration-image {
+    width: 60%;
+    max-width: 250px;
+    margin: auto;
+    display: block;
+}
+
+::ng-deep .p-dialog .p-dialog-header {
+    color: var(--primary-color);
+}
+
+.certificate-card {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.image-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.certificate-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* Ensures the image scales proportionally without being distorted */
+}
+
+.p-button-facebook {
+    background-color: #3b5998; /* Facebook color */
+    color: white;
+}
+
+.p-button-twitter {
+    background-color: #1da1f2; /* Twitter color */
+    color: white;
+}
+
+.p-button-linkedin {
+    background-color: #0077b5; /* LinkedIn color */
+    color: white;
+}
+
+.p-button-snapchat {
+    background-color: #fffc00; /* Snapchat color */
+    color: black; /* Ensure contrast with yellow */
+}
+
+.p-button-gmail {
+    background-color: #db4437; /* Gmail color */
+    color: white;
+}

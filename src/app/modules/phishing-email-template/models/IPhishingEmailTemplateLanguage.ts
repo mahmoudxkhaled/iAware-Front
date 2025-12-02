@@ -1,0 +1,45 @@
+import { IPhishingEmailTemplateLanguageLandingKey } from './IPhishingEmailTemplateLanguageLandingKey';
+
+export interface IPhishingEmailTemplateLanguage {
+    id: string;
+    emailName: string;
+    description: string;
+    phishingEmailImageUrl?: string;
+    phishingEmailInstructionHtml?: string;
+    phishingEmailSubject?: string;
+    phishingEmailContentHtml?: string;
+    phishingLandingPageTitle?: string;
+    phishingLandingPageDescription?: string;
+    phishingLandingPageContentHtml?: string;
+    phishingLandingPageInput1Key?: string;
+    phishingLandingPageInput1Type?: string;
+    phishingLandingPageInput1Action?: string;
+    phishingLandingPageInput1ActionReturnType?: string;
+    phishingLandingPageInput2Key?: string;
+    phishingLandingPageInput2Type?: string;
+    phishingLandingPageInput2Action?: string;
+    phishingLandingPageInput2ActionReturnType?: string;
+    phishingLandingPageInput3Key?: string;
+    phishingLandingPageInput3Type?: string;
+    phishingLandingPageInput3Action?: string;
+    phishingLandingPageInput3ActionReturnType?: string;
+    phishingLandingPageInput4Key?: string;
+    phishingLandingPageInput4Type?: string;
+    phishingLandingPageInput4Action?: string;
+    phishingLandingPageInput4ActionReturnType?: string;
+    phishingLandingPageInput5Key?: string;
+    phishingLandingPageInput5Type?: string;
+    phishingLandingPageInput5Action?: string;
+    phishingLandingPageInput5ActionReturnType?: string;
+    phishingEmailSuccessMessageTitle?: string;
+    phishingEmailSuccessMessagePageHtml?: string;
+    phishingEmailFailureMessageTitle?: string;
+    phishingEmailFailureMessagePageHtml?: string;
+    phishingEmailTemplateId?: string;
+    languageId?: string;
+    languageName?: string;
+    isActive: boolean;
+    canEdit?: boolean;
+    isQrCodeChecked: boolean;
+    phishingEmailTemplateLanguageLandingKeys: IPhishingEmailTemplateLanguageLandingKey[];
+}

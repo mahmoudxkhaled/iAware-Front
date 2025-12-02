@@ -1,0 +1,32 @@
+<p-toast></p-toast>
+<form [formGroup]="form" (ngSubmit)="saveSettings()">
+    <div class="col-12">
+        <div class="p-fluid p-formgrid grid">
+            <div class="field col-12 md:col-6">
+                <label class="font-medium text-900 " htmlFor="ipAddress">{{'account.ad-settings.ipAddress' | translate}}</label>
+                <input pInputText id="ipAddress" type="text" formControlName="ipAddress" />
+            </div>
+            <div class="field col-12 md:col-6">
+                <label class="font-medium text-900 " htmlFor="adDomainName">{{'account.ad-settings.adDomainName' | translate}}</label>
+                <input pInputText id="adDomainName" type="text" formControlName="adDomainName" />
+            </div>
+            <div class="field col-12 md:col-6">
+                <label class="font-medium text-900 " htmlFor="adDomainNameExtention">{{'account.ad-settings.adDomainNameExtention' |
+                    translate}}</label>
+                <input pInputText id="adDomainNameExtention" type="text" formControlName="adDomainNameExtention" />
+            </div>
+            <div class="field col-12 md:col-6">
+                <label class="font-medium text-900 " htmlFor="adUserName">{{'account.ad-settings.adUserName' | translate}}</label>
+                <input pInputText id="adUserName" type="text" formControlName="adUserName" />
+            </div>
+            <div class="field col-12 md:col-6">
+                <label class="font-medium text-900 " htmlFor="adPassword">{{'account.ad-settings.adPassword' | translate}}</label>
+                <p-password formControlName="adPassword" [toggleMask]="true" [feedback]="false" />
+            </div>
+            <div class="col-12">
+                <button pButton pRipple label="{{'shared.actions.saveChanges' | translate}}" class="w-auto mt-3"
+                    type="submit" [disabled]="!form.valid"></button>
+            </div>
+        </div>
+    </div>
+</form>

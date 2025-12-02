@@ -1,0 +1,386 @@
+<p-toast></p-toast>
+<p-card>
+    <p-tabView [(activeIndex)]="activeTabIndex">
+        <p-tabPanel [tabindex]="0" *ngIf="hasPermission(actions.dashboard)"
+            header="{{ 'training-campaigns.current-campaign.dashboard' | translate }}">
+            <app-training-campaigns-dashboard></app-training-campaigns-dashboard>
+        </p-tabPanel>
+
+        <p-tabPanel [tabindex]="hasPermission(actions.dashboard) ? 1 : 0"
+            header="{{ 'training-campaigns.current-campaign.currentCampaigns' | translate }}">
+
+            <app-iAware-info description="{{'training-campaigns.current-campaign.currentMessage' | translate}}"
+                icon="fa fa-solid fa-circle-info text-3xl" severity="info"></app-iAware-info>
+
+            <div class="iAware-loading-table-container" style="position: relative">
+                <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                <p-table [value]="trainingAwarenessCampaigns" rowGroupMode="subheader" groupRowsBy="campaignName"
+                    sortField="campaignName" sortMode="single" [tableStyle]="{ 'min-width': '60rem' }"
+                    [paginator]="true" 
+                    [rows]="5" 
+                    [lazy]="true"
+                    responsiveLayout="scroll"
+                    [totalRecords]="currentCampaignsTotalRecords"
+                    (onLazyLoad)="onLazyLoadCurrentCampaigns($event)"
+                    [rowsPerPageOptions]="[5 ,10, 25, 50]">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>{{ 'training-campaigns.current-campaign.name' | translate }}</th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th class="text-centerr">
+                                {{ 'training-campaigns.current-campaign.progress' | translate }}
+                            </th>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="groupheader" let-campaign>
+                        <tr pRowGroupHeader>
+                            <td colspan="5" class="group-header">
+                                <div class="grid justify-content-between">
+                                    <div class="col-6">
+                                        <strong class="font-bold mb-2" style="display: block">
+                                            <a *ngIf="hasPermission(actions.viewCampaignDetails)"
+                                                style="cursor: pointer"
+                                                [pTooltip]="'phishing-campaigns.phishingcampaign.clicktoviewcampaigndetails' | translate"
+                                                tooltipPosition="right" [routerLink]="[
+                                                    '/training-campaign/campaign-statistics/',
+                                                    campaign.campaignId
+                                                ]">
+                                                {{ campaign.campaignName }}
+                                            </a>
+
+                                            <a *ngIf="!hasPermission(actions.viewCampaignDetails)"
+                                                style="cursor: not-allowed">
+                                                {{ campaign.campaignName }}
+                                            </a>
+                                        </strong>
+                                        <span class="text-sm">{{ campaign.campaignStartDate | date }} -
+                                            {{ campaign.campaignEndDate | date }}</span>
+                                    </div>
+                                    <div class="col-2" *ngIf="campaign.certificateImageUrl">
+                                        <p-button styleClass="class-wight"
+                                            label="{{'training-campaigns.current-campaign.viewCertificate' | translate}}"
+                                            icon="pi pi-eye" (onClick)="getCertificate(campaign)"></p-button>
+                                    </div>
+                                    <div class="col-4">
+                                        <p class="text-center">
+                                            {{
+                                            'training-campaigns.current-campaign.compelationPercentage'
+                                            | translate : { number: campaign.campaignProgressPercentage }
+                                            }}</p>
+                                        <p-progressBar [value]="campaign.campaignProgressPercentage"
+                                            [showValue]="false"></p-progressBar>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="th-table">{{ 'training-campaigns.current-campaign.lessonName' | translate }}</th>
+                            <th class="th-table">
+                                {{ 'training-campaigns.current-campaign.lessonJoiningDate' | translate }}
+                            </th>
+                            <th class="th-table text-center" style="text-align: center !important;">
+                                {{ 'training-campaigns.current-campaign.contentStatus' | translate }}
+                            </th>
+                            <th class="th-table text-center" style="text-align: center !important;">{{
+                                'training-campaigns.current-campaign.status' | translate }}</th>
+                            <th class="th-table text-center" style="text-align: center !important;">{{
+                                'training-campaigns.current-campaign.score' | translate
+                                }}</th>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="groupfooter" let-campaign>
+                        <tr>
+                            <td colspan="5" class="group-footer text-right font-bold pr-6 pb-7">
+                                {{
+                                'training-campaigns.current-campaign.totalLessons'
+                                | translate : { number: calculateTotalNumberOfLessons(campaign.campaignName) }
+                                }}
+                            </td>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="body" let-lesson>
+                        <tr style="cursor: pointer" (click)="navigateToLesson(lesson)">
+                            <td [pTooltip]="
+                            lesson.status !== 'Completed'
+                                ? lesson.contentStarted
+                                    ? ('training-campaigns.current-campaign.clicktocontinue'| translate)
+                                    : ('training-campaigns.current-campaign.clicktostart'| translate)
+                                : undefined
+                        " tooltipPosition="right">{{ lesson.contentName }}</td>
+                            <td>{{ lesson.joiningDate | date : 'MMM d, yyyy' }}</td>
+                            <td class="text-center">
+                                <i *ngIf="lesson.status === 'Completed'" class="pi pi-check"
+                                    style="color: green; font-size: large; font-weight: 900"></i>
+                                <i *ngIf="lesson.status === 'InProgress'" class="pi pi-stopwatch"
+                                    style="color: rgb(232, 186, 2); font-size: large; font-weight: 900"></i>
+                                <i *ngIf="lesson.status === 'NotStarted'" class="pi pi-times"
+                                    style="color: red; font-size: large; font-weight: 900"></i>
+                            </td>
+                            <td class="text-center">
+                                <span [ngClass]="{
+                                        'status-completed': lesson.status === 'Completed',
+                                        'status-in-progress': lesson.status === 'InProgress',
+                                        'status-not-started': lesson.status === 'NotStarted'
+                                    }">
+                                    {{ lesson.status }}
+                                </span>
+                            </td>
+                            <td class="text-center"
+                                style="color: var(--primary-color); font-size: larger; font-weight: 800">
+                                {{
+                                'training-campaigns.current-campaign.lessonScore'
+                                | translate : { number: lesson.score ?? 0 }
+                                }}
+                            </td>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="emptymessage">
+                        <tr class="text-center">
+                            <td colspan="5">
+                                <div style="width: 100%; padding: 10px; text-align: center">
+                                    {{ 'training-campaigns.current-campaign.noCampaignsAvailable' | translate }}
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </p-tabPanel>
+
+        <p-tabPanel [tabindex]="hasPermission(actions.dashboard) ? 2 : 1"
+            header="{{ 'training-campaigns.current-campaign.completedCampaigns' | translate }}">
+            <app-iAware-info
+                description="{{'training-campaigns.current-campaign.completedCampaignsMessage' | translate}}"
+                icon="fa fa-solid fa-circle-info text-3xl" severity="info">
+            </app-iAware-info>
+
+            <div class="iAware-loading-table-container" style="position: relative">
+                <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                <p-table [value]="historyCampaignsData" rowGroupMode="subheader" groupRowsBy="campaignName"
+                    sortField="campaignName" 
+                    sortMode="single" 
+                    [tableStyle]="{ 'min-width': '60rem' }"
+                    [paginator]="true" 
+                    [rows]="5" 
+                    [showCurrentPageReport]="true" 
+                    responsiveLayout="scroll"
+                    [rowsPerPageOptions]="[5 ,10, 25, 50]" 
+                    [lazy]="true" [totalRecords]="histroyCampaignsTotalRecords"
+                    (onLazyLoad)="onLazyLoadHistoryCampaigns($event)">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>{{ 'training-campaigns.current-campaign.name' | translate }}</th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th class="text-centerr">
+                                {{ 'training-campaigns.current-campaign.progress' | translate }}
+                            </th>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="groupheader" let-campaign>
+                        <tr pRowGroupHeader>
+                            <td colspan="5" class="group-header">
+                                <div class="grid justify-content-between">
+                                    <div class="col-6">
+                                        <strong class="font-bold mb-2" style="display: block">
+                                            <a *ngIf="hasPermission(actions.viewCampaignDetails)"
+                                                style="cursor: pointer"
+                                                [pTooltip]="'training-campaigns.current-campaign.clickviewdetails'| translate"
+                                                tooltipPosition="right" [routerLink]="[
+                                                    '/training-campaign/campaign-statistics/',
+                                                    campaign.campaignId
+                                                ]">
+                                                {{ campaign.campaignName }}
+                                            </a>
+
+                                            <a *ngIf="!hasPermission(actions.viewCampaignDetails)"
+                                                style="cursor: not-allowed">
+                                                {{ campaign.campaignName }}
+                                            </a>
+                                        </strong>
+                                        <span class="text-sm">{{ campaign.campaignStartDate | date }} -
+                                            {{ campaign.campaignEndDate | date }}</span>
+                                    </div>
+                                    <div class="col-2" *ngIf="campaign.certificateImageUrl">
+                                        <p-button styleClass="class-wight"
+                                            label="{{'training-campaigns.current-campaign.viewCertificate' | translate}}"
+                                            icon="pi pi-eye" (onClick)="getCertificate(campaign)"></p-button>
+                                    </div>
+                                    <div class="col-4">
+                                        <p class="text-center">
+                                            {{
+                                            'training-campaigns.current-campaign.compelationPercentage'
+                                            | translate : { number: campaign.campaignProgressPercentage }
+                                            }}
+                                        </p>
+                                        <p-progressBar [value]="campaign.campaignProgressPercentage"
+                                            [showValue]="false"></p-progressBar>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="th-table">{{ 'training-campaigns.current-campaign.lessonName' | translate }}</th>
+                            <th class="th-table">
+                                {{ 'training-campaigns.current-campaign.lessonJoiningDate' | translate }}
+                            </th>
+                            <th class="th-table text-center" style="text-align: center !important;">
+                                {{ 'training-campaigns.current-campaign.contentStatus' | translate }}
+                            </th>
+                            <th class="th-table text-center" style="text-align: center !important;">{{
+                                'training-campaigns.current-campaign.status' | translate }}</th>
+                            <th class="th-table text-center" style="text-align: center !important;">{{
+                                'training-campaigns.current-campaign.score' | translate }}</th>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="groupfooter" let-campaign>
+                        <tr>
+                            <td colspan="5" class="group-footer text-right font-bold pr-6 pb-7">
+                                {{
+                                'training-campaigns.current-campaign.totalLessons'
+                                | translate : { number: calculateTotalNumberOfLessonsVII(campaign.campaignName) }
+                                }}
+                            </td>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="body" let-lesson>
+                        <tr style="cursor: pointer" (click)="navigateToLesson(lesson)">
+                            <td [pTooltip]="
+                                lesson.status !== 'Completed'
+                                    ? lesson.contentStarted
+                                        ? ('training-campaigns.current-campaign.clicktocontinue'| translate)
+                                        : ('training-campaigns.current-campaign.clicktostart'| translate)
+                                    : undefined
+                            " tooltipPosition="right">{{ lesson.contentName }}</td>
+                            <td>{{ lesson.joiningDate | date : 'MMM d, yyyy' }}</td>
+                            <td class="text-center">
+                                <i *ngIf="lesson.status === 'Completed'" class="pi pi-check"
+                                    style="color: green; font-size: large; font-weight: 900"></i>
+                                <i *ngIf="lesson.status === 'InProgress'" class="pi pi-stopwatch"
+                                    style="color: rgb(232, 186, 2); font-size: large; font-weight: 900"></i>
+                                <i *ngIf="lesson.status === 'NotStarted'" class="pi pi-times"
+                                    style="color: red; font-size: large; font-weight: 900"></i>
+                            </td>
+                            <td class="text-center">
+                                <span [ngClass]="{
+                                        'status-completed': lesson.status === 'Completed',
+                                        'status-in-progress': lesson.status === 'InProgress',
+                                        'status-not-started': lesson.status === 'NotStarted'
+                                    }">
+                                    {{ lesson.status }}
+                                </span>
+                            </td>
+                            <td class="text-center"
+                                style="color: var(--primary-color); font-size: larger; font-weight: 800">
+                                {{
+                                'training-campaigns.current-campaign.lessonScore'
+                                | translate : { number: lesson.score ?? 0 }
+                                }}
+                            </td>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="emptymessage">
+                        <tr class="text-center">
+                            <td colspan="5">
+                                <div style="width: 100%; padding: 10px; text-align: center">
+                                    {{ 'training-campaigns.current-campaign.noCampaignsAvailable' | translate }}
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </p-tabPanel>
+    </p-tabView>
+</p-card>
+
+<p-dialog [(visible)]="certificateDialog"
+    [style]="{ border: 'none', width: '60%', height: '100vh', 'background-color': 'transparent' }" [modal]="true"
+    [contentStyle]="{ 'background-color': 'transparent', 'box-shadow': 'none' }" [dismissableMask]="true">
+    <ng-template pTemplate="headless">
+        <div style="display: flex; height: 100%; align-items: center">
+            <!-- Left side: Share buttons -->
+            <div style="
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    gap: 1rem;
+                    width: 10%;
+                ">
+                <p-button icon="pi pi-facebook" (onClick)="shareOnFacebook()" [style]="{
+                        'background-color': '#3b5998',
+                        color: 'white',
+                        'border-color': '#3b5998',
+                        'border-radius': '50%',
+                        width: '2.5rem',
+                        height: '2.5rem',
+                        'font-size': '1.5rem'
+                    }"></p-button>
+                <p-button icon="pi pi-twitter" (onClick)="shareOnTwitter()" [style]="{
+                        'background-color': '#1da1f2',
+                        color: 'white',
+                        'border-color': '#1da1f2',
+                        'border-radius': '50%',
+                        width: '2.5rem',
+                        height: '2.5rem',
+                        'font-size': '1.5rem'
+                    }"></p-button>
+                <p-button icon="pi pi-linkedin" (onClick)="shareOnLinkedIn()" [style]="{
+                        'background-color': '#0077b5',
+                        color: 'white',
+                        'border-color': '#0077b5',
+                        'border-radius': '50%',
+                        width: '2.5rem',
+                        height: '2.5rem',
+                        'font-size': '1.5rem'
+                    }"></p-button>
+                <p-button icon="pi pi-envelope" (onClick)="shareViaGmail()" [style]="{
+                        'background-color': '#db4437',
+                        color: 'white',
+                        'border-color': '#db4437',
+                        'border-radius': '50%',
+                        width: '2.5rem',
+                        height: '2.5rem',
+                        'font-size': '1.5rem'
+                    }"></p-button>
+                <p-button icon="pi pi-whatsapp" (onClick)="shareOnWhatsApp()" [style]="{
+                        'background-color': '#25d366',
+                        color: 'white',
+                        'border-color': '#25d366',
+                        'border-radius': '50%',
+                        width: '2.5rem',
+                        height: '2.5rem',
+                        'font-size': '1.5rem'
+                    }"></p-button>
+                <p-button icon="fas fa-download" (onClick)="downloadCertificate()" [style]="{
+                        'background-color': '#883cae',
+                        color: 'white',
+                        'border-color': '#25d366',
+                        'border-radius': '50%',
+                        width: '2.5rem',
+                        height: '2.5rem',
+                        'font-size': '1.5rem'
+                    }"></p-button>
+            </div>
+
+            <!-- Right side: Certificate image -->
+            <div class="image-container"
+                style="flex-grow: 1; display: flex; justify-content: center; align-items: center">
+                <img [src]="generatedCertificate" alt="Certificate" class="certificate-image"
+                    style="max-width: 100%; max-height: 100%" />
+            </div>
+        </div>
+    </ng-template>
+</p-dialog>

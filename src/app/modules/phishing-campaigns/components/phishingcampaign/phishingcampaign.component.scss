@@ -1,0 +1,39 @@
+.th-table {
+  text-align: left;
+  padding: 1rem 1rem;
+  border: 1px solid #dee2e6;
+  border-width: 1px 0 2px 0;
+  font-weight: 600;
+  color: #212529;
+  background: #ffffff;
+  transition: box-shadow 0.15s;
+}
+
+.status-active {
+  background-color: #28a745;
+  color: white;
+  padding: 4px 6px;
+  border-radius: 12px;
+  font-size: smaller;
+  font-weight: 700;
+}
+
+.status-closed {
+  background-color: red;
+  color: white;
+  padding: 4px 6px;
+  border-radius: 12px;
+  font-size: smaller;
+  font-weight: 700;
+}
+
+.th-table {
+  text-align: left;
+  padding: 1rem;
+  font-weight: 600;
+  transition: box-shadow 0.15s;
+}
+
+th,td {
+  text-align: inherit;
+}

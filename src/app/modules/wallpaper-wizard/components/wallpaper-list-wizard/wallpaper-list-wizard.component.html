@@ -1,0 +1,408 @@
+<div class="iAware-loading-table-container" style="position: relative">
+    <p-tabView class="w-full h-full" styleClass="tabview-custom">
+        <div class="mb-1">
+            <!-- <app-tag-filter (filterApplied)="onTagFilterChanged($event)"  [componentName]="'Wallpapers'"></app-tag-filter> -->
+        </div>
+
+        <p-tabPanel *ngIf="isIAwareTeamUser !== null && isIAwareTeamUser"
+            [header]="isIAwareTeamUser ? ('shared.headers.defaultWallpapers' | translate) : ('shared.headers.companyWallpapers' | translate)">
+            <div *ngIf="!selectedWallpaper">
+                <div class="card">
+                    <app-table-loading-spinner *ngIf="iAwareWallpapersLoading"></app-table-loading-spinner>
+                    <p-toast></p-toast>
+                    <p-dataView #dv (onLazyLoad)="lazyLoadiAwareWallpapers($event)"
+                        [totalRecords]="iAwareWallpapersTotalRecords" [lazy]="true" [value]="iAwareWallpapers"
+                        [paginator]="true" [rows]="9" layout="grid">
+                        <ng-template pTemplate="header">
+                            <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                                <h5 class="m-0">
+                                    {{ 'wallpaper-wizard.wallpaper-list-wizard.title' | translate }}
+                                </h5>
+                                <div class="my-1">
+                                    <button *ngIf="hasPermission(actions.add)" pButton pRipple
+                                        label="{{ 'wallpaper-wizard.wallpaper-list-wizard.actions.add1' | translate }}"
+                                        icon="pi pi-plus" class="p-button mr-2" (click)="CreateNewWallpaper()"></button>
+                                    <button *ngIf="hasPermission(actions.add)" pButton pRipple
+                                        label="{{ 'wallpaper-wizard.wallpaper-list-wizard.actions.add2' | translate }}"
+                                        icon="pi pi-plus" class="p-button mr-2"
+                                        (click)="openAddNewStandaloneWallpaperDialog()"></button>
+                                </div>
+                            </div>
+                        </ng-template>
+                        <ng-template let-walls pTemplate="gridItem">
+                            <div class="grid grid-nogutter">
+                                <div class="col-12 md:col-4 wall-see-more" *ngFor="let wall of walls">
+                                    <div class="p-3">
+                                        <div
+                                            class="surface-card shadow-3 border-round overflow-hidden hover:shadow-5 transition-all relative">
+                                            <div style="cursor: pointer"
+                                                class="relative object-cover wall-image-container">
+                                                <img (click)="navigateToLangauges(wall.id, wall.wallpaperTitle, 'defaultWallpapers')"
+                                                    [src]="wall.wallpaperImageThumbnailUrl"
+                                                    class="w-full border-round-top" />
+                                            </div>
+                                            <button *ngIf="!isIAwareTeamUser" pButton pRipple type="button"
+                                                icon="pi pi-ellipsis-v"
+                                                class="p-button-rounded p-button-text p-button-plain absolute top-0 right-0 m-2 bg-gray-200 shadow-lg border border-gray-300"
+                                                (click)="adminMenu.toggle($event); assigneCurrentSelect(wall)"></button>
+
+                                            <button *ngIf="isIAwareTeamUser" pButton pRipple type="button"
+                                                icon="pi pi-ellipsis-v"
+                                                class="p-button-rounded p-button-text p-button-plain absolute top-0 right-0 m-2 bg-gray-200 shadow-lg border border-gray-300"
+                                                (click)="iAwareMenu.toggle($event); assigneCurrentSelect(wall)"></button>
+
+                                            <p-menu #adminMenu [model]="normalMenuItems" [appendTo]="'body'"
+                                                [popup]="true"></p-menu>
+
+                                            <p-menu #iAwareMenu [model]="ownerMenuItems" [appendTo]="'body'"
+                                                [popup]="true"></p-menu>
+
+                                            <button *ngIf="!isIAwareTeamUser" pButton pRipple type="button"
+                                                icon="pi pi-ellipsis-v"
+                                                class="p-button-rounded p-button-text p-button-plain absolute top-0 right-0 m-2 bg-gray-200 shadow-lg border border-gray-300"
+                                                (click)="adminMenu.toggle($event); assigneCurrentSelect(wall)">
+                                            </button>
+                                            <div class="text-center p-3"
+                                                (click)="navigateToLangauges(wall.id, wall.wallpaperTitle, 'defaultWallpapers')">
+                                                <div style="cursor: pointer">
+                                                    <h4>
+                                                        {{ wall.wallpaperTitle }}
+
+                                                    </h4>
+                                                </div>
+                                                <span class="text-1xl font-bold"
+                                                    style="display: block; padding-bottom: 0px">{{
+                                                    wall.wallpaperLanguagesCount || 0 }} Languages</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </p-dataView>
+                </div>
+            </div>
+        </p-tabPanel>
+
+
+        <p-tabPanel *ngIf="isIAwareTeamUser !== null &&!isIAwareTeamUser"
+            [header]="!isIAwareTeamUser ? ('shared.headers.defaultWallpapers' | translate) : ('shared.headers.companyWallpapers' | translate)">
+            <div *ngIf="!selectedWallpaper">
+                <div class="card">
+                    <app-table-loading-spinner *ngIf="iAwareWallpapersLoading"></app-table-loading-spinner>
+                    <p-dataView #dv (onLazyLoad)="lazyLoadiAwareWallpapers($event)"
+                        [totalRecords]="iAwareWallpapersTotalRecords" [lazy]="true" [value]="iAwareWallpapers"
+                        [paginator]="true" [rows]="9" layout="grid">
+                        <ng-template pTemplate="header">
+                            <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                                <h5 class="m-0">
+                                    {{ 'wallpaper-wizard.wallpaper-list-wizard.title' | translate }}
+                                </h5>
+                                <div class="my-1">
+                                    <button *ngIf="hasPermission(actions.add) && isIAwareTeamUser" pButton pRipple
+                                        label="{{ 'wallpaper-wizard.wallpaper-list-wizard.actions.add1' | translate }}"
+                                        icon="pi pi-plus" class="p-button mr-2" (click)="CreateNewWallpaper()"></button>
+                                </div>
+                            </div>
+                        </ng-template>
+                        <ng-template let-walls pTemplate="gridItem">
+                            <div class="grid grid-nogutter">
+                                <div class="col-12 md:col-4 wall-see-more" *ngFor="let wall of walls">
+                                    <div class="p-3">
+                                        <div
+                                            class="surface-card shadow-3 border-round overflow-hidden hover:shadow-5 transition-all">
+                                            <!-- Container for Image and Menu -->
+                                            <div style="cursor: pointer"
+                                                class="relative object-cover wall-image-container">
+                                                <img (click)="navigateToLangauges(wall.id, wall.wallpaperTitle, 'defaultWallpapers')"
+                                                    [src]="wall.wallpaperImageThumbnailUrl"
+                                                    class="w-full border-round-top" />
+                                            </div>
+
+                                            <!-- Category Name -->
+                                            <div class="text-center p-3">
+                                                <div (click)="navigateToLangauges(wall.id, wall.wallpaperTitle, 'defaultWallpapers')"
+                                                    style="cursor: pointer">
+                                                    <h4>
+                                                        {{ wall.wallpaperTitle }}
+                                                    </h4>
+                                                </div>
+                                                <span class="text-1xl font-bold "
+                                                    style="display: block; padding-bottom: 0px">{{
+                                                    wall.wallpaperLanguagesCount || 0 }} Languages</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </p-dataView>
+                </div>
+            </div>
+        </p-tabPanel>
+
+        <p-tabPanel *ngIf="isIAwareTeamUser !== null &&!isIAwareTeamUser"
+            [header]="isIAwareTeamUser ? ('shared.headers.defaultWallpapers' | translate) : ('shared.headers.companyWallpapers' | translate)">
+            <div *ngIf="!selectedWallpaper">
+                <div class="card">
+                    <app-table-loading-spinner *ngIf="companyWallpapersLoading"></app-table-loading-spinner>
+                    <p-dataView #dv (onLazyLoad)="lazyLoadCompanyWallpapers($event)"
+                        [totalRecords]="companyWallpapersTotalRecords" [lazy]="true" [value]="companyWallpapers"
+                        [paginator]="true" [rows]="9" layout="grid">
+                        <ng-template pTemplate="header">
+                            <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                                <h5 class="m-0">
+                                    {{ 'wallpaper-wizard.wallpaper-list-wizard.title' | translate }}
+                                </h5>
+                                <div class="my-1">
+                                    <button *ngIf="hasPermission(actions.add)" pButton pRipple
+                                        label="{{ 'wallpaper-wizard.wallpaper-list-wizard.actions.add1' | translate }}"
+                                        icon="pi pi-plus" class="p-button mr-2" (click)="CreateNewWallpaper()"></button>
+                                </div>
+                            </div>
+                        </ng-template>
+                        <ng-template let-walls pTemplate="gridItem">
+                            <div class="grid grid-nogutter">
+
+                                <div class="col-12 md:col-4 wall-see-more" *ngFor="let wall of walls">
+                                    <div class="p-3">
+                                        <div
+                                            class="surface-card shadow-3 border-round overflow-hidden hover:shadow-5 transition-all relative">
+                                            <div style="cursor: pointer"
+                                                class="relative object-cover wall-image-container">
+                                                <img (click)="navigateToLangauges(wall.id, wall.wallpaperTitle, 'companyWallpapers')"
+                                                    [src]="wall.wallpaperImageThumbnailUrl"
+                                                    class="w-full border-round-top" />
+                                            </div>
+                                            <button *ngIf="!isIAwareTeamUser" pButton pRipple type="button"
+                                                icon="pi pi-ellipsis-v"
+                                                class="p-button-rounded p-button-text p-button-plain absolute top-0 right-0 m-2 bg-gray-200 shadow-lg border border-gray-300"
+                                                (click)="
+                                                        adminMenu.toggle($event); assigneCurrentSelect(wall)"></button>
+
+                                            <button *ngIf="isIAwareTeamUser" pButton pRipple type="button"
+                                                icon="pi pi-ellipsis-v"
+                                                class="p-button-rounded p-button-text p-button-plain absolute top-0 right-0 m-2 bg-gray-200 shadow-lg border border-gray-300"
+                                                (click)="
+                                                        iAwareMenu.toggle($event); assigneCurrentSelect(wall)"></button>
+
+                                            <p-menu #adminMenu [model]="normalMenuItems" [appendTo]="'body'"
+                                                [popup]="true"></p-menu>
+
+                                            <p-menu #iAwareMenu [model]="ownerMenuItems" [appendTo]="'body'"
+                                                [popup]="true"></p-menu>
+
+                                            <button *ngIf="!isIAwareTeamUser" pButton pRipple type="button"
+                                                icon="pi pi-ellipsis-v"
+                                                class="p-button-rounded p-button-text p-button-plain absolute top-0 right-0 m-2 bg-gray-200 shadow-lg border border-gray-300"
+                                                (click)="adminMenu.toggle($event); assigneCurrentSelect(wall)">
+                                            </button>
+                                            <div class="text-center p-3"
+                                                (click)="navigateToLangauges(wall.id, wall.wallpaperTitle, 'companyWallpapers')">
+                                                <div style="cursor: pointer">
+                                                    <h4>
+                                                        {{ wall.wallpaperTitle }}
+                                                    </h4>
+                                                </div>
+                                                <span class="text-1xl font-bold"
+                                                    style="display: block; padding-bottom: 0px">{{
+                                                    wall.wallpaperLanguagesCount || 0 }} Languages</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </p-dataView>
+                </div>
+            </div>
+        </p-tabPanel>
+
+        <div *ngIf="isIAwareTeamUser === null" class="col-12 flex flex-column justify-content-center align-items-center"
+            style="height: 100vh;">
+            <p-progressSpinner></p-progressSpinner>
+            <br>
+            <p class="ml-3">{{ 'shared.loading' | translate }}</p>
+        </div>
+    </p-tabView>
+</div>
+
+
+<p-dialog [(visible)]="switchActivationWallpaperDialog" header="{{ 'shared.header.active' | translate }}" [modal]="true"
+    [style]="{ width: '450px' }">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        @if (wallpaper && wallpaper.isActive) {
+        <span> {{ 'shared.messages.deactive' | translate }} </span>
+        }@else {
+        <span>{{ 'shared.messages.active' | translate }} </span>
+        }
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="declineActivation()"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{ 'shared.actions.save' | translate }}"
+            (click)="confirmtActivation()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="deletionWallpaperDialog" header="{{ 'shared.header.delete' | translate }}" [modal]="true"
+    [style]="{ width: '450px' }">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="wallpaper">{{ 'shared.messages.delete' | translate }} <b>{{ wallpaper.wallpaperTitle }}</b>
+            ?</span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="declineDeletion()"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{ 'shared.actions.save' | translate }}"
+            (click)="confirmDeletion()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="openCategoryPageContentHtmlDialog" [modal]="true" [style]="{ width: '450px' }">
+    <div class="flex align-items-center justify-content-center">
+        <strong *ngIf="wallpaper" [innerHTML]="wallpaper.wallpaperQuote"></strong>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="hideCategoryPageContentHtmlDialog()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog header="{{ 'wallpaper-wizard.wallpaper-list-wizard.actions.add2' | translate }}"
+    [(visible)]="addNewStandaloneWallpaperDialog" [modal]="true" [style]="{ width: '50%', height: '81%' }">
+    <ng-template pTemplate="content">
+        <div class="grid p-fluid">
+
+            <!-- Language Dropdown -->
+            <div class="col-12 md:col-6 field">
+                <label for="languageId" class="font-medium text-900">{{
+                    'wallpaper-wizard.wallpaper-list-wizard.library-character-wizard.addDialog.language' | translate
+                    }}</label>
+                <label for="languageId" class="font-medium text-900">{{
+                    'wallpaper-wizard.wallpaper-list-wizard.library-character-wizard.addDialog.language' | translate
+                    }}</label>
+                <p-dropdown [options]="defaultLanguage" optionLabel="name" placeholder=" {{
+                        'wallpaper-wizard.wallpaper-list-wizard.library-character-wizard.addDialog.languagePlceholder'
+                            | translate
+                    }}" optionValue="id">
+                </p-dropdown>
+            </div>
+
+            <!-- Title Input -->
+            <div class="col-12 md:col-6 field">
+                <label for="name" class="font-medium text-900">{{
+                    'wallpaper-wizard.wallpaper-list-wizard.addDialog.fields.title'
+                    | translate }}</label>
+                <input type="text" pInputText id="name" [(ngModel)]="imageTitle" required
+                    [ngClass]="{ 'p-invalid': submitted && !imageTitle }" />
+                <small *ngIf="submitted && !imageTitle" class="p-error">{{
+                    'wallpaper-wizard.wallpaper-list-wizard.addDialog.fields.titleisrequired' | translate }}</small>
+            </div>
+
+            <!-- Tag Input -->
+            <div class="col-12 field">
+                <label for="name" class="font-medium text-900">{{
+                    'wallpaper-wizard.wallpaper-list-wizard.addDialog.fields.tag'
+                    | translate }}</label>
+                <p-multiSelect
+                    [placeholder]="'wallpaper-wizard.wallpaper-list-wizard.addDialog.fields.tagsPlaceholder' | translate"
+                    [options]="tages" optionLabel="tagName" optionValue="id"
+                    [(ngModel)]="selectedTages"></p-multiSelect>
+
+            </div>
+
+            <!-- Wallpaper Image Section -->
+            <div class="col-12 md:col-6">
+                <p-panel header="{{ 'wallpaper-wizard.wallpaper-list-wizard.actions.wallpaperImage' | translate }}"
+                    class="mb-3">
+                    <!-- Image Preview -->
+                    <div style="cursor: pointer" class="flex align-items-center justify-content-center mb-2">
+                        <img [src]="wallUrl || 'placeholder.jpg'" alt="Wallpaper Preview" class="avatar"
+                            style="width: 100%; max-width: 300px; border-radius: 8px; border: 1px solid #ccc;"
+                            (click)="onUploadWallpaperImageClick()" />
+                    </div>
+                    <!-- Recommended Dimensions -->
+                    <small class="text-center block m-2">{{ 'shared.messages.recommendedDimensions' | translate}}
+                        <strong>{{ 'shared.messages.1920x1080' | translate}}</strong> {{ 'shared.messages.pixels' |
+                        translate}}</small>
+                    <!-- Upload Button -->
+                    <div class="flex justify-content-center">
+                        <p-button label="{{ 'shared.actions.upload' | translate }}" icon="pi pi-upload"
+                            (click)="onUploadWallpaperImageClick()"></p-button>
+                        <input type="file" id="addWallpaperImage" style="display: none"
+                            (change)="onImageSelected($event)" />
+                    </div>
+                </p-panel>
+            </div>
+
+            <!-- Wallpaper Thumbnail Section -->
+            <div class="col-12 md:col-6">
+                <p-panel
+                    header="{{ 'wallpaper-wizard.wallpaper-list-wizard.actions.wallpaperThumbnailImage' | translate }}"
+                    class="mb-3">
+                    <!-- Image Preview -->
+                    <div style="cursor: pointer" class="flex align-items-center justify-content-center mb-2">
+                        <img [src]="wallUrlThumbnail || '../../../../../assets/media/upload-photo.jpg'"
+                            alt="Thumbnail Preview" class="avatar"
+                            style="width: 100%; max-width: 150px; border-radius: 8px; border: 1px solid #ccc;"
+                            (click)="onUploadWallpaperImageThumbnailClick()" />
+                    </div>
+                    <!-- Recommended Dimensions -->
+                    <small class="text-center block m-2">{{ 'shared.messages.recommendedDimensions' | translate}}
+                        <strong>{{ 'shared.messages.300x300' | translate}}</strong> {{ 'shared.messages.pixels' |
+                        translate}}</small>
+                    <!-- Upload Button -->
+                    <div class="flex justify-content-center">
+                        <p-button label="{{ 'shared.actions.upload' | translate }}" icon="pi pi-upload"
+                            (click)="onUploadWallpaperImageThumbnailClick()"></p-button>
+                        <input type="file" id="addWallpaperImageThumbnail" style="display: none"
+                            (change)="onThumbnailImageSelected($event)" />
+                    </div>
+                </p-panel>
+            </div>
+
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <div class="flex justify-content-between">
+            <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+                class="p-button-text" (click)="declineAddSingleWallpaper()"></button>
+            <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check"
+                class="p-button-text" (click)="confirmAddSingleWallpaper()"></button>
+        </div>
+    </ng-template>
+</p-dialog>
+
+
+<p-dialog [(visible)]="editWallpaperDialog" [style]="{ width: '50%', height: '70%' }"
+    header="{{ 'phishing-email-template.editHeader' | translate }}" [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <form [formGroup]="editWallpaperForm" (ngSubmit)="saveEditWallpaprTages()">
+            <div class="grid">
+                <div class="col-12">
+                    <div class="grid formgrid p-fluid">
+                        <div class="field mb-4 col-12">
+                            <label for="name" class="font-medium text-900">{{
+                                'wallpaper-wizard.wallpaper-list-wizard.addDialog.fields.tag' | translate }}</label>
+                            <p-multiSelect
+                                [placeholder]="'wallpaper-wizard.wallpaper-list-wizard.addDialog.fields.tagsPlaceholder' | translate"
+                                [options]="tages" optionLabel="tagName" optionValue="id"
+                                formControlName="tages"></p-multiSelect>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+            class="p-button-text" (click)="editWallpaperDialog = false"></button>
+        <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check" class="p-button-text"
+            (click)="saveEditWallpaprTages()"></button>
+    </ng-template>
+</p-dialog>

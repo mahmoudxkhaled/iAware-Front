@@ -1,0 +1,100 @@
+<p-button class="mb-3" label="{{'shared.actions.back' | translate}}" (onClick)="prevPage()" icon="pi pi-arrow-left"></p-button>
+<div class="card-container">
+    <div class="form-group">
+        <label class="font-medium text-900">{{'wallpaper-wizard.wall-lang-list-wiz.wall-lang-preview.wallpaper' | translate }}</label>
+        <input type="text" pInputText id="characterName" required [(ngModel)]="WallpaperTitle" />
+        <small class="mt-1 text-red-500" [ngStyle]="{ 'display': !WallpaperTitle ? 'block' : 'none' }">
+            {{'wallpaper-wizard.wall-lang-list-wiz.wall-lang-preview.wallpaperValidation' | translate }}
+        </small>
+    </div>
+
+    <div class="form-group">
+        <div class="field p-fluid ">
+            <label for="languageId" class="font-medium text-900">{{'wallpaper-wizard.wall-lang-list-wiz.wall-lang-preview.language' | translate }}</label>
+            <p-dropdown [(ngModel)]="selectedLanguageId" [options]="activeLanguages" optionLabel="name"
+                placeholder="{{'wallpaper-wizard.wall-lang-list-wiz.wall-lang-preview.languagePlaceholder' | translate }}" optionValue="id">
+            </p-dropdown>
+            <small class="mt-1 text-red-500" [ngStyle]="{ 'display': !selectedLanguageId ? 'block' : 'none' }">
+                {{'wallpaper-wizard.wall-lang-list-wiz.wall-lang-preview.languageValidation' | translate }}
+            </small>
+        </div>
+    </div>
+
+    <div class="image-previews">
+        <div *ngIf="selectedCharacter" class="grid-item character">
+            <div class="character-preview mx-4">
+                <label class="font-medium text-900 flex justify-content-center">{{'wallpaper-wizard.wall-lang-list-wiz.wall-lang-preview.selectedCharacter' | translate }}</label>
+                <img [src]="selectedCharacter.characterImageUrl" class="shadow-2 my-3 mx-0"
+                    style="width: 150px; height: 150px; cursor: pointer;" />
+            </div>
+        </div>
+        <div *ngIf="selectedBackground" class="grid-item background">
+            <div class="background-preview mx-4">
+                <label class="font-medium text-900 flex justify-content-center">{{'wallpaper-wizard.wall-lang-list-wiz.wall-lang-preview.selectedBackground' | translate }}</label>
+                <img [src]="selectedBackground.backgroundImageUrl" class="shadow-2 my-3 mx-0"
+                    style="width: 150px; height: 150px; cursor: pointer;" />
+            </div>
+        </div>
+    </div>
+
+    <label class="flex justify-content-center font-medium text-900 mb-2">{{'wallpaper-wizard.wall-lang-list-wiz.wall-lang-preview.selectedQuote' | translate }}</label>
+    <div class="quote-container">
+        <div class="quote-text">
+            <strong [innerHTML]="selectedQuote?.quoteText" class="text-l"></strong>
+        </div>
+    </div>
+    <div class="header mt-4">
+        <div class="button-container shadow-4" (click)="createWallpaper()" style="cursor: pointer;">
+            <p class="p-button font-bold fs-1 fw-bold" severity="help" style="cursor: pointer;">
+                {{'wallpaper-wizard.wall-lang-list-wiz.wall-lang-preview.createWallpaper' | translate }}
+                <i class="pi pi-check px-2 fs-1 fw-bold" style="font-size: 18px;"></i>
+            </p>
+        </div>
+    </div>
+
+    <ng-container *ngIf="isLoading$ | async">
+        <p-progressBar mode="indeterminate" [style]="{ height: '6px' }" />
+    </ng-container>
+
+</div>
+
+<!-- <div class="card">
+
+    <div class="field mb-1 col-12 mt-3">
+        <div class="flex justify-content-end">
+
+            <p (click)="createWallpaper()" class="p-button font-bold fs-1 fw-bold">
+                Create Wallpaper
+                <i class="pi pi-check px-2 fs-1 fw-bold"></i>
+            </p>
+
+
+        </div>
+    </div>
+
+    <div class="field mb-1 col-12 mt-3">
+
+        <label for="characterName" class="font-medium text-900">Name</label>
+        <input type="text" pInputText id="characterName" formControlName="characterName" required
+            [ngModel]="WallpaperTitle" />
+    </div>
+
+
+    <div *ngIf="selectedCharacter" class="grid-item character">
+        <img [src]="selectedCharacter.characterImageUrl" class="shadow-2 my-3 mx-0"
+            style="width: 150px; height: 150px; cursor: pointer;" />
+    </div>
+
+
+    <div *ngIf="selectedBackground" class="grid-item background">
+        <img [src]="selectedBackground.backgroundImageUrl" class="shadow-2 my-3 mx-0"
+            style="width: 150px; height: 150px; cursor: pointer;" />
+    </div>
+
+    <div class="card shadow-2 my-3 mx-0"
+        style="min-width: 100% ;min-height: 150px;cursor: pointer;align-items: center;vertical-align: middle;display: flex;justify-content: center;">
+        <div class="text-center mb-2 ">
+            <strong [innerHTML]="selectedQuote?.quoteText" class="text-l"></strong>
+        </div>
+    </div>
+</div> -->

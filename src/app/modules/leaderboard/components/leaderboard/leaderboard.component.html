@@ -1,0 +1,276 @@
+<p-card>
+    <p-tabView>
+
+        <p-tabPanel header="{{ 'leaderboard.usersLeaderboard' | translate }}">
+            <div class="iAware-loading-table-container" style="position: relative">
+                <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                <div class="grid justify-content-center"
+                    *ngIf="topThreeRankedUsers.length > 0; else noUsersMessage">
+
+                    <!-- Top 3 Users Cards -->
+                    <div class="col-12 md:col-6 justify-content-center">
+                        <!-- 1st Place - Larger, Centered -->
+                        <div class="col-12 flex justify-content-center align-items-center text-center">
+                            <div class="renking-item col-12 md:col-6">
+                                <div class="flex justify-content-center"
+                                    *ngIf="topThreeRankedUsers[0]">
+                                    <p-card styleClass="renking-user-card"
+                                        [subheader]="topThreeRankedUsers[0].userName"
+                                        styleClass="renking-card" [style]="{ width: '100%' }">
+                                        <ng-template pTemplate="header">
+                                            <img src="assets/ranking-images/users/1.jpg" />
+                                        </ng-template>
+                                        <p>
+                                            {{
+                                            topThreeRankedUsers[0].userPoints | number : '1.0-0'
+                                            }}
+                                            {{ 'leaderboard.points' | translate }}
+                                        </p>
+                                    </p-card>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2nd and 3rd Place - Aligned Beside Each Other -->
+                        <div class="col-12 flex justify-content-center align-items-center text-center">
+                            <div class="col-12">
+                                <div class="grid">
+                                    <!-- 2nd Place -->
+                                    <div class="renking-item col-6"
+                                        *ngIf="topThreeRankedUsers[1]">
+                                        <p-card [subheader]="topThreeRankedUsers[1].userName"
+                                            styleClass="renking-card" [style]="{ width: '100%' }">
+                                            <ng-template pTemplate="header">
+                                                <img src="assets/ranking-images/users/2.jpg" />
+                                            </ng-template>
+                                            <p>
+                                                {{
+                                                topThreeRankedUsers[1].userPoints
+                                                | number : '1.0-0'
+                                                }}
+                                                {{ 'leaderboard.points' | translate }}
+                                            </p>
+                                        </p-card>
+                                    </div>
+
+                                    <!-- 3rd Place -->
+                                    <div class="renking-item col-6"
+                                        *ngIf="topThreeRankedUsers[2]">
+                                        <p-card [subheader]="topThreeRankedUsers[2].userName"
+                                            styleClass="renking-card" [style]="{ width: '100%' }">
+                                            <ng-template pTemplate="header">
+                                                <img src="assets/ranking-images/users/3.jpg" />
+                                            </ng-template>
+                                            <p>
+                                                {{
+                                                topThreeRankedUsers[2].userPoints
+                                                | number : '1.0-0'
+                                                }}
+                                                {{ 'leaderboard.points' | translate }}
+                                            </p>
+                                        </p-card>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- All Users Ranking -->
+                    <div class="col-12 md:col-6 ranking-container">
+                        <ul class="flex p-0">
+                            <li class="ranking-row-header col-5">{{ 'leaderboard.ranking' | translate }}</li>
+                            <li class="ranking-row-header col-3">{{ 'leaderboard.name' | translate }}</li>
+                            <li class="ranking-row-header col-4">
+                                <span>{{ 'leaderboard.points' | translate }}</span>
+                            </li>
+                        </ul>
+                        <p-scrollPanel [style]="{ height: 'calc(100vh - 100px)' }">
+                            <ul class="ranking-list" style="list-style-type: none">
+                                <li *ngFor="let user of leaderboardDataForUsers.rankedUsers"
+                                    [ngClass]="{ 'unique-row': user.isUnique }" class="ranking-row mb-1">
+                                    <span class="ranking-no">{{ user.rankingNo }}</span>
+                                    <span> <p-avatar
+                                            [image]="user.userImageUrl ? user.userImageUrl : '../../assets/media/avatar.png'"
+                                            shape="circle" size="large">
+                                        </p-avatar>
+                                    </span>
+                                    <div class="user-info">
+                                        <div class="user-text">
+                                            <span class="user-name">{{ user.userName }}</span>
+                                            <span class="you-badge" *ngIf="user.isUnique"></span>
+                                        </div>
+                                    </div>
+                                    <span class="user-points justify-content-center">{{ user.userPoints | number :
+                                        '1.0-0' }}</span>
+                                </li>
+                            </ul>
+                        </p-scrollPanel>
+                        <div class="pagination-container mt-3">
+                            <p-paginator 
+                                [rows]="pagination.size" 
+                                [totalRecords]="totalRecords" 
+                                [rowsPerPageOptions]="[9, 18, 27]"
+                                (onPageChange)="onPageChange($event)"
+                                [showCurrentPageReport]="true"
+                                currentPageReportTemplate="{{ 'shared.pagination.showing' | translate:{first: pagination.page, last: pagination.page + pagination.size, totalRecords: totalRecords} }}"
+                                [showFirstLastIcon]="true">
+                            </p-paginator>
+                        </div>
+                    </div>
+                </div>
+
+                <ng-template #noUsersMessage>
+                    <div class="no-data-message text-center">
+                        <p>{{ 'leaderboard.noUsersAvailable' | translate }}</p>
+                    </div>
+                </ng-template>
+            </div>
+        </p-tabPanel>
+
+        <p-tabPanel header="{{ 'leaderboard.unitLeaderboard' | translate }}">
+            <div class="iAware-loading-table-container" style="position: relative">
+                <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                <div class="col-12 flex justify-content-center" *ngIf="topThreeRankedTenantUnits.length > 0; else noDepartmentsMessage">
+                    <div class="grid justify-content-center mt-5">
+                        <!-- 2nd place group -->
+                        <div class="col-8 md:col-3" *ngIf="topThreeRankedTenantUnits[1]">
+                            <p-card styleClass="renking-group-card" [style]="{
+                                width: '100%',
+                                border: '2px solid rgb(136 60 174 / 26%)',
+                                borderRadius: '8px',
+                                margin: '1rem'
+                            }">
+                                <ng-template pTemplate="header">
+                                    <div class="congrats-message text-center"
+                                        *ngIf="topThreeRankedTenantUnits[1].isUnique">
+                                        <strong>{{ 'leaderboard.congrats' | translate }}</strong>
+                                        <p class="m-0">{{ 'leaderboard.yourGroupIs2d' | translate }}</p>
+                                        <div class="stars">
+                                            <i class="pi pi-star star star-1"></i>
+                                            <i class="pi pi-star-fill star star-2"></i>
+                                            <i class="pi pi-star star star-3"></i>
+                                        </div>
+                                    </div>
+                                    <img class="pt-2" src="assets/ranking-images/groups/2.jpg" />
+                                </ng-template>
+                                <div class="renking-group-text text-center">
+                                    <div class="group-name" style="font-weight: bold; font-size: 1.2rem;"> {{
+                                        topThreeRankedTenantUnits[1].tenantUnitName }}
+                                    </div>
+                                    {{ topThreeRankedTenantUnits[1].tenantUnitPercentage
+                                    }}%
+                                    Complete
+                                </div>
+                            </p-card>
+                        </div>
+
+                        <!-- 1st place group (with congrats if user group is 1st) -->
+                        <div class="renking-group-item-special col-8 md:col-3"
+                            *ngIf="topThreeRankedTenantUnits[0]">
+                            <p-card styleClass="renking-group-card" [style]="{
+                                width: '100%',
+                                border: '2px solid rgb(136 60 174 / 26%)',
+                                borderRadius: '8px',
+                                margin: '1rem'
+                            }">
+                                <ng-template pTemplate="header">
+                                    <div class="congrats-message text-center"
+                                        *ngIf="topThreeRankedTenantUnits[0].isUnique">
+                                        <strong>{{ 'leaderboard.congrats' | translate }}</strong>
+                                        <p class="m-0">{{ 'leaderboard.yourGroupIs1d' | translate }}</p>
+                                        <div class="stars">
+                                            <i class="pi pi-star star star-1"></i>
+                                            <i class="pi pi-star-fill star star-2"></i>
+                                            <i class="pi pi-star star star-3"></i>
+                                        </div>
+                                    </div>
+                                    <img class="pt-2" src="assets/ranking-images/groups/1.jpg" />
+                                </ng-template>
+                                <div class="renking-group-text text-center">
+                                    <div class="group-name" style="font-weight: bold; font-size: 1.2rem;"> {{
+                                        topThreeRankedTenantUnits[0].tenantUnitName }}
+                                    </div>
+                                    {{ topThreeRankedTenantUnits[0].tenantUnitPercentage
+                                    }}%
+                                    Complete
+                                </div>
+                            </p-card>
+                        </div>
+
+                        <!-- 3rd place group -->
+                        <div class="col-8 md:col-3" *ngIf="topThreeRankedTenantUnits[2]">
+                            <p-card styleClass="renking-group-card" [style]="{
+                                width: '100%',
+                                border: '2px solid rgb(136 60 174 / 26%)',
+                                borderRadius: '8px',
+                                margin: '1rem'
+                            }">
+                                <ng-template pTemplate="header">
+                                    <div class="congrats-message text-center"
+                                        *ngIf="topThreeRankedTenantUnits[2].isUnique">
+                                        <strong>{{ 'leaderboard.congrats' | translate }}</strong>
+                                        <p class="m-0">{{ 'leaderboard.yourGroupIs3d' | translate }}</p>
+                                        <div class="stars">
+                                            <i class="pi pi-star star star-1"></i>
+                                            <i class="pi pi-star-fill star star-2"></i>
+                                            <i class="pi pi-star star star-3"></i>
+                                        </div>
+                                    </div>
+                                    <img class="pt-2" src="assets/ranking-images/groups/3.jpg" />
+                                </ng-template>
+                                <div class="renking-group-text text-center">
+                                    <div class="group-name" style="font-weight: bold; font-size: 1.2rem;"> {{
+                                        topThreeRankedTenantUnits[2].tenantUnitName }}
+                                    </div>
+                                    {{ topThreeRankedTenantUnits[2].tenantUnitPercentage
+                                    }}%
+                                    Complete
+                                </div>
+                            </p-card>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12" *ngIf="leaderboardDataForTenantUnits && leaderboardDataForTenantUnits.rankedTenantUnits.length > 0;">
+                    <ul class="flex p-0">
+                        <li class="ranking-row-header col-5">{{ 'leaderboard.ranking' | translate }}</li>
+                        <li class="ranking-row-header col-3">{{ 'leaderboard.name' | translate }}</li>
+                        <li class="ranking-row-header col-4">
+                            <span>{{ 'leaderboard.pointsPercentage' | translate }}</span>
+                        </li>
+                    </ul>
+                    <p-scrollPanel [style]="{ height: '35vh' }">
+                        <ul class="ranking-list">
+                            <li *ngFor="let unit of leaderboardDataForTenantUnits.rankedTenantUnits"
+                                [ngClass]="{ 'unique-row': unit.isUnique }" class="ranking-row mb-1">
+                                <span class="ranking-no">{{ unit.rankingNo }}</span>
+                                <span class="group-name">
+                                    {{ unit.tenantUnitName }}
+                                    <span class="your-group-badge" *ngIf="unit.isUnique"></span>
+                                </span>
+                                <span class="group-percentage">{{ unit.tenantUnitPercentage }}%</span>
+                            </li>
+                        </ul>
+                    </p-scrollPanel>
+                    <div class="pagination-container mt-3">
+                        <p-paginator 
+                            [rows]="paginationUnits.size" 
+                            [totalRecords]="totalRecordsUnits" 
+                            [rowsPerPageOptions]="[5, 10, 15, 20]"
+                            (onPageChange)="onPageChangeUnits($event)"
+                            [showCurrentPageReport]="true"
+                            currentPageReportTemplate="{{ 'shared.pagination.showing' | translate:{first: paginationUnits.page, last: paginationUnits.page + paginationUnits.size, totalRecords: totalRecordsUnits} }}"
+                            [showFirstLastIcon]="true">
+                        </p-paginator>
+                    </div>
+                </div>
+
+                <ng-template #noDepartmentsMessage>
+                    <div class="no-data-message text-center">
+                        <p>{{ 'leaderboard.noDepartmentsAvailable' | translate }}</p>
+                    </div>
+                </ng-template>
+            </div>
+        </p-tabPanel>
+
+    </p-tabView>
+</p-card>

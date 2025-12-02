@@ -1,0 +1,408 @@
+<div class="card">
+    <span class="text-900 text-xl font-bold mb-4 block">{{
+        'security-training.security-training-create.title' | translate
+        }}</span>
+    <form [formGroup]="trainingForm" (ngSubmit)="saveTrainingLesson()">
+        <div class="grid">
+            <div class="col-12">
+                <div class="grid formgrid p-fluid">
+                    <div class="field mb-4 col-12 md:col-12">
+                        <label for="name" class="font-medium text-900">{{
+                            'security-training.security-training-create.fields.name' | translate
+                            }}</label>
+                        <input id="name" type="text" pInputText formControlName="name"
+                            placeholder="{{
+                            'security-training.security-training-create.placeholders.namePlaceholder' | translate }}" />
+                        <small *ngIf="submitted && !trainingForm.controls['name'].valid"
+                            class="ng-dirty ng-invalid text-red-500">{{
+                            'security-training.security-training-create.validations.name' | translate }}</small>
+                    </div>
+
+                    <div class="field mb-4 col-12 md:col-12">
+                        <label for="description" class="font-medium text-900">{{
+                            'security-training.security-training-create.fields.description' | translate
+                            }}</label>
+                        <textarea id="description" formControlName="description" pInputTextarea required [ngClass]="{
+                                'ng-invalid ng-dirty': submitted && !trainingForm.controls['description'].valid     }"
+                            rows="3" cols="20"
+                            placeholder="{{
+                                'security-training.security-training-create.placeholders.descriptionPlaceholder' | translate }}"></textarea>
+                        <small *ngIf="submitted && !trainingForm.controls['description'].valid"
+                            class="ng-dirty ng-invalid text-red-500">{{
+                            'security-training.security-training-create.validations.description' | translate}}.</small>
+                    </div>
+
+                    <div class="field mb-4 col-6">
+                        <label for="trainingLessonCategoryId" class="font-medium text-900">{{
+                            'security-training.security-training-create.fields.category' | translate}}</label>
+                        <span>
+                            <p-dropdown formControlName="trainingLessonCategoryId" [options]="categories"
+                                optionLabel="name" optionValue="id" placeholder="{{
+                                    'security-training.security-training-create.placeholders.category' | translate}}">
+                            </p-dropdown>
+                        </span>
+                    </div>
+
+                    <div class="field mb-4 col-6">
+                        <label for="lessonLanguageId" class="font-medium text-900">{{
+                            'security-training.security-training-create.fields.language' | translate
+                            }}</label>
+                        <span>
+                            <p-dropdown formControlName="lessonLanguageId" [options]="defaultLanguage"
+                                optionLabel="name" optionValue="id" placeholder="{{
+                                    'security-training.security-training-create.placeholders.language' | translate}}">
+                            </p-dropdown>
+                        </span>
+                    </div>
+
+                    <div class="field mb-4 col-12 md:col-6">
+                        <p-fieldset legend="{{ 'security-training.security-training-create.fields.pdf' | translate }}">
+                            <div class="custom-file-upload">
+                                <button type="button" class="bbbutton" (click)="fileInputBook.click()">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="2" stroke="currentColor" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M13.5 3H12H8C6.34315 3 5 4.34315 5 6V18C5 19.6569 6.34315 21 8 21H11M13.5 3L19 8.625M13.5 3V7.625C13.5 8.17728 13.9477 8.625 14.5 8.625H19M19 8.625V11.8125"
+                                            stroke="#ffffff" stroke-width="2"></path>
+                                        <path d="M17 15V18M17 21V18M17 18H14M17 18H20" stroke="#ffffff" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round"></path>
+                                    </svg>
+                                    {{ 'security-training.security-training-create.messages.pdf' | translate }}
+                                </button>
+                                <div *ngIf="selectedBooks.length > 0">
+                                    <p>{{ selectedBooks[0].name }}</p>
+                                </div>
+                                <input #fileInputBook type="file" accept="application/pdf"
+                                    (change)="onlessonBookChange($event)" style="display: none" />
+                            </div>
+                            <small *ngIf="submitted && !trainingForm.controls['lessonBookUrl'].valid"
+                                class="ng-dirty ng-invalid text-red-500">{{
+                                'security-training.security-training-create.validations.pdf' | translate }}</small>
+                        </p-fieldset>
+                    </div>
+
+                    <div class="field mb-4 col-12 md:col-6">
+                        <p-fieldset
+                            legend="{{ 'security-training.security-training-create.fields.video' | translate }}">
+                            <div class="custom-file-upload">
+                                <!-- <button type="button" class="bbbutton" (click)="fileInputVideo.click()">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                    stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M13.5 3H12H8C6.34315 3 5 4.34315 5 6V18C5 19.6569 6.34315 21 8 21H11M13.5 3L19 8.625M13.5 3V7.625C13.5 8.17728 13.9477 8.625 14.5 8.625H19M19 8.625V11.8125"
+                      stroke="#ffffff" stroke-width="2"></path>
+                    <path d="M17 15V18M17 21V18M17 18H14M17 18H20" stroke="#ffffff" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round"></path>
+                  </svg>
+                  {{'security-training.security-training-create.messages.video' | translate}}
+                </button> -->
+
+                                <input placeholder="Enter Video ID" style="width: 500px; margin-right: 20px" type="text"
+                                    pInputText formControlName="lessonVideoUrl" />
+                                <div *ngIf="selectedVideos.length > 0">
+                                    <p>{{ selectedVideos[0].name }}</p>
+                                </div>
+                                <input #fileInputVideo type="file" accept="video/*" style="display: none"
+                                    (change)="onlessonVideoChange($event)" />
+                            </div>
+                            <small *ngIf="submitted && !trainingForm.controls['lessonVideoUrl'].valid"
+                                class="ng-dirty ng-invalid text-red-500">{{
+                                'security-training.security-training-create.validations.video' | translate
+                                }}.</small>
+                        </p-fieldset>
+                    </div>
+                    <div class="field col-12">
+                        <p-fieldset legend="{{ 'security-training.security-training-create.fields.email' | translate }}"
+                            class="p-fluid">
+                            <div class="field mb-4 col-12">
+                                <label for="lessonAwarenessEmailSubject" class="font-medium text-900">{{
+                                    'security-training.security-training-create.fields.emailSubject' | translate
+                                    }}</label>
+                                <input id="lessonAwarenessEmailSubject" type="text" pInputText
+                                    formControlName="lessonAwarenessEmailSubject"
+                                    placeholder="{{
+                            'security-training.security-training-create.placeholders.emailSubjectPlaceholder' | translate }}" />
+                                <small *ngIf="submitted && !trainingForm.controls['lessonAwarenessEmailSubject'].valid"
+                                    class="ng-dirty ng-invalid text-red-500">{{
+                                    'security-training.security-training-create.validations.emailSubject' }}</small>
+                            </div>
+
+                            <div class="field mb-4 col-12">
+                                <label for="lessonAwarenessEmailSubject" class="font-medium text-900">{{
+                                    'security-training.security-training-create.fields.emailContent' | translate
+                                    }}</label>
+                                <app-iAware-rich-text
+                                    placeholder="{{ 'security-training.security-training-create.placeholders.emailContentPlaceholder' | translate }}"
+                                    [id]="'lessonAwarenessEmailContentHtml'"
+                                    formControlName="lessonAwarenessEmailContentHtml"></app-iAware-rich-text>
+                                <small
+                                    *ngIf="submitted && !trainingForm.controls['lessonAwarenessEmailContentHtml'].valid"
+                                    class="ng-dirty ng-invalid text-red-500">{{
+                                    'security-training.security-training-create.validations.emailContent' | translate
+                                    }}</small>
+                            </div>
+                        </p-fieldset>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap">
+                    <div class="md:col-12">
+                        <p-fieldset
+                            legend="{{ 'security-training.security-training-create.fields.screenSavers' | translate }}">
+                            <div formArrayName="trainingLessonScreenSavers"
+                                class="flex flex-wrap align-items-center justify-content-between p-fluid">
+                                <div *ngFor="let contact of trainingLessonScreenSavers.controls; let i = index"
+                                    [formGroupName]="i"
+                                    class="form-group flex flex-wrap align-items-center justify-content-between col-11"
+                                    style="margin: 0; padding: 0">
+
+                                    <div class="col-3 p-fluid">
+                                        <input id="screenSaverTitle" type="text" pInputText
+                                            formControlName="screenSaverTitle"
+                                            placeholder="{{'security-training.security-training-create.placeholders.title'| translate}}" />
+                                    </div>
+
+                                    <div class="col-3 p-fluid">
+                                        <p-dropdown id="screenSaverPlatform" [options]="screenSaverPlatformType"
+                                            formControlName="screenSaverPlatform"
+                                            placeholder="{{ 'security-training.security-training-create.placeholders.platform' | translate }}">
+                                        </p-dropdown>
+                                    </div>
+
+                                    <div class="col-5 flex flex-wrap justify-content-start">
+                                        <p-button icon="pi pi-upload" (click)="fileInputScreenSaver.click()"
+                                            [style]="{ 'margin-right.px': 2 }"></p-button>
+
+                                        <p-button icon="pi pi-trash" class="p-button-rounded"
+                                            [style]="{ 'margin-right.px': 2 }"
+                                            (click)="removeLessonScreenSaver(i)"></p-button>
+
+                                        <span *ngIf="isScreenSaverUploaded(i)" style="color: green; font-weight: 700">
+                                            <span style="font-size: 16px"> ✓ </span>
+                                            {{'security-training.security-training-create.messages.uploaded'| translate
+                                            }}
+                                        </span>
+
+                                        <input #fileInputScreenSaver type="file" style="display: none"
+                                            accept=".scr,.saver,.xscreensaver,.desktop"
+                                            (change)="onlessonScreenSaverChange($event, i)" />
+                                    </div>
+                                </div>
+
+                                <div class="col-1">
+                                    <p-button icon="pi pi-plus" class="p-button-rounded"
+                                        [style]="{ 'width.px': 30, 'margin-right.px': 5 }"
+                                        (click)="addLessonScreenSaver()"></p-button>
+                                </div>
+                            </div>
+                        </p-fieldset>
+                    </div>
+                    <!-- 
+                    <div class="md:col-6">
+                        <p-fieldset legend="{{'security-training.security-training-create.fields.wallpaper' | translate}}">
+                        <p-button (onClick)="openWallpapers()" label="Wallpaper Gallery"></p-button>
+                        <p *ngIf="selectedWallpapersCount>0 ">
+                            {{'security-training.security-training-create.messages.numberOfChosenWallpapers' | translate}}
+                            <span style="color: green; font-weight: 700;">
+                            {{ selectedWallpapersCount }}
+                            </span>
+                        </p>
+                        </p-fieldset>
+                    </div> -->
+
+                    <div class="md:col-6">
+                        <p-fieldset
+                            legend="{{ 'security-training.security-training-create.fields.quizzes' | translate }}">
+                            <div formArrayName="trainingLessonQuizzes">
+                                <div *ngFor="let quizGroup of trainingLessonQuizzes.controls; let quizIndex = index"
+                                    [formGroupName]="quizIndex">
+                                    <div class="mb-3">
+                                        <strong>{{'security-training.security-training-create.messages.question'|
+                                            translate}}
+                                            {{ quizIndex + 1 }}</strong>
+                                    </div>
+                                    <div class="p-col-12 p-md-8">
+                                        <textarea formControlName="quizText" pInputTextarea rows="5" placeholder="{{
+                                                'security-training.security-training-create.placeholders.writeQuestion'
+                                                    | translate
+                                            }}" class="p-fluid" style="width: 100%; max-width: 100%"></textarea>
+                                    </div>
+
+                                    <div formArrayName="quizAnswers" class="mt-2">
+                                        <div *ngFor="
+                                                let answerGroup of getQuizAnswers(quizIndex).controls;
+                                                let answerIndex = index
+                                            " [formGroupName]="answerIndex">
+                                            <div class="p-col-12 p-md-8">
+                                                <div class="p-inputgroup mb-2">
+                                                    <p-radioButton class="mx-2" name="isTrueAnswer{{ quizIndex }}"
+                                                        [value]="answerIndex"
+                                                        formControlName="isTrueAnswer{{ quizIndex }}"
+                                                        (onClick)="onAnswerSelected(quizIndex, answerIndex)">
+                                                        ></p-radioButton>
+                                                    <input type="text" pInputText
+                                                        name="answerText{{ quizIndex }}-{{ answerIndex }}"
+                                                        formControlName="answerText{{ quizIndex }}-{{ answerIndex }}"
+                                                        [placeholder]="'security-training.security-training-create.placeholders.answer' | translate : { index: answerIndex + 1 }" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div *ngIf="
+                                                quizGroup.get('quizText')?.value.trim() !== '' &&
+                                                submitted &&
+                                                !hasAtLeastTwoAnswers(quizGroup)
+                                            " class="text-danger">
+                                            {{
+                                            'security-training.security-training-create.validations.quizText'
+                                            | translate
+                                            }}
+                                        </div>
+                                        <div *ngIf="
+                                                quizGroup.get('quizText')?.value.trim() !== '' &&
+                                                submitted &&
+                                                !hasOneTrueAnswer(quizGroup)
+                                            " class="text-danger">
+                                            {{
+                                            'security-training.security-training-create.validations.quizTextTrue'
+                                            | translate
+                                            }}
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-content-center flex-wrap">
+                                        <div class="mt-2 col-md-6">
+                                            <p-button icon="pi pi-trash" class="p-button-rounded"
+                                                [style]="{ 'width.px': 50 }"
+                                                (click)="removeLessonQuiz(quizIndex)"></p-button>
+                                        </div>
+                                    </div>
+                                    <hr />
+                                </div>
+
+                                <div class="flex justify-content-center flex-wrap">
+                                    <p-button icon="pi pi-plus" class="p-button-rounded"
+                                        [style]="{ 'width.px': 50, 'margin-right.px': 5 }"
+                                        (click)="addLessonQuiz()"></p-button>
+                                </div>
+                            </div>
+                        </p-fieldset>
+                    </div>
+                    <div class="md:col-6">
+                        <p-fieldset
+                            legend="{{ 'security-training.security-training-create.fields.quotes' | translate }}">
+                            <div formArrayName="trainingLessonQuotes" class="field mb-2 col-12">
+                                <div *ngFor="let quote of trainingLessonQuotes.controls; let i = index"
+                                    [formGroupName]="i" class="form-group row mb-1">
+                                    <div class="flex justify-content-between flex-wrap mt-1">
+                                        <div class="col-10 p-fluid">
+                                            <input id="quoteText" type="text" pInputText formControlName="quoteText"
+                                                placeholder="{{
+                                                    'security-training.security-training-create.placeholders.writeQuote'
+                                                        | translate
+                                                }}" />
+                                        </div>
+                                        <div class="col-2">
+                                            <p-button icon="pi pi-trash" class="p-button-rounded"
+                                                [style]="{ 'width.px': 50 }" (click)="removeLessonQuote(i)"></p-button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex justify-content-center flex-wrap">
+                                    <p-button icon="pi pi-plus" class="p-button-rounded"
+                                        [style]="{ 'width.px': 50, 'margin-right.px': 5 }"
+                                        (click)="addLessonQuote()"></p-button>
+                                </div>
+                            </div>
+                        </p-fieldset>
+
+                        <div class="mt-4">
+                            <p-fieldset
+                                legend="{{ 'security-training.security-training-create.fields.tages' | translate }}">
+                                <div class="grid formgrid p-fluid">
+                                    <div class="field col-12">
+                                        <p-multiSelect
+                                            [placeholder]="'security-training.security-training-create.fields.tagesPlaceHolder' | translate"
+                                            [options]="tages" optionLabel="tagName" optionValue="id"
+                                            formControlName="lessonTages"></p-multiSelect>
+                                    </div>
+                                </div>
+                            </p-fieldset>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 flex justify-content-center flex-wrap">
+                    <button pButton pRipple
+                        label="{{ 'security-training.security-training-create.actions.submit' | translate }}"
+                        class="w-auto mt-3" type="submit"></button>
+                </div>
+
+                <ng-container *ngIf="isLoading$ | async">
+                    <p-progressBar mode="indeterminate" [style]="{ height: '6px' }" />
+                </ng-container>
+            </div>
+        </div>
+    </form>
+</div>
+
+<p-dialog [(visible)]="chooseWllpapersDialog"
+    header="{{ 'security-training.security-training-create.dialogs.chooseWllpapersDialog.header' | translate }}"
+    [modal]="true" [style]="{ width: '80%', height: '80vh' }">
+    <div class="card">
+        <p-toast></p-toast>
+        <p-dataView #dv [value]="wallpapers" [paginator]="true" [rows]="12" layout="grid">
+            <ng-template pTemplate="header">
+                <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                    <h5 class="m-0">
+                        {{
+                        'security-training.security-training-create.dialogs.chooseWllpapersDialog.fields.wallpaper'
+                        | translate
+                        }}
+                    </h5>
+                    <!-- <div class="my-1">
+              <button pButton pRipple
+                label="{{ 'security-training.security-training-create.dialogs.chooseWllpapersDialog.actions.add' | translate }}"
+                icon="pi pi-plus" class="p-button  mr-2" (click)="CreateWallpaper()"></button>
+            </div> -->
+                </div>
+            </ng-template>
+            <ng-template let-walls pTemplate="gridItem">
+                <div class="grid grid-nogutter">
+                    <div class="col-12 md:col-4" *ngFor="let wall of walls">
+                        <div class="card m-3 border-1 surface-border">
+                            <p-checkbox [id]="wall?.id" [(ngModel)]="checkboxStates[wall?.id]" [binary]="true"
+                                (onChange)="addToselected($event, wall)">
+                            </p-checkbox>
+                            <div class="mb-3">
+                                <div class="flex flex-wrap justify-content-center">
+                                    <img (click)="toggleSelection(wall)" [src]="wall.wallpaperImageUrl"
+                                        [alt]="wall.wallpaperTitle" class="w-9 shadow-2 my-3 mx-0"
+                                        style="width: 100px; height: 140px; cursor: pointer" />
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold">{{ wall.wallpaperTitle }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+        </p-dataView>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{
+                'security-training.security-training-create.dialogs.chooseWllpapersDialog.actions.continue' | translate
+            }}" (click)="confirmWallpaperSelected()"></button>
+    </ng-template>
+</p-dialog>
+
+<!-- <p-dialog [(visible)]="libraryWallpaperDialog"
+    header="{{ 'security-training.security-training-create.dialogs.libraryWallpaperDialog.header' | translate }}"
+    [modal]="true" [style]="{ width: '80%', height: '80vh' }">
+    <div class="mb-4">
+        <p-button (click)="BacktoWallapapersGallery()" icon="pi pi-arrow-left" label="{{
+                'security-training.security-training-create.dialogs.libraryWallpaperDialog.actions.back' | translate
+            }}"></p-button>
+    </div>
+    <app-wallpaper-list-wizard></app-wallpaper-list-wizard>
+</p-dialog> -->

@@ -1,0 +1,246 @@
+<div class="iAware-loading-table-container" style="position: relative;">
+    <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+    <div class="card">
+        <p-table #dt [value]="roles" [paginator]="true" [rows]="pagination.size" [showCurrentPageReport]="true"
+            responsiveLayout="scroll" [rowsPerPageOptions]="[10,25,50]" [totalRecords]="totalRecords"
+            [lazy]="true" (onLazyLoad)="onLazyLoad($event)"  [globalFilterFields]="['name']">
+            <ng-template pTemplate="caption">
+                <div class="flex flex-wrap gap-2 align-items-center justify-content-between">
+                    <span class="p-input-icon-left w-full sm:w-20rem flex-order-1 sm:flex-order-0">
+                        <i class="pi pi-search"></i>
+                        <input pInputText type="text" (input)="onGlobalFilter(dt, $event)"
+                            placeholder="{{ 'shared.search.role' | translate }}" class="w-full" />
+                    </span>
+                    <p-button *ngIf="hasPermission(actions.add)" (click)="navigateToCreateUser()"
+                        class="p-button-outlined w-full sm:w-auto flex-order-0 sm:flex-order-1" icon="pi pi-sitemap"
+                        label="{{ 'role.role-listing.actions.add' | translate }}"></p-button>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="header">
+                <tr>
+                    <th pSortableColumn="name" class="white-space-nowrap" style="width:25%">{{
+                        'role.role-listing.fields.name' | translate }}<p-sortIcon field="name"></p-sortIcon></th>
+                    <th pSortableColumn="usersCount" class="white-space-nowrap" style="width:25%">{{
+                        'role.role-listing.fields.users' | translate }}<p-sortIcon field="usersCount"></p-sortIcon></th>
+                    <th pSortableColumn="permissionsCount" class="white-space-nowrap" style="width:25%">
+                        {{ 'role.role-listing.fields.permissions' | translate }}<p-sortIcon
+                            field="permissionsCount"></p-sortIcon></th>
+                    <th pSortableColumn="status" class="white-space-nowrap" style="width:25%">
+                        {{ 'role.role-listing.fields.status' | translate }}<p-sortIcon field="status"></p-sortIcon></th>
+                    <th class="text-right"></th>
+
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-role>
+                <tr>
+                    <td>{{role.name}}</td>
+                    <td>{{role.usersCount}} <i *ngIf="hasPermission(actions.viewUsers)" (click)="openUsersDialog(role)"
+                            class="mb-2 pi pi-eye text-1xl"></i></td>
+                    <td> {{role?.permissionsCount}} <i *ngIf="hasPermission(actions.viewPermessions)"
+                            (click)="openEditDialog(role)" class="mb-2 pi pi-eye text-1xl"></i></td>
+                    <td><p-inputSwitch *ngIf="hasPermission(actions.active)" [ngModel]="role.isActive"
+                            (onChange)="openActivationDialog(role)"></p-inputSwitch></td>
+                    <td>
+                        <button *ngIf="menuItems.length > 0" pButton pRipple type="button" icon="pi pi-ellipsis-v"
+                            class="p-button-rounded p-button-text p-button-plain ml-3"
+                            (click)="menu.toggle($event); assigneCurrentSelect(role)"></button>
+                        <p-menu #menu [model]="menuItems" [appendTo]="'body'" [popup]="true"></p-menu>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+
+<p-dialog [(visible)]="addDialog" [style]="{width: '50vw', maxWidth: '600px', height: '70vh', maxHeight: '800px' }"
+    header="{{ 'role.role-listing.dialog.addDialog.header' | translate }}" [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <div class="col-12">
+            <div class="grid formgrid p-fluid">
+                <form (ngSubmit)="onSubmit()">
+                    <div class="grid">
+                        <div class="col-12">
+                            <div class="grid formgrid p-fluid">
+                                <div class="field mb-1 col-12 ">
+                                    <label for="roleName" class="font-medium text-900">{{
+                                        'role.role-listing.dialog.addDialog.fields.name' | translate }}</label>
+                                    <input id="roleName" type="text" pInputText [(ngModel)]="roleModel.name" name="name"
+                                        #name="ngModel" required>
+                                    <div style="color: red;" *ngIf="name.invalid && (name.dirty || name.touched)">
+                                        <div *ngIf="name.errors?.['required']">{{
+                                            'role.role-listing.dialog.addDialog.validations.name' | translate }}</div>
+                                    </div>
+                                </div>
+                                <div class="field mt-2 col-12 md:col-6">
+                                    <p-checkbox name="isTenantRole" [(ngModel)]="roleModel.isTenantRole" [binary]="true"
+                                        label="{{ 'role.role-listing.dialog.addDialog.fields.isTenantRole' | translate }}"></p-checkbox>
+                                </div>
+                                <div class="field mt-2 mb-3 col-12 md:col-6">
+                                    <p-checkbox name="isTenantRole" [(ngModel)]="roleModel.isTenantAdministratorRole"
+                                        [binary]="true"
+                                        label="{{ 'role.role-listing.dialog.addDialog.fields.isTenantAdministratorRole' | translate }}"></p-checkbox>
+                                </div>
+
+                                <div class="field mt-2 col-12 mb-4">
+                                    <label class="font-medium text-900">{{
+                                        'role.role-listing.dialog.addDialog.fields.permissions' | translate
+                                        }}:</label>
+                                    <div class="iAware-loading-table-container" style="position: relative;">
+                                        <app-table-loading-spinner
+                                            *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                                        <p-accordion>
+                                            <p-accordionTab *ngFor="let permission of permessionsForAdd"
+                                                [header]="permission.pageNameEn" [selected]="true">
+                                                <div class="flex flex-wrap gap-3">
+                                                    <ng-container *ngFor="let item of permission.pageItems">
+                                                        <p-checkbox [binary]="true" [value]="item.id"
+                                                            [label]="item.controlKey"
+                                                            (onChange)="updatePermissionsForAddRole($event, item.id)"></p-checkbox>
+                                                    </ng-container>
+                                                </div>
+                                            </p-accordionTab>
+                                        </p-accordion>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+            class="p-button-text" (click)="hideDialog()"></button>
+        <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check" class="p-button-text"
+            [disabled]="!isAddFormValid" (click)="onSubmit()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="editeDialog" [style]="{width: '50vw', maxWidth: '600px', height: '70vh', maxHeight: '800px' }"
+    header="{{ 'role.role-listing.dialog.editDialog.header' | translate }}" [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <div class="grid">
+            <div class="col-12">
+                <div class="grid formgrid p-fluid">
+                    <div class="field mb-4 col-12">
+                        <label for="firstName" class="font-medium text-900">{{
+                            'role.role-listing.dialog.editDialog.fields.name' | translate }}</label>
+                        <input id="firstName" type="text" pInputText [(ngModel)]="currentSelected.name">
+                    </div>
+                    <div class="field mt-2 col-12 md:col-6">
+                        <p-checkbox name="isTenantRole" [(ngModel)]="currentSelected.isTenantRole" [binary]="true"
+                            label="{{ 'role.role-listing.dialog.editDialog.fields.isTenantRole' | translate }}"></p-checkbox>
+                    </div>
+
+                    <div class="field mt-2 mb-2 col-12 md:col-6">
+                        <p-checkbox name="isTenantRole" [(ngModel)]="currentSelected.isTenantAdministratorRole"
+                            [binary]="true"
+                            label="{{ 'role.role-listing.dialog.editDialog.fields.isTenantAdministratorRole' | translate }}"></p-checkbox>
+                    </div>
+
+                    <div class="field col-12 mt-2 mb-4">
+                        <label class="font-medium text-900">Permissions</label>
+                        <p-accordion>
+                            <p-accordionTab *ngFor="let permission of permessions" [header]="permission.pageNameEn"
+                                [selected]="true">
+                                <div class="flex flex-wrap gap-3">
+                                    <ng-container *ngFor="let item of permission.pageItems">
+                                        <p-checkbox [binary]="true" [value]="item.id" [label]="item.controlKey"
+                                            [ngModel]="isPermissionSelected(item.id!)"
+                                            (onChange)="updatePermissionsForEditRole($event, item.id!)"></p-checkbox>
+                                    </ng-container>
+                                </div>
+                            </p-accordionTab>
+                        </p-accordion>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+            class="p-button-text" (click)="hideDialog()"></button>
+        <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check" class="p-button-text"
+            [disabled]="!isEditFormValid" (click)="edit()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="usersWithinRoleDialog" [style]="{width: '70%', height:'80%'}" [header]="hederText" [modal]="true"
+    class="p-fluid">
+    <ng-template pTemplate="content">
+        <div class="card">
+            <div class="iAware-loading-table-container" style="position: relative;">
+                <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                <p-table #dt [value]="users" [paginator]="true" [rows]="10" [showCurrentPageReport]="true"
+                    responsiveLayout="scroll" [rowsPerPageOptions]="[10,25,50]"
+                    [globalFilterFields]="['firstName','lastName', 'email']">
+                    <ng-template pTemplate="caption">
+                        <div class="flex flex-wrap gap-2 align-items-center justify-content-between">
+                            <span class="p-input-icon-left w-full sm:w-20rem flex-order-1 sm:flex-order-0">
+                                <i class="pi pi-search"></i>
+                                <input pInputText type="text" (input)="onGlobalFilter(dt, $event)"
+                                    placeholder="{{ 'role.role-listing.dialog.usersWithinRoleDialog.search' | translate }}"
+                                    class="w-full" />
+                            </span>
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th pSortableColumn="firstName" class="white-space-nowrap" style="width:25%">{{
+                                'role.role-listing.dialog.usersWithinRoleDialog.firstName' | translate }}<p-sortIcon
+                                    field="firstName"></p-sortIcon></th>
+                            <th pSortableColumn="lastName" class="white-space-nowrap" style="width:25%">{{
+                                'role.role-listing.dialog.usersWithinRoleDialog.lastName' | translate }}<p-sortIcon
+                                    field="lastName"></p-sortIcon></th>
+                            <th pSortableColumn="email" class="white-space-nowrap" style="width:25%">{{
+                                'role.role-listing.dialog.usersWithinRoleDialog.email' | translate }}<p-sortIcon
+                                    field="email"></p-sortIcon></th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-user>
+                        <tr>
+                            <td>{{user.firstName}}</td>
+                            <td>{{user.lastName}}</td>
+                            <td>{{user.email}}</td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="deleteDialog" header="{{ 'shared.headers.delete' | translate }}" [modal]="true"
+    [style]="{width: '30%'}">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="currentSelected">{{ 'shared.messages.delete' | translate }}<b> {{currentSelected.name}}
+            </b>?</span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="deleteDialog = false"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{ 'shared.actions.delete' | translate }}"
+            (click)="delete()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="activationDialog" header="{{ 'shared.headers.active' | translate }}" [modal]="true"
+    [style]="{width:'450px'}">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        @if (currentSelected.isActive) {
+        <span>{{ 'shared.messages.deactive' | translate }} <b>{{currentSelected.name}}</b></span>
+        }@else {
+        <span>{{ 'shared.messages.active' | translate }} <b>{{currentSelected.name}}</b></span>
+        }
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="activationDialog = false"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{ 'shared.actions.save' | translate }}"
+            (click)="currentSelected.isActive ? activation(false) : activation(true)"></button>
+    </ng-template>
+</p-dialog>

@@ -1,0 +1,192 @@
+<p-card>
+    <div class="grid campaign-container">
+        <div class="col-12 md:col-8">
+            <p-card header="{{ 'training-campaigns.training-campaign-statistics.campaignContent' | translate}}">
+                <div class="campaign-content">
+                    <div *ngFor="let lesson of campaignStatistcsData.awarenessCampaignStatisticsLessons" class="p-0">
+                        <div class="col-12 campaign-row p-0">
+                            <div class="col-4">
+                                <p>{{ lesson.lessonName }}</p>
+                                <p-button icon="pi pi-chart-line" iconPos="left" label="{{ 'training-campaigns.training-campaign-statistics.viewUsersProgress' | translate}}"
+                                    [outlined]="true"
+                                    (click)="viewUsersProgress(lesson.awarenessCampaignScheduleId)"></p-button>
+                            </div>
+                            <div class="col-8">
+                                <p class="text-center">
+                                    {{ 'training-campaigns.training-campaign-statistics.compelationPercentage' | translate:{number:lesson.compelationPercentage} }}
+                                </p>
+                                <p-progressBar [value]="lesson.compelationPercentage"
+                                    [showValue]="false"></p-progressBar>
+                            </div>
+                        </div>
+                        <hr>
+                    </div>
+                </div>
+
+                <div class="user-completion-chart">
+                    <h4 class="text-center">{{'training-campaigns.training-campaign-statistics.userCompletionActivity' | translate}}</h4>
+                    <p-chart type="line" [data]="lineChartData" [options]="lineChartOptions"></p-chart>
+                </div>
+            </p-card>
+        </div>
+
+        <div class="col-12 md:col-4">
+            <p-card header="{{ 'training-campaigns.training-campaign-statistics.campaignSummary' | translate}}" styleClass="campaign-summary-card">
+                <div class="campaign-summary-content">
+                    <div class="text-center mb-2 mt-2">
+                        <p-chart type="doughnut" [data]="doughnutChartData" [options]="doughnutChartOptions" />
+                    </div>
+                    <div class="detail-row mb-2 mt-2">
+                        <strong class="mt-3">{{ 'training-campaigns.training-campaign-statistics.status' | translate}}</strong>
+                        <span class="text-center" [ngClass]="{
+                            'status-completed': campaignStatistcsData.campaignStatus === 'Completed',
+                            'status-in-progress': campaignStatistcsData.campaignStatus === 'InProgress',
+                            'status-not-started': campaignStatistcsData.campaignStatus === 'NotStarted'
+                        }">{{ campaignStatistcsData.campaignStatus }}</span>
+                    </div>
+                    <hr>
+                    <div class="detail-row mb-2 mt-2">
+                        <strong>{{ 'training-campaigns.training-campaign-statistics.name' | translate}}</strong>
+                        <span>{{ campaignStatistcsData.campaignName }}</span>
+                    </div>
+                    <hr>
+                    <div class="detail-row mb-2 mt-2">
+                        <strong>{{ 'training-campaigns.training-campaign-statistics.startDate' | translate}}</strong>
+                        <span>{{ campaignStatistcsData.startDate | date: 'MM/dd/yyyy' }}</span>
+                    </div>
+                    <hr>
+                    <div class="detail-row mb-2 mt-2">
+                        <strong>{{ 'training-campaigns.training-campaign-statistics.endDate' | translate}}</strong>
+                        <span>{{ campaignStatistcsData.endDate | date: 'MM/dd/yyyy' }}</span>
+                    </div>
+                    <hr>
+                    <div class="detail-row mb-2 mt-2">
+                        <strong>{{ 'training-campaigns.training-campaign-statistics.duration' | translate}}</strong>
+                        <span>{{ 'training-campaigns.training-campaign-statistics.durationValue' | translate:{valueString:campaignStatistcsData.durationString} }}</span>
+                    </div>
+                    <hr>
+                    <div class="detail-row mb-2 mt-2">
+                        <strong>{{ 'training-campaigns.training-campaign-statistics.users' | translate}}</strong>
+                        <span>{{ campaignStatistcsData.usersCount }}</span>
+                    </div>
+                </div>
+            </p-card>
+        </div>
+
+        <div class="col-12">
+            <p-card header="{{ 'training-campaigns.training-campaign-statistics.CampaignLeaderboardHeader' | translate}}">
+                <div class="grid">
+                    <div class="col-12 pb-0">
+                        <app-iAware-info severity="info" [description]="'training-campaigns.training-campaign-statistics.CampaignLeaderboardMessage' | translate"></app-iAware-info>
+                    </div>
+                    <div class="col-12 pb-0" *ngIf="leaderboardDataForUsers.rankedUsers.length > 0">
+                        <div class="col-12 ranking-container">
+                            <ul class="flex p-0">
+                                <li class="ranking-row-header col-5">{{'trainingCampaignsDashboard.ranking' | translate}}
+                                </li>
+                                <li class="ranking-row-header col-3">{{'trainingCampaignsDashboard.name' | translate}}</li>
+                                <li class="ranking-row-header col-4"><span>{{'trainingCampaignsDashboard.points' |
+                                        translate}}</span></li>
+                            </ul>
+                            <p-scrollPanel [style]="{ height: '100vh' }">
+                                <ul class="ranking-list">
+                                    <li *ngFor="let user of leaderboardDataForUsers.rankedUsers"
+                                        [ngClass]="{ 'unique-row': user.isUnique }" class="ranking-row mb-1">
+                                        <span class="ranking-no">{{ user.rankingNo }}</span>
+                                        <span class="user-name">
+                                            {{ user.userName }}
+                                            <span class="you-badge" *ngIf="user.isUnique"></span>
+                                        </span>
+                                        <span class="user-points">{{ user.userPoints | number : '1.0-0' }}</span>
+                                    </li>
+                                </ul>
+                            </p-scrollPanel>
+                        </div>
+                    </div>
+    
+                    <div class="col-12 pb-0" *ngIf="leaderboardDataForUsers.rankedUsers.length == 0">
+                        <app-iAware-info
+                            description="{{'trainingCampaignsDashboard.campaignLeaderboardNoDataMessage' | translate}}"
+                            icon="fa fa-solid fa-circle-info text-3xl" severity="info"></app-iAware-info>
+                    </div>
+
+                </div>
+            </p-card>
+        </div>    
+    </div>
+</p-card>
+
+<p-dialog [(visible)]="viewUsersProgressDialog" header="{{ 'training-campaigns.training-campaign-statistics.usersProgressDilogHeader' | translate}}" [modal]="true"
+    [style]="{ width: '60%', height: '90%' }">
+    <div class="grid">
+        <div class="col-12">
+
+            <div class="iAware-loading-table-container" style="position: relative;">
+                <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+
+                <p-table [value]="usersProgress" [paginator]="true" [rows]="10">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>{{ 'training-campaigns.training-campaign-statistics.userName' | translate}}</th>
+                            <th class="text-center">{{ 'training-campaigns.training-campaign-statistics.percentage' | translate}}</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-user>
+                        <tr>
+                            <td>{{ user.userName }}</td>
+                            <td class="text-center">{{ user.progressPercentage }}%</td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text" label="{{ 'shared.actions.close' | translate }}" (click)="viewUsersProgressDialog = false"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="displayDialog" [modal]="true" [closable]="true" [header]="dounghtChartHeader" [style]="{ width: '60%', height: '90%' }">
+    <div class="grid">
+        <div class="col-12 col-12 flex justify-content-end">
+            <div class="mr-3">
+                <p-button label="{{'shared.actions.csv' | translate}}" icon="pi pi-file-excel"
+                    [disabled]="clickedSliceData.length == 0"
+                    (onClick)="downloadSelectedUsersReportAsCSV()"></p-button>
+            </div>
+            <div>
+                <p-button label="{{'shared.actions.pdf' | translate}}" icon="pi pi-file-pdf" [disabled]="clickedSliceData.length == 0"
+                    (onClick)="downloadSelectedUsersReportAsPDF()"></p-button>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="iAware-loading-table-container" style="position: relative;">
+                <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+
+                <p-table [value]="clickedSliceData" [paginator]="true" [rows]="10">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>{{ 'training-campaigns.training-campaign-statistics.userName' | translate}}</th>
+                            <th class="text-center">{{ 'training-campaigns.training-campaign-statistics.userEmail' | translate}}</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-user>
+                        <tr>
+                            <td>                                
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <img [alt]="user.userName" [src]="user.userImageUrl ?? '../../../../../assets/media/avatar.png'" width="40" height="40"
+                                        style="border-radius: 50%;" />
+
+                                    <div style="display: flex; flex-direction: column; line-height: 1.2;">
+                                        <strong class="font-bold" style="font-size: 1rem;">{{ user.userName }}</strong>
+                                    </div>
+                                </div> 
+                            </td>
+                            <td class="text-center">{{ user.email }}</td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+    </div>
+</p-dialog>

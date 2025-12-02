@@ -1,0 +1,138 @@
+:host ::ng-deep .custom-galleria {
+    &.p-galleria {
+        &.fullscreen {
+            display: flex;
+            flex-direction: column;
+
+            .p-galleria-content {
+                flex-grow: 1;
+                justify-content: center;
+            }
+        }
+
+        .p-galleria-content {
+            position: relative;
+        }
+
+        .p-galleria-thumbnail-wrapper {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+        }
+
+        .p-galleria-thumbnail-items-container {
+            width: 100%;
+        }
+
+        .custom-galleria-footer {
+            display: flex;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.9);
+            color: #ffffff;
+
+            >button {
+                background-color: transparent;
+                color: #ffffff;
+                border: 0 none;
+                border-radius: 0;
+                margin: 0.2rem 0;
+
+                &.fullscreen-button {
+                    margin-left: auto;
+                }
+
+                &:hover {
+                    background-color: rgba(255, 255, 255, 0.1);
+                }
+            }
+        }
+
+        .title-container {
+            >span {
+                font-size: 0.9rem;
+                padding-left: 0.829rem;
+
+                &.title {
+                    font-weight: bold;
+                }
+            }
+        }
+    }
+}
+
+.bbbutton {
+    border: none;
+    display: flex;
+    padding: 0.75rem 1.5rem;
+    background-color: #883cae;
+    color: #ffffff;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 700;
+    text-align: center;
+    text-transform: uppercase;
+    vertical-align: middle;
+    align-items: center;
+    border-radius: 0.5rem;
+    user-select: none;
+    gap: 0.75rem;
+    box-shadow: 0 4px 6px -1px #488aec31, 0 2px 4px -1px #488aec17;
+    transition: all 0.6s ease;
+}
+
+.bbbutton:hover {
+    box-shadow: 0 10px 15px -3px #488aec4f, 0 4px 6px -2px #488aec17;
+}
+
+.bbbutton:focus,
+button:active {
+    opacity: 0.85;
+    box-shadow: none;
+}
+
+.bbbutton svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.correct-answer {
+    color: green;
+    /* Or any other styling for correct answers */
+    font-weight: 600;
+}
+
+.incorrect-answer {
+    color: red;
+    /* Or any other styling for incorrect answers */
+}
+
+.no-data {
+    color: red;
+    /* Optional: to make the text more readable */
+}
+
+.avatar {
+    vertical-align: middle;
+    width: 150px;
+    height: 150px;
+    border: 1px solid black;
+}
+
+.form-section-header {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.file-upload-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}

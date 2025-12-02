@@ -1,0 +1,78 @@
+.points-card {
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+}
+
+.points-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.points-card .card-content {
+    padding: 30px;
+}
+
+.points-card h2 {
+    margin: 20px 0;
+    font-size: 3rem;
+    font-weight: 700;
+}
+
+.points-card p {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.points-card .icon-container {
+    background: rgba(40, 167, 69, 0.1);
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.points-card .icon {
+    font-size: 2.5rem;
+    color: #28a745;
+}
+
+.negative-points .icon-container {
+    background: rgba(220, 53, 69, 0.1);
+}
+
+.negative-points .icon {
+    color: #dc3545;
+}
+
+.total-points .icon-container {
+    background: rgba(255, 193, 7, 0.1);
+}
+
+.total-points .icon {
+    color: #ffc107;
+}
+
+@keyframes fadeinup {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fadeinup {
+    animation-name: fadeinup;
+}
+
+::ng-deep .p-card-content {
+    padding-bottom: 0.5rem !important;
+} 

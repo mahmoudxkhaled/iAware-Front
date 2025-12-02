@@ -1,0 +1,311 @@
+<div class="stepsdemo-content">
+    <p-toast></p-toast>
+    <p-card styleClass="c">
+        <ng-template pTemplate="content">
+
+            <div class="card" *ngIf="type == 1 && campaignLessons?.length > 0">
+                <app-iAware-info severity="info" [isDynamic]="true" [description]="aiRecomindationMessage"></app-iAware-info>
+                <p-card styleClass="w" id="awarenessCampaignScedual" header="{{'campaign-management.campaign-create.scedual.training.fields.awarenessCampaignScedual' | translate }}"
+                    [style]="{ border: '2px solid rgb(136 60 174 / 26%)', borderRadius:'8px', margin:'1rem' }">
+                    <div class="iAware-loading-table-container" style="position: relative;">
+                        <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+
+                        <p-table #dtLessons [value]="campaignLessons" [paginator]="true" [rows]="10"
+                            [showCurrentPageReport]="true" responsiveLayout="scroll"
+                            [rowsPerPageOptions]="[10, 25, 50]">
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th class="white-space-nowrap" style="width: 25%">{{
+                                        'campaign-management.campaign-create.scedual.training.fields.trainingLessonName'
+                                        |
+                                        translate }}</th>
+                                    <th class="white-space-nowrap" style="width: 25%">{{
+                                        'campaign-management.campaign-create.scedual.training.fields.scedualedTime' |
+                                        translate
+                                        }}</th>
+                                    <th class="white-space-nowrap" style="width: 25%">{{
+                                        'campaign-management.campaign-create.scedual.training.fields.lessonAwaernesEmail'
+                                        |
+                                        translate }}</th>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body" let-schedual>
+                                <tr>
+                                    <td>{{ schedual?.awarenessCampaignLessonName }}</td>
+                                    <td>
+                                        <input class="startDate" [id]="schedual?.awarenessCampaignLessonId" type="date"
+                                            [(ngModel)]="schedual.scheduledTime"
+                                            (change)="onLessenScedualTimeChanged($event, schedual)" />
+                                    </td>
+                                    <td>
+                                        <a style="cursor: pointer">
+                                            <i class="pi pi-envelope" (click)="openEditEmail(schedual)"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </div>
+                </p-card>
+
+                <p-card styleClass="w" id="awarenessCampaignEmail" header="{{'campaign-management.campaign-create.scedual.training.fields.awarenessCampaignEmail' | translate }}"
+                    [style]="{ border: '2px solid rgb(136 60 174 / 26%)', borderRadius:'8px', margin:'1rem' }">                    
+                    <app-iAware-info [isDynamic]="true" severity="info" [description]="'campaign-management.campaign-create.scedual.training.defaultEmailInstructions' | translate "></app-iAware-info>
+                    <form [formGroup]="campaignTypeForm">
+                        <div class="grid formgrid p-fluid">
+                            <div class="field mb-1 col-12 mt-3" *ngIf="activeLanguages.length > 0">
+                                <p-tabView [style]="{ width: '100%' }">
+                                    <ng-container *ngFor="let item of activeLanguages">
+                                        <p-tabPanel [header]="item.name">
+                                            <div [formGroup]="getLanguageFormGroup(item.code)!">
+                                                <div class="field mb-4 col-12">
+                                                    <label class="font-medium text-900">{{
+                                                        'campaign-management.campaign-create.campaign-type.fields.emailSubject'
+                                                        | translate }}
+                                                        ({{item.name}}):</label>
+                                                    <input type="text" pInputText
+                                                        formControlName="awarenessCampaignEmailSubject"
+                                                        placeholder="Subject">
+                                                </div>
+                                                <div class="field mb-4 col-12">
+                                                    <label class="font-medium text-900">{{
+                                                        'campaign-management.campaign-create.campaign-type.fields.emailContent'
+                                                        | translate }}
+                                                        ({{item.name}}):</label>
+                                                    <app-iAware-rich-text [id]="item.id"
+                                                        [formControlName]="'awarenessCampaignEmailContentHtml'"></app-iAware-rich-text>
+                                                </div>
+                                            </div>
+                                        </p-tabPanel>
+                                    </ng-container>
+                                </p-tabView>
+                            </div>
+                            <div *ngIf="activeLanguages.length == 0" class="col-12 flex flex-column justify-content-center align-items-center"
+                                style="height: 30vh;">
+                                <p-progressSpinner></p-progressSpinner>
+                                <br>
+                                <p class="ml-3">{{ 'shared.loading' | translate }}</p>
+                            </div>
+                        </div>
+                    </form>
+                </p-card>
+            </div>
+            
+            <div class="card" *ngIf="type == 2">
+                <app-iAware-info description="{{'campaign-management.campaign-create.scedual.phishing.message' | translate}}"
+                    icon="fa fa-solid fa-circle-info text-3xl"
+                    severity="info"></app-iAware-info>
+                    
+                <p-card styleClass="w" header="{{ 'campaign-management.campaign-create.scedual.phishing.fields.awarenessCampaignPhishingSchedule' | translate }}"
+                    [style]="{ border: '2px solid rgb(136 60 174 / 26%)', borderRadius:'8px', margin:'1rem' }">
+                    <form [formGroup]="phishingForm" (ngSubmit)="onSubmitPhishingForm()">
+                        <div class="grid formgrid p-fluid">
+                            <div class="field col-12 lg:col-6" id="phishingTemplates">
+                                <label htmlFor="country" class="font-medium text-900">{{
+                                    'campaign-management.campaign-create.scedual.phishing.fields.template' | translate
+                                    }} <i class="pi pi-question-circle" style="font-size: 0.9rem;"
+                                        pTooltip="select template to scedual"></i></label>
+                                <p-dropdown [options]="phishingTemplates" optionLabel="emailName" (onChange)="onSelectPhishingTemplate($event)"
+                                    placeholder="{{ 'campaign-management.campaign-create.scedual.phishing.placeholders.template' | translate }}"
+                                    optionValue="id" formControlName="phishingEmailTemplateId"></p-dropdown>
+                            </div>
+                            <div class="field col-12 lg:col-6" id="phishingUsers">
+                                <label htmlFor="country" class="font-medium text-900">{{
+                                    'campaign-management.campaign-create.scedual.phishing.fields.users' | translate }}
+                                    <i class="pi pi-question-circle" style="font-size: 0.9rem;"
+                                        pTooltip="select users / user to scedual in template"></i></label>
+                                <p-multiSelect [options]="users" optionLabel="name"
+                                    placeholder="{{ 'campaign-management.campaign-create.scedual.phishing.placeholders.users' | translate }}"
+                                    optionValue="id" formControlName="users"></p-multiSelect>
+                            </div>
+
+                            <div class="field col-12 md:col-6 mb-4 mt-2">
+                                <label htmlFor="fromAddressEmailName" class="font-medium text-900">{{
+                                    'campaign-management.campaign-create.scedual.phishing.fields.phishingDomainEmailId' | translate
+                                    }} <i class="pi pi-question-circle" style="font-size: 0.9rem;"
+                                        pTooltip="select the from email address that this phishing template send using it"></i></label>
+                                <p-dropdown [options]="domainEmails" optionLabel="senderEmail"
+                                    placeholder="{{ 'campaign-management.campaign-create.scedual.phishing.placeholders.phishingDomainEmailId' | translate }}"
+                                    optionValue="id" formControlName="phishingDomainEmailId"></p-dropdown>
+                            </div>
+
+                            <div class="field col-12 md:col-6 mb-4 mt-4 flex flex-column align-items-start justify-content-center">
+                                <div class="flex flex-wrap gap-3">
+                                    <div id="isFrequently">
+                                        <p-radioButton class="font-medium text-900"
+                                            label="{{ 'campaign-management.campaign-create.scedual.phishing.fields.isFrequently' | translate }}"
+                                            [value]="true" formControlName="isFrequently"> </p-radioButton>
+                                        <i class="pi pi-question-circle ml-1" style="font-size: 0.9rem;"
+                                            pTooltip="this option mean that the template will send more than one time for users"></i>
+                                    </div>
+                                    <div id="isImmediately">
+                                        <p-radioButton class="font-medium text-900"
+                                            label="{{ 'campaign-management.campaign-create.scedual.phishing.fields.isImmediately' | translate }}"
+                                            [value]="false" formControlName="isFrequently"> </p-radioButton>
+                                        <i class="pi pi-question-circle ml-1" style="font-size: 0.9rem;"
+                                            pTooltip="this option mean that the template will send for users NOW"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="field flex flex-wrap justify-content-between"
+                                *ngIf="phishingForm.value.isFrequently">
+
+                                <div class="field col-12 lg:col-6 mt-2 mb-2" id="phishingStartTime">
+                                    <label htmlFor="phishingStartTime" class="font-medium text-900">{{
+                                        'campaign-management.campaign-create.scedual.phishing.fields.startTime' |
+                                        translate
+                                        }} <i class="pi pi-question-circle" style="font-size: 0.9rem;"
+                                            pTooltip="this when the phishing on this template start "></i></label>
+                                    <input class="startDate" type="date" formControlName="phishingStartTime"
+                                        id="phishingStartTime" (change)="onTimeChange($event ,'phishingStartTime')" />
+                                    <div *ngIf="validationPhishingStartTimeMessage" class="validation-message">
+                                        {{ validationPhishingStartTimeMessage }}
+                                    </div>
+                                </div>
+
+                                <div class="field col-12 lg:col-6 mt-2 mb-2" id="phishingEndTime">
+                                    <label htmlFor="phishingEndTime" class="font-medium text-900">{{
+                                        'campaign-management.campaign-create.scedual.phishing.fields.endTime' |
+                                        translate }}
+                                        <i class="pi pi-question-circle" style="font-size: 0.9rem;"
+                                            pTooltip="this when the phishing on this template end "></i></label>
+                                    <input class="startDate" type="date" formControlName="phishingEndTime"
+                                        id="phishingEndTime" (change)="onTimeChange($event ,'phishingEndTime')" />
+                                    <div *ngIf="validationPhishingEndTimeMessage" class="validation-message">
+                                        {{ validationPhishingEndTimeMessage }}
+                                    </div>
+                                </div>
+
+                                <div class="field col-12 md:col-6 mt-2 mb-2" id="frequencyInDays">
+                                    <label for="frequencyDays" class="font-medium text-900">{{
+                                        'campaign-management.campaign-create.scedual.phishing.fields.frequencyDays' |
+                                        translate }} <i class="pi pi-question-circle" style="font-size: 0.9rem;"
+                                            pTooltip="how many days want to repeat this template between phishing start date and phishing end date"></i></label>
+                                    <p-inputNumber id="frequencyDays" (keyup)="calculateOccurrences()"
+                                        formControlName="frequencyDays" />
+                                </div>
+
+                                <div class="field col-12 md:col-6 mt-2 mb-2" id="numberOfOccurrences">
+                                    <label for="number" class="font-medium text-900">{{
+                                        'campaign-management.campaign-create.scedual.phishing.fields.numberOfOccurrences'
+                                        |
+                                        translate }} <i class="pi pi-question-circle" style="font-size: 0.9rem;"
+                                            pTooltip="this is the number of ocuurenace that will happend based on frequency days you input"></i></label>
+                                    <p-inputNumber [(ngModel)]="numberOfOccurrences"
+                                        [ngModelOptions]="{ standalone: true }" [disabled]="true"></p-inputNumber>
+                                </div>
+
+                            </div>
+                            <div class="field col-12 md:col-6 m-auto" id="add">
+                                <button class="w-50" pButton pRipple
+                                    label="{{ 'campaign-management.campaign-create.scedual.phishing.actions.add' | translate }}"
+                                    type="submit" [disabled]="!phishingForm.valid"></button>
+                            </div>
+                        </div>
+                    </form>
+                </p-card>
+                <p-card styleClass="w" header="{{ 'campaign-management.campaign-create.scedual.phishing.fields.awarenessCampaignPhishingScedualResult' | translate }}"
+                    [style]="{ border: '2px solid rgb(136 60 174 / 26%)', borderRadius:'8px', margin:'1rem' }">
+                    <div class="mt-3" id="scedualTemplateTable">
+                        <p-table #dt [value]="schedualPhishingDataEntered" [paginator]="true" [rows]="10"
+                            [showCurrentPageReport]="true" responsiveLayout="scroll"
+                            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                            [rowsPerPageOptions]="[10, 25, 50]" [globalFilterFields]="['name', 'type', 'tenant']">
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th class="white-space-nowrap" style="width: 25%">{{
+                                        'campaign-management.campaign-create.scedual.phishing.columns.template' |
+                                        translate
+                                        }}
+                                    </th>
+                                    <th class="white-space-nowrap" style="width: 25%">{{
+                                        'campaign-management.campaign-create.scedual.phishing.columns.startTime' |
+                                        translate
+                                        }}
+                                    </th>
+                                    <th class="white-space-nowrap" style="width: 25%">{{
+                                        'campaign-management.campaign-create.scedual.phishing.columns.endTime' |
+                                        translate
+                                        }}
+                                    </th>
+                                    <th class="white-space-nowrap" style="width: 25%">{{
+                                        'campaign-management.campaign-create.scedual.phishing.columns.frequencyDays' |
+                                        translate
+                                        }}</th>
+                                    <th class="white-space-nowrap" style="width: 25%">{{
+                                        'campaign-management.campaign-create.scedual.phishing.columns.usersCount' |
+                                        translate }}
+                                    </th>
+                                    <th></th>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body" let-schedual>
+                                <tr>
+                                    <td>{{ schedual?.phishingEmailTemplateName }}</td>
+                                    <td>{{ schedual?.phishingStartTime | date:'MMM d, yyyy' }}</td>
+                                    <td>{{ schedual?.phishingEndTime | date:'MMM d, yyyy' }}</td>
+                                    <td>{{ schedual?.frequencyDays }}</td>
+                                    <td>{{ schedual?.users?.length }}</td>
+                                    <td>
+                                        <button pButton pRipple icon="pi pi-trash"
+                                            class="p-button-rounded p-button-danger"
+                                            (click)="deleteFromPhishingTable(schedual)"></button>
+                                    </td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </div>
+                </p-card>
+            </div>
+
+        </ng-template>
+        <ng-template pTemplate="footer">
+            <div class="grid grid-nogutter justify-content-between">
+                <p-button label="{{ 'shared.actions.back' | translate }}" (onClick)="prevPage()" icon="pi pi-angle-left"></p-button>
+                @if(type == 1){
+                <p-button label="{{ 'shared.actions.confirm' | translate }}" (onClick)="confirm()" icon="pi pi-check"
+                    id="stepLast"></p-button>
+                }@else {
+                <p-button label="{{ 'shared.actions.confirm' | translate }}" (onClick)="confirm()"
+                    [disabled]=" this.schedualPhishingDataEntered.length === 0 || phishingTemplates.length > 0 ? true : false"
+                    icon="pi pi-check" id="stepLast"></p-button>
+                }
+            </div>
+        </ng-template>
+    </p-card>
+</div>
+
+<p-dialog [(visible)]="editEmailTrainingLanguageDialog"
+    header="{{ 'campaign-management.campaign-create.scedual.training.dialogs.editEmailTrainingLanguageDialog.header' | translate }}"
+    [modal]="true" [style]="{ width: '80%', height: '70%' }" class="p-fluid">
+    <ng-template pTemplate="content">
+        <p-tabView [style]="{ width: '100%' }" *ngIf="lessonLanguages.length > 0">
+            <ng-container *ngFor="let item of lessonLanguages">
+                <p-tabPanel [header]="item.name">
+                    <div>
+                        <div class="field mb-4 col-12">
+                            <label class="font-medium text-900">{{
+                                'campaign-management.campaign-create.scedual.training.dialogs.editEmailTrainingLanguageDialog.emailSubject'
+                                | translate }}</label>
+                            <input type="text" pInputText [(ngModel)]="item.lessonAwarenessEmailSubject" />
+                        </div>
+                        <div class="field mb-4 col-12">
+                            <label class="font-medium text-900">{{
+                                'campaign-management.campaign-create.scedual.training.dialogs.editEmailTrainingLanguageDialog.emailContent'
+                                | translate }}</label>
+                            <app-iAware-rich-text [id]="item.id"
+                                [(ngModel)]="item.lessonAwarenessEmailContentHtml"></app-iAware-rich-text>
+                        </div>
+                    </div>
+                </p-tabPanel>
+            </ng-container>
+        </p-tabView>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+            class="p-button-text" (click)="hideEditEmailDialog()"></button>
+        <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check" class="p-button-text"
+            (click)="saveEditEmail()"></button>
+    </ng-template>
+</p-dialog>

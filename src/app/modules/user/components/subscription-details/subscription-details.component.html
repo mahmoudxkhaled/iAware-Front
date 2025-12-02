@@ -1,0 +1,1425 @@
+<div *ngIf="currentPage === 'SubscriptionOverview'" class="block-content">
+    <div class="lg:px-8 md:px-6 px-4 py-8 ng-star-inserted">
+        <div class=" ">
+            <div class="grid">
+
+                <div class="col-12 md:col-6 xl:col-4 p-3">
+                    <div
+                        class="surface-card border-light shadow-3 border-round p-4 flex flex-column pt-3 justify-content-center align-items-center">
+                        <div class="flex flex-column align-items-center border-bottom-1 surface-border pb-3">
+                            <img src="../../../../../assets/media/renew.png" class="mb-3 w-9" />
+                            <span
+                                class="text-xl text-900 font-medium mb-2">{{'user.user-tenant-profile.renewSubscription'
+                                | translate}}</span>
+                            <span class="text-600 font-medium mb-3">{{'user.user-tenant-profile.remainingDays' |
+                                translate}} </span>
+                            <span class="text-2xl text-800 block mb-3 font-semibold">
+                                {{ remainingDays !== null ? remainingDays : 'N/A' }}
+                            </span>
+                        </div>
+                        <div class="flex pt-3 justify-content-center align-items-center">
+                            <p-button class="p-button-label" (onClick)="navigateTo('RenewSubscriptionInvoice', 'Renew')"
+                                label="{{'user.user-tenant-profile.renew' | translate}}" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 md:col-6 xl:col-4 p-3">
+                    <div
+                        class="surface-card border-light shadow-3 border-round p-4 flex flex-column pt-3 justify-content-center align-items-center">
+                        <div class="flex flex-column align-items-center border-bottom-1 surface-border pb-3">
+                            <img src="../../../../../assets/media/upgrade.png" class="mb-3 w-9" />
+                            <span
+                                class="text-xl text-900 font-medium mb-2">{{'user.user-tenant-profile.updgradeSubscription'
+                                | translate}}</span>
+                            <span class="text-600 font-medium mb-3">{{'user.user-tenant-profile.currentPlan' |
+                                translate}} </span>
+                            <span *ngIf="tenantSubscription" class="text-2xl text-800 block mb-3 font-semibold">
+                                {{ tenantSubscription.subscriptionPlanName }}
+                            </span>
+                        </div>
+                        <div class="flex pt-3 justify-content-center align-items-center">
+                            <p-button class="p-button-label" (onClick)="navigateTo('pricing')"
+                                label="{{'shared.actions.upgrade' | translate}}" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 md:col-6 xl:col-4 p-3">
+                    <div
+                        class="surface-card border-light shadow-3 border-round p-4 flex flex-column pt-3 justify-content-center align-items-center">
+                        <div class="flex flex-column align-items-center border-bottom-1 surface-border pb-3">
+                            <img src="../../../../../assets/media/add-user.png" class="mb-3 w-9" />
+                            <span class="text-xl text-900 font-medium mb-2">{{'user.user-tenant-profile.purchaseUsers' |
+                                translate}}</span>
+                            <span class="text-600 font-medium mb-3">{{'user.user-tenant-profile.currentUsersNumber' |
+                                translate}} </span>
+                            <span *ngIf="tenantSubscription" class="text-2xl text-800 block mb-3 font-semibold">
+                                {{ tenantSubscription.usersCount }}
+                            </span>
+                        </div>
+                        <div class="flex pt-3 justify-content-center align-items-center">
+                            <p-button class="p-button-label" (onClick)="navigateTo('PurchaseUsersInvoice')"
+                                label="{{'user.user-tenant-profile.purchaseUsers' | translate}}" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- <div class="col-12 md:col-6 xl:col-3 p-3">
+                    <div
+                        class="surface-card border-light shadow-3 border-round p-4 flex flex-column pt-3 justify-content-center align-items-center">
+                        <div class="flex flex-column align-items-center border-bottom-1 surface-border pb-3">
+                            <img src="https://cdn-icons-png.flaticon.com/512/411/411736.png" class="mb-3 w-9" />
+
+                            <span class="text-xl text-900 font-medium mb-2"> </span>
+                            <span class="text-600 font-medium mb-3"> </span>
+                            <span class="text-2xl text-800 block mb-3 font-semibold"></span>
+                            <span class="text-xl text-900 font-medium mb-2">{{'user.user-tenant-profile.refundRequest' | translate}}</span>
+                            <span class="text-2xl text-800 block mb-3 font-semibold"></span>
+                            <span class="text-2xl text-800 block mb-4 font-semibold"> </span>
+                            <span class="text-2xl text-800 block mb-2 font-semibold"> </span>
+                        </div>
+                        <div class="flex pt-3 justify-content-center align-items-center">
+                            <p-button class="p-button-label" (onClick)="navigateTo('RefundRequest')" label="{{'user.user-tenant-profile.request' | translate}}" />
+                        </div>
+                    </div>
+                </div> -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="tenantSubscription && currentPage === 'SubscriptionOverview'" class="subscription-card">
+    <h2 class="card-title">{{'user.user-tenant-profile.yourSubscriptionDetails' | translate}}</h2>
+    <hr />
+    <div class="card-content">
+        <!-- <div class="card-item">
+                <span class="card-item-label">ID:</span> <span class="card-item-value">{{
+                    tenantSubscription.tenantId }}</span>
+            </div> -->
+        <div class="card-item">
+            <span class="card-item-label">{{'user.user-tenant-profile.company' | translate}}</span>
+            <span class="card-item-value">{{ tenantSubscription.tenantName }}</span>
+        </div>
+        <div class="card-item">
+            <span *ngIf="tenantSubscription" class="card-item-label">{{'user.user-tenant-profile.subscriptionPlan' |
+                translate}}</span>
+            <span class="card-item-value">{{ tenantSubscription.subscriptionPlanName }}</span>
+        </div>
+        <div class="card-item">
+            <span class="card-item-label">{{'user.user-tenant-profile.startDate' | translate}}</span>
+            <span class="card-item-value">{{ tenantSubscription.startDate | date : 'MM/dd/yyyy' }}</span>
+        </div>
+        <div class="card-item">
+            <span class="card-item-label">{{'user.user-tenant-profile.endDate' | translate}}</span>
+            <span class="card-item-value">{{ tenantSubscription.endDate | date : 'MM/dd/yyyy' }}</span>
+        </div>
+        <div class="card-item">
+            <span class="card-item-label">{{'user.user-tenant-profile.remainingDays' | translate}}</span>
+            <span class="card-item-value">{{ remainingDays !== null ? remainingDays : 'N/A' }}</span>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="currentPage === 'RenewSubscriptionInvoice'" class="page-content ">
+    <div class="px-4 py-3 md:px-6 lg:px-8">
+        <div class="flex justify-content-between align-items-center">
+            <div>
+                <p-button (onClick)="navigateTo('SubscriptionOverview')" icon="pi pi-arrow-left"
+                    label="{{'shared.actions.back' | translate}}"></p-button>
+            </div>
+            <div class="text-900 font-bold text-6xl mb-4 text-center" style="flex-grow: 1">{{ quoteName }}
+                {{'user.user-tenant-profile.invoice' | translate}}</div>
+            <!-- Empty div to maintain spacing on the right (if needed for alignment) -->
+            <div style="width: 100px"></div>
+        </div>
+
+        <div class="grid">
+            <div class="col-12">
+                <!-- Invoice Details Card -->
+                <div class="invoice-card">
+                    <div class="card">
+                        <p-table #dt [value]="previewRenewInvoice" responsiveLayout="scroll" [rows]="10"
+                            styleClass="p-datatable-striped">
+                            <ng-template pTemplate="caption">
+                                <div
+                                    class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                                    <h5 class="m-0">{{'user.user-tenant-profile.invoice' | translate}}</h5>
+                                </div>
+                            </ng-template>
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th>{{'user.user-tenant-profile.subscriptionPlann' | translate}}</th>
+                                    <th>{{'user.user-tenant-profile.startDatee' | translate}}</th>
+                                    <th>{{'user.user-tenant-profile.endDatee' | translate}}</th>
+                                    <th class="text-center">{{'user.user-tenant-profile.userCount' | translate}}</th>
+                                    <th class="text-center">{{'user.user-tenant-profile.priceUser' | translate}}</th>
+                                    <th class="text-center">{{'user.user-tenant-profile.total' | translate}}</th>
+                                </tr>
+                            </ng-template>
+
+                            <ng-template pTemplate="body" let-invoice>
+                                <tr>
+                                    <td>{{ invoice.subscriptionPlanName }}</td>
+                                    <td>{{ invoice.startDate | date : 'MM/dd/yyyy' }}</td>
+                                    <td>{{ invoice.endDate | date : 'MM/dd/yyyy' }}</td>
+                                    <td class="text-center">{{ invoice.userCount }} <i class="pi pi-user"></i></td>
+                                    <td class="text-center">{{ invoice.userPrice | currency }}</td>
+                                    <td class="text-center">{{ invoice.totalAmount | currency }}</td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </div>
+
+                    <div class="ng-star-inserted">
+                        <div class="px-4 py-4 md:px-6 lg:px-8">
+                            <div class="text-900 text-xl font-medium mb-3 text-center">
+                                {{'user.user-tenant-profile.paymentMethods' | translate}}</div>
+                            <p class="text-700 mt-0 mb-4 text-center">
+                                {{'user.user-tenant-profile.paymentMethodsMessage' | translate}}
+                            </p>
+
+                            <div class="grid">
+                                <!-- Credit Card -->
+                                <div class="col-12 lg:col-6 p-3"
+                                    (click)="selectPaymentMethod(PaymentTypeEnum.CreditCard)">
+                                    <div class="shadow-2 surface-card p-4 border-2 cursor-pointer"
+                                        [class.border-blue-500]="selectedPaymentMethod === PaymentTypeEnum.CreditCard"
+                                        style="border-radius: 10px">
+                                        <div class="flex align-items-center mb-4">
+                                            <div class="mr-3">
+                                                <span
+                                                    class="inline-flex justify-content-center align-items-center bg-indigo-100"
+                                                    style="border-radius: 4px; width: 45px; height: 45px">
+                                                    <i class="pi pi-credit-card text-2xl text-indigo-600"></i>
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span
+                                                    class="text-900 text-xl mb-2 font-medium">{{'user.user-tenant-profile.creditCard'
+                                                    | translate}}</span>
+                                                <p class="m-0 text-600 font-medium text-sm">
+                                                    {{'user.user-tenant-profile.creditCardMessage' | translate}}
+                                                </p>
+                                            </div>
+                                            <p-radioButton name="payment" class="p-element ml-auto px-5"
+                                                [value]="PaymentTypeEnum.CreditCard"
+                                                [ngModel]="selectedPaymentMethod"></p-radioButton>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- PayPal -->
+                                <div class="col-12 lg:col-6 p-3" (click)="selectPaymentMethod(PaymentTypeEnum.PayPal)">
+                                    <div class="shadow-2 surface-card p-4 border-2 cursor-pointer"
+                                        [class.border-blue-500]="selectedPaymentMethod === PaymentTypeEnum.PayPal"
+                                        style="border-radius: 10px">
+                                        <div class="flex align-items-center mb-4">
+                                            <div class="mr-3">
+                                                <span
+                                                    class="inline-flex justify-content-center align-items-center bg-blue-100"
+                                                    style="border-radius: 4px; width: 45px; height: 45px">
+                                                    <img src="https://blocks.primeng.org/assets/images/blocks/logos/paypal.svg"
+                                                        style="height: 1.5rem" />
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span
+                                                    class="text-900 text-xl mb-2 font-medium">{{'user.user-tenant-profile.payPal'
+                                                    | translate}}</span>
+                                                <p class="m-0 text-600 font-medium text-sm">
+                                                    {{'user.user-tenant-profile.payPalMessage' | translate}}
+                                                </p>
+                                            </div>
+                                            <p-radioButton name="payment" class="p-element ml-auto px-5"
+                                                [value]="PaymentTypeEnum.PayPal"
+                                                [ngModel]="selectedPaymentMethod"></p-radioButton>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Transfer -->
+                                <div class="col-12 lg:col-6 p-3"
+                                    (click)="selectPaymentMethod(PaymentTypeEnum.Transfer)">
+                                    <div class="shadow-2 surface-card p-4 border-2 cursor-pointer"
+                                        [class.border-blue-500]="selectedPaymentMethod === PaymentTypeEnum.Transfer"
+                                        style="border-radius: 10px">
+                                        <div class="flex align-items-center mb-4">
+                                            <div class="mr-3">
+                                                <span
+                                                    class="inline-flex justify-content-center align-items-center bg-green-100"
+                                                    style="border-radius: 4px; width: 45px; height: 45px">
+                                                    <i class="pi pi-money-bill text-2xl text-green-600"></i>
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span
+                                                    class="text-900 text-xl mb-2 font-medium">{{'user.user-tenant-profile.wireTransfer'
+                                                    | translate}}</span>
+                                                <p class="m-0 text-600 font-medium text-sm">
+                                                    {{'user.user-tenant-profile.wireTransferMessage' | translate}}
+                                                </p>
+                                            </div>
+                                            <p-radioButton name="payment" class="p-element ml-auto px-5"
+                                                [value]="PaymentTypeEnum.Transfer"
+                                                [ngModel]="selectedPaymentMethod"></p-radioButton>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- BitCoin -->
+                                <div class="col-12 lg:col-6 p-3" (click)="selectPaymentMethod(PaymentTypeEnum.BitCoin)">
+                                    <div class="shadow-2 surface-card p-4 border-2 cursor-pointer"
+                                        [class.border-blue-500]="selectedPaymentMethod === PaymentTypeEnum.BitCoin"
+                                        style="border-radius: 10px">
+                                        <div class="flex align-items-center mb-4">
+                                            <div class="mr-3">
+                                                <span
+                                                    class="inline-flex justify-content-center align-items-center bg-orange-100"
+                                                    style="border-radius: 4px; width: 45px; height: 45px">
+                                                    <img src="https://blocks.primeng.org/assets/images/blocks/logos/bitcoin.svg"
+                                                        style="height: 1.5rem" />
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span
+                                                    class="text-900 text-xl mb-2 font-medium">{{'user.user-tenant-profile.bitCoin'
+                                                    | translate}}</span>
+                                                <p class="m-0 text-600 font-medium text-sm">
+                                                    {{'user.user-tenant-profile.bitCoinMessage' | translate}}
+                                                </p>
+                                            </div>
+                                            <p-radioButton name="payment" class="px-5 p-element ml-auto"
+                                                [value]="PaymentTypeEnum.BitCoin"
+                                                [ngModel]="selectedPaymentMethod"></p-radioButton>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Conditionally show the form -->
+                    <form class="coming-soonTransfer"
+                        *ngIf="selectedPaymentMethod !== null && selectedPaymentMethod == PaymentTypeEnum.Transfer"
+                        [formGroup]="addInvoicePaymentRequestForm"
+                        (ngSubmit)="SubmitRenewSubscriptionInvoicePaymentRequest()">
+                        <div class="grid">
+                            <div class="col">
+                                <div class="p-3 border-round-sm font-bold">
+                                    <div class="field p-fluid">
+                                        <label for="RequestAmount">{{ 'user.user-tenant-profile.amount' | translate
+                                            }}</label>
+                                        <p-inputNumber class="p-fluid" id="RequestAmount"
+                                            formControlName="RequestAmount" mode="decimal" [min]="0"></p-inputNumber>
+                                        <small
+                                            *ngIf="addInvoicePaymentRequestForm.get('RequestAmount')?.invalid && (addInvoicePaymentRequestForm.get('RequestAmount')?.dirty || submitted)"
+                                            class="p-error">{{ 'shared.validation.required' | translate }}</small>
+                                    </div>
+
+                                    <div class="field">
+                                        <label for="RequestReferenceKey">{{
+                                            'user.user-tenant-profile.requestReferenceKey' | translate }}</label>
+                                        <input type="text" pInputText id="RequestReferenceKey"
+                                            formControlName="RequestReferenceKey" />
+                                        <small
+                                            *ngIf="addInvoicePaymentRequestForm.get('RequestReferenceKey')?.invalid && (addInvoicePaymentRequestForm.get('RequestReferenceKey')?.dirty || submitted)"
+                                            class="p-error">{{ 'shared.validation.required' | translate }}</small>
+                                    </div>
+
+                                    <div class="field">
+                                        <label for="RequestPaymentNote">{{ 'user.user-tenant-profile.requestPaymentNote'
+                                            | translate }}</label>
+                                        <textarea id="RequestPaymentNote" pInputTextarea
+                                            formControlName="RequestPaymentNote" rows="3" cols="20"></textarea>
+                                        <small
+                                            *ngIf="addInvoicePaymentRequestForm.get('RequestPaymentNote')?.invalid && (addInvoicePaymentRequestForm.get('RequestPaymentNote')?.dirty || submitted)"
+                                            class="p-error">{{ 'shared.validation.required' | translate }}</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <div class="text-center p-3 border-round-sm font-bold">
+                                    <div class="flex justify-content-center flex-wrap">
+                                        <div class="md:col-6 flex flex-column">
+                                            <div class="flex align-items-center justify-content-center">
+                                                <img [src]="invoiceImageURL" alt="Avatar" class="invoiceImage"
+                                                    style="cursor: pointer"
+                                                    (click)="onUploadPaymentReuqestImageClick()" />
+                                            </div>
+                                            <label class="flex justify-content-center">{{
+                                                'user.user-tenant-profile.paymentReuqestImage' | translate }}</label>
+                                            <div class="flex align-items-center justify-content-center mt-2">
+                                                <p-button label="{{ 'shared.actions.upload' | translate }}"
+                                                    icon="pi pi-upload"
+                                                    (click)="onUploadPaymentReuqestImageClick()"></p-button>
+                                                <input type="file" id="PaymentReuqestImage" style="display: none"
+                                                    (change)="onPaymentReuqestImageSelected($event)" />
+                                            </div>
+                                            <small
+                                                *ngIf="addInvoicePaymentRequestForm.get('RequestReferenceImageUrl')?.invalid && (addInvoicePaymentRequestForm.get('RequestReferenceImageUrl')?.dirty || submitted)"
+                                                class="p-error">{{ 'shared.validation.required' | translate }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 flex flex-wrap justify-content-center">
+                            <button type="submit" pButton pRipple [disabled]="addInvoicePaymentRequestForm.invalid">{{
+                                'shared.actions.submit' | translate }}</button>
+                        </div>
+                    </form>
+                    <div class="m-auto" style="width: 500px; height: 500px; margin: auto"
+                        *ngIf="selectedPaymentMethod !== null && selectedPaymentMethod == PaymentTypeEnum.BitCoin"
+                        class="coming-soon-container">
+                        <img src="assets/media/fe547d7e2f8ebf8722fdefd259f47e8d.jpg" alt="Coming Soon"
+                            class="coming-soon-image" />
+                    </div>
+
+                    <div class="m-auto" style="width: 500px; height: 500px; margin: auto"
+                        *ngIf="selectedPaymentMethod !== null && selectedPaymentMethod == PaymentTypeEnum.CreditCard"
+                        class="coming-soon-container">
+                        <img src="assets/media/fe547d7e2f8ebf8722fdefd259f47e8d.jpg" alt="Coming Soon"
+                            class="coming-soon-image" />
+                    </div>
+
+                    <div class="m-auto" style="width: 500px; height: 500px; margin: auto"
+                        *ngIf="selectedPaymentMethod !== null && selectedPaymentMethod == PaymentTypeEnum.PayPal"
+                        class="coming-soon-container">
+                        <img src="assets/media/fe547d7e2f8ebf8722fdefd259f47e8d.jpg" alt="Coming Soon"
+                            class="coming-soon-image" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="currentPage === 'invoice'" class="page-content ">
+    <div class="px-4 py-3 md:px-6 lg:px-8">
+        <div class="flex justify-content-between align-items-center">
+            <div>
+                <p-button (onClick)="navigateTo('SubscriptionOverview')" icon="pi pi-arrow-left"
+                    label="Back"></p-button>
+            </div>
+            <div class="text-900 font-bold text-6xl mb-4 text-center" style="flex-grow: 1">{{ quoteName }}
+                {{'user.user-tenant-profile.invoice' | translate}}</div>
+            <!-- Empty div to maintain spacing on the right (if needed for alignment) -->
+            <div style="width: 100px"></div>
+        </div>
+
+        <div class="grid">
+            <div class="col-12">
+                <!-- Invoice Details Card -->
+                <div class="invoice-card">
+                    <div class="card">
+                        <p-table #dt [value]="generatedInvoice" responsiveLayout="scroll" [rows]="10"
+                            styleClass="p-datatable-striped">
+                            <ng-template pTemplate="caption">
+                                <div
+                                    class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                                    <h5 class="m-0"> {{'user.user-tenant-profile.invoice' | translate}}</h5>
+                                </div>
+                            </ng-template>
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th>{{'user.user-tenant-profile.subscriptionPlann' | translate}}</th>
+                                    <th>{{'user.user-tenant-profile.startDatee' | translate}}</th>
+                                    <th>{{'user.user-tenant-profile.endDatee' | translate}}</th>
+                                    <th class="text-center">{{'user.user-tenant-profile.userCount' | translate}}</th>
+                                    <th class="text-center">{{'user.user-tenant-profile.priceUser' | translate}}</th>
+                                    <th class="text-center">{{'user.user-tenant-profile.total' | translate}}</th>
+                                </tr>
+                            </ng-template>
+
+                            <ng-template pTemplate="body" let-invoice>
+                                <tr>
+                                    <td>{{ invoice.subscriptionPlanName }}</td>
+                                    <td>{{ invoice.startDate | date : 'MM/dd/yyyy' }}</td>
+                                    <td>{{ invoice.endDate | date : 'MM/dd/yyyy' }}</td>
+                                    <td class="text-center">
+                                        {{ invoice.requestUserCount }} <i class="pi pi-user"></i>
+                                    </td>
+                                    <td class="text-center">{{ invoice.userPrice | currency }}</td>
+                                    <td class="text-center">{{ invoice.totalAmount | currency }}</td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </div>
+
+                    <div class="ng-star-inserted">
+                        <div class="px-4 py-4 md:px-6 lg:px-8">
+                            <div class="text-900 text-xl font-medium mb-3 text-center">
+                                {{'user.user-tenant-profile.paymentMethods' | translate}}</div>
+                            <p class="text-700 mt-0 mb-4 text-center">
+                                {{'user.user-tenant-profile.paymentMethodsMessage' | translate}}
+                            </p>
+
+                            <div class="grid">
+                                <!-- Credit Card -->
+                                <div class="col-12 lg:col-6 p-3"
+                                    (click)="selectPaymentMethod(PaymentTypeEnum.CreditCard)">
+                                    <div class="shadow-2 surface-card p-4 border-2 cursor-pointer"
+                                        [class.border-blue-500]="selectedPaymentMethod === PaymentTypeEnum.CreditCard"
+                                        style="border-radius: 10px">
+                                        <div class="flex align-items-center mb-4">
+                                            <div class="mr-3">
+                                                <span
+                                                    class="inline-flex justify-content-center align-items-center bg-indigo-100"
+                                                    style="border-radius: 4px; width: 45px; height: 45px">
+                                                    <i class="pi pi-credit-card text-2xl text-indigo-600"></i>
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span
+                                                    class="text-900 text-xl mb-2 font-medium">{{'user.user-tenant-profile.creditCard'
+                                                    | translate}}</span>
+                                                <p class="m-0 text-600 font-medium text-sm">
+                                                    {{'user.user-tenant-profile.creditCardMessage' | translate}}
+                                                </p>
+                                            </div>
+                                            <p-radioButton name="payment" class="p-element ml-auto px-5"
+                                                [value]="PaymentTypeEnum.CreditCard"
+                                                [ngModel]="selectedPaymentMethod"></p-radioButton>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- PayPal -->
+                                <div class="col-12 lg:col-6 p-3" (click)="selectPaymentMethod(PaymentTypeEnum.PayPal)">
+                                    <div class="shadow-2 surface-card p-4 border-2 cursor-pointer"
+                                        [class.border-blue-500]="selectedPaymentMethod === PaymentTypeEnum.PayPal"
+                                        style="border-radius: 10px">
+                                        <div class="flex align-items-center mb-4">
+                                            <div class="mr-3">
+                                                <span
+                                                    class="inline-flex justify-content-center align-items-center bg-blue-100"
+                                                    style="border-radius: 4px; width: 45px; height: 45px">
+                                                    <img src="https://blocks.primeng.org/assets/images/blocks/logos/paypal.svg"
+                                                        style="height: 1.5rem" />
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span
+                                                    class="text-900 text-xl mb-2 font-medium">{{'user.user-tenant-profile.payPal'
+                                                    | translate}}</span>
+                                                <p class="m-0 text-600 font-medium text-sm">
+                                                    {{'user.user-tenant-profile.payPalMessage' | translate}}
+                                                </p>
+                                            </div>
+                                            <p-radioButton name="payment" class="p-element ml-auto px-5"
+                                                [value]="PaymentTypeEnum.PayPal"
+                                                [ngModel]="selectedPaymentMethod"></p-radioButton>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Transfer -->
+                                <div class="col-12 lg:col-6 p-3"
+                                    (click)="selectPaymentMethod(PaymentTypeEnum.Transfer)">
+                                    <div class="shadow-2 surface-card p-4 border-2 cursor-pointer"
+                                        [class.border-blue-500]="selectedPaymentMethod === PaymentTypeEnum.Transfer"
+                                        style="border-radius: 10px">
+                                        <div class="flex align-items-center mb-4">
+                                            <div class="mr-3">
+                                                <span
+                                                    class="inline-flex justify-content-center align-items-center bg-green-100"
+                                                    style="border-radius: 4px; width: 45px; height: 45px">
+                                                    <i class="pi pi-money-bill text-2xl text-green-600"></i>
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span
+                                                    class="text-900 text-xl mb-2 font-medium">{{'user.user-tenant-profile.wireTransfer'
+                                                    | translate}}</span>
+                                                <p class="m-0 text-600 font-medium text-sm">
+                                                    {{'user.user-tenant-profile.wireTransferMessage' | translate}}
+                                                </p>
+                                            </div>
+                                            <p-radioButton name="payment" class="p-element ml-auto px-5"
+                                                [value]="PaymentTypeEnum.Transfer"
+                                                [ngModel]="selectedPaymentMethod"></p-radioButton>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- BitCoin -->
+                                <div class="col-12 lg:col-6 p-3" (click)="selectPaymentMethod(PaymentTypeEnum.BitCoin)">
+                                    <div class="shadow-2 surface-card p-4 border-2 cursor-pointer"
+                                        [class.border-blue-500]="selectedPaymentMethod === PaymentTypeEnum.BitCoin"
+                                        style="border-radius: 10px">
+                                        <div class="flex align-items-center mb-4">
+                                            <div class="mr-3">
+                                                <span
+                                                    class="inline-flex justify-content-center align-items-center bg-orange-100"
+                                                    style="border-radius: 4px; width: 45px; height: 45px">
+                                                    <img src="https://blocks.primeng.org/assets/images/blocks/logos/bitcoin.svg"
+                                                        style="height: 1.5rem" />
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span
+                                                    class="text-900 text-xl mb-2 font-medium">{{'user.user-tenant-profile.bitCoin'
+                                                    | translate}}</span>
+                                                <p class="m-0 text-600 font-medium text-sm">
+                                                    {{'user.user-tenant-profile.bitCoinMessage' | translate}}
+                                                </p>
+                                            </div>
+                                            <p-radioButton name="payment" class="px-5 p-element ml-auto"
+                                                [value]="PaymentTypeEnum.BitCoin"
+                                                [ngModel]="selectedPaymentMethod"></p-radioButton>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Conditionally show the form -->
+                    <form class="coming-soonTransfer"
+                        *ngIf="selectedPaymentMethod !== null && selectedPaymentMethod == PaymentTypeEnum.Transfer"
+                        [formGroup]="addInvoicePaymentRequestForm"
+                        (ngSubmit)="SubmitRenewSubscriptionInvoicePaymentRequest()">
+                        <div class="grid">
+                            <div class="col">
+                                <div class="p-3 border-round-sm font-bold">
+                                    <div class="field">
+                                        <label for="SubscriptionTenantInvoiceId">
+                                            {{ 'user.user-tenant-profile.invoiceKey' | translate: { key: currentInvoice
+                                            } }}</label>
+                                    </div>
+
+                                    <div class="field p-fluid">
+                                        <label for="RequestAmount"> {{'user.user-tenant-profile.amount' | translate}}
+                                        </label>
+                                        <p-inputNumber class="p-fluid" id="RequestAmount"
+                                            formControlName="RequestAmount"></p-inputNumber>
+                                    </div>
+
+                                    <div class="field">
+                                        <label for="RequestReferenceKey">
+                                            {{'user.user-tenant-profile.requestReferenceKey' | translate}} </label>
+                                        <input type="text" pInputText id="RequestReferenceKey"
+                                            formControlName="RequestReferenceKey" required />
+                                    </div>
+
+                                    <div class="field">
+                                        <label for="RequestPaymentNote"> {{'user.user-tenant-profile.requestPaymentNote'
+                                            | translate}} </label>
+                                        <textarea id="RequestPaymentNote" pInputTextarea
+                                            formControlName="RequestPaymentNote" required rows="3" cols="20"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <div class="text-center p-3 border-round-sm font-bold">
+                                    <div class="flex justify-content-center flex-wrap">
+                                        <div class="md:col-6 flex flex-column">
+                                            <div class="flex align-items-center justify-content-center">
+                                                <img [src]="invoiceImageURL" alt="Avatar" class="invoiceImage"
+                                                    style="cursor: pointer"
+                                                    (click)="onUploadPaymentReuqestImageClick()" />
+                                            </div>
+                                            <label
+                                                class="flex justify-content-center">{{'user.user-tenant-profile.paymentReuqestImage'
+                                                | translate}} </label>
+                                            <div class="flex align-items-center justify-content-center mt-2"
+                                                style="display: none">
+                                                <p-button label="{{'shared.actions.upload' | translate}} "
+                                                    icon="pi pi-upload"
+                                                    (click)="onUploadPaymentReuqestImageClick()"></p-button>
+                                                <input type="file" id="PaymentReuqestImage" style="display: none"
+                                                    (change)="onPaymentReuqestImageSelected($event)" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 flex flex-wrap justify-content-center">
+                            <!-- <button type="submit" pButton pRipple [disabled]="registerForm.invalid"> -->
+                            <button type="submit" pButton pRipple>{{'shared.actions.submit' | translate}}</button>
+                        </div>
+                    </form>
+                    <div class="m-auto" style="width: 500px; height: 500px; margin: auto"
+                        *ngIf="selectedPaymentMethod !== null && selectedPaymentMethod == PaymentTypeEnum.BitCoin"
+                        class="coming-soon-container">
+                        <img src="assets/media/fe547d7e2f8ebf8722fdefd259f47e8d.jpg" alt="Coming Soon"
+                            class="coming-soon-image" />
+                    </div>
+
+                    <div class="m-auto" style="width: 500px; height: 500px; margin: auto"
+                        *ngIf="selectedPaymentMethod !== null && selectedPaymentMethod == PaymentTypeEnum.CreditCard"
+                        class="coming-soon-container">
+                        <img src="assets/media/fe547d7e2f8ebf8722fdefd259f47e8d.jpg" alt="Coming Soon"
+                            class="coming-soon-image" />
+                    </div>
+
+                    <div class="m-auto" style="width: 500px; height: 500px; margin: auto"
+                        *ngIf="selectedPaymentMethod !== null && selectedPaymentMethod == PaymentTypeEnum.PayPal"
+                        class="coming-soon-container">
+                        <img src="assets/media/fe547d7e2f8ebf8722fdefd259f47e8d.jpg" alt="Coming Soon"
+                            class="coming-soon-image" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="currentPage === 'UpgradeSubscriptionInvoice'" class="page-content">
+    <div class="px-4 py-3 md:px-6 lg:px-8">
+        <div class="flex justify-content-between align-items-center">
+            <div>
+                <p-button (onClick)="navigateTo('pricing')" icon="pi pi-arrow-left" label="Back"></p-button>
+            </div>
+            <div class="text-900 font-bold text-6xl mb-4 text-center" style="flex-grow: 1">{{ quoteName }}
+                {{'user.user-tenant-profile.invoice' | translate}}</div>
+            <!-- Empty div to maintain spacing on the right (if needed for alignment) -->
+            <div style="width: 100px"></div>
+        </div>
+
+        <div class="grid">
+            <div class="col-12">
+                <!-- Invoice Details Card -->
+                <div class="invoice-card">
+                    <div class="card">
+                        <p-table #dt [value]="previewUpgradeInvoice" responsiveLayout="scroll" [rows]="10"
+                            styleClass="p-datatable-striped">
+                            <ng-template pTemplate="caption">
+                                <div
+                                    class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                                    <h5 class="m-0"> {{'user.user-tenant-profile.invoice' | translate}}</h5>
+                                </div>
+                            </ng-template>
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th>{{'user.user-tenant-profile.subscriptionPlann' | translate}}</th>
+                                    <th>{{'user.user-tenant-profile.startDatee' | translate}}</th>
+                                    <th>{{'user.user-tenant-profile.endDatee' | translate}}</th>
+                                    <th class="text-center">{{'user.user-tenant-profile.userCount' | translate}}</th>
+                                    <th class="text-center">{{'user.user-tenant-profile.priceUser' | translate}}</th>
+                                    <th class="text-center">{{'user.user-tenant-profile.total' | translate}}</th>
+                                </tr>
+                            </ng-template>
+
+                            <ng-template pTemplate="body" let-invoice>
+                                <tr>
+                                    <td>{{ invoice.subscriptionPlanName }}</td>
+                                    <td>{{ invoice.startDate | date : 'MM/dd/yyyy' }}</td>
+                                    <td>{{ invoice.endDate | date : 'MM/dd/yyyy' }}</td>
+                                    <td class="text-center">{{ invoice.userCount }} <i class="pi pi-user"></i></td>
+                                    <td class="text-center">{{ invoice.userPrice | currency }}</td>
+                                    <td class="text-center">{{ invoice.totalAmount | currency }}</td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </div>
+
+                    <div class="ng-star-inserted">
+                        <div class="px-4 py-4 md:px-6 lg:px-8">
+                            <div class="text-900 text-xl font-medium mb-3 text-center">
+                                {{'user.user-tenant-profile.paymentMethods' | translate}}</div>
+                            <p class="text-700 mt-0 mb-4 text-center">
+                                {{'user.user-tenant-profile.paymentMethodsMessage' | translate}}
+                            </p>
+
+                            <div class="grid">
+                                <!-- Credit Card -->
+                                <div class="col-12 lg:col-6 p-3"
+                                    (click)="selectPaymentMethod(PaymentTypeEnum.CreditCard)">
+                                    <div class="shadow-2 surface-card p-4 border-2 cursor-pointer"
+                                        [class.border-blue-500]="selectedPaymentMethod === PaymentTypeEnum.CreditCard"
+                                        style="border-radius: 10px">
+                                        <div class="flex align-items-center mb-4">
+                                            <div class="mr-3">
+                                                <span
+                                                    class="inline-flex justify-content-center align-items-center bg-indigo-100"
+                                                    style="border-radius: 4px; width: 45px; height: 45px">
+                                                    <i class="pi pi-credit-card text-2xl text-indigo-600"></i>
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span
+                                                    class="text-900 text-xl mb-2 font-medium">{{'user.user-tenant-profile.creditCard'
+                                                    | translate}}</span>
+                                                <p class="m-0 text-600 font-medium text-sm">
+                                                    {{'user.user-tenant-profile.creditCardMessage' | translate}}
+                                                </p>
+                                            </div>
+                                            <p-radioButton name="payment" class="p-element ml-auto px-5"
+                                                [value]="PaymentTypeEnum.CreditCard"
+                                                [ngModel]="selectedPaymentMethod"></p-radioButton>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- PayPal -->
+                                <div class="col-12 lg:col-6 p-3" (click)="selectPaymentMethod(PaymentTypeEnum.PayPal)">
+                                    <div class="shadow-2 surface-card p-4 border-2 cursor-pointer"
+                                        [class.border-blue-500]="selectedPaymentMethod === PaymentTypeEnum.PayPal"
+                                        style="border-radius: 10px">
+                                        <div class="flex align-items-center mb-4">
+                                            <div class="mr-3">
+                                                <span
+                                                    class="inline-flex justify-content-center align-items-center bg-blue-100"
+                                                    style="border-radius: 4px; width: 45px; height: 45px">
+                                                    <img src="https://blocks.primeng.org/assets/images/blocks/logos/paypal.svg"
+                                                        style="height: 1.5rem" />
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span
+                                                    class="text-900 text-xl mb-2 font-medium">{{'user.user-tenant-profile.payPal'
+                                                    | translate}}</span>
+                                                <p class="m-0 text-600 font-medium text-sm">
+                                                    {{'user.user-tenant-profile.payPalMessage' | translate}}
+                                                </p>
+                                            </div>
+                                            <p-radioButton name="payment" class="p-element ml-auto px-5"
+                                                [value]="PaymentTypeEnum.PayPal"
+                                                [ngModel]="selectedPaymentMethod"></p-radioButton>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Transfer -->
+                                <div class="col-12 lg:col-6 p-3"
+                                    (click)="selectPaymentMethod(PaymentTypeEnum.Transfer)">
+                                    <div class="shadow-2 surface-card p-4 border-2 cursor-pointer"
+                                        [class.border-blue-500]="selectedPaymentMethod === PaymentTypeEnum.Transfer"
+                                        style="border-radius: 10px">
+                                        <div class="flex align-items-center mb-4">
+                                            <div class="mr-3">
+                                                <span
+                                                    class="inline-flex justify-content-center align-items-center bg-green-100"
+                                                    style="border-radius: 4px; width: 45px; height: 45px">
+                                                    <i class="pi pi-money-bill text-2xl text-green-600"></i>
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span
+                                                    class="text-900 text-xl mb-2 font-medium">{{'user.user-tenant-profile.wireTransfer'
+                                                    | translate}}</span>
+                                                <p class="m-0 text-600 font-medium text-sm">
+                                                    {{'user.user-tenant-profile.wireTransferMessage' | translate}}
+                                                </p>
+                                            </div>
+                                            <p-radioButton name="payment" class="p-element ml-auto px-5"
+                                                [value]="PaymentTypeEnum.Transfer"
+                                                [ngModel]="selectedPaymentMethod"></p-radioButton>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- BitCoin -->
+                                <div class="col-12 lg:col-6 p-3" (click)="selectPaymentMethod(PaymentTypeEnum.BitCoin)">
+                                    <div class="shadow-2 surface-card p-4 border-2 cursor-pointer"
+                                        [class.border-blue-500]="selectedPaymentMethod === PaymentTypeEnum.BitCoin"
+                                        style="border-radius: 10px">
+                                        <div class="flex align-items-center mb-4">
+                                            <div class="mr-3">
+                                                <span
+                                                    class="inline-flex justify-content-center align-items-center bg-orange-100"
+                                                    style="border-radius: 4px; width: 45px; height: 45px">
+                                                    <img src="https://blocks.primeng.org/assets/images/blocks/logos/bitcoin.svg"
+                                                        style="height: 1.5rem" />
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span
+                                                    class="text-900 text-xl mb-2 font-medium">{{'user.user-tenant-profile.bitCoin'
+                                                    | translate}}</span>
+                                                <p class="m-0 text-600 font-medium text-sm">
+                                                    {{'user.user-tenant-profile.bitCoinMessage' | translate}}
+                                                </p>
+                                            </div>
+                                            <p-radioButton name="payment" class="px-5 p-element ml-auto"
+                                                [value]="PaymentTypeEnum.BitCoin"
+                                                [ngModel]="selectedPaymentMethod"></p-radioButton>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Conditionally show the form -->
+                    <form class="coming-soonTransfer"
+                        *ngIf="selectedPaymentMethod !== null && selectedPaymentMethod == PaymentTypeEnum.Transfer"
+                        [formGroup]="addInvoicePaymentRequestForm"
+                        (ngSubmit)="SubmitUpgradeSubscriptionInvoicePaymentRequest()">
+                        <div class="grid">
+                            <div class="col">
+                                <div class="p-3 border-round-sm font-bold">
+                                    <div class="field p-fluid">
+                                        <label for="RequestAmount">{{ 'user.user-tenant-profile.amount' | translate
+                                            }}</label>
+                                        <p-inputNumber class="p-fluid" id="RequestAmount"
+                                            formControlName="RequestAmount" mode="decimal" [min]="0"></p-inputNumber>
+                                        <small
+                                            *ngIf="addInvoicePaymentRequestForm.get('RequestAmount')?.invalid && (addInvoicePaymentRequestForm.get('RequestAmount')?.dirty || submitted)"
+                                            class="p-error">{{ 'shared.validation.required' | translate }}</small>
+                                    </div>
+
+                                    <div class="field">
+                                        <label for="RequestReferenceKey">{{
+                                            'user.user-tenant-profile.requestReferenceKey' | translate }}</label>
+                                        <input type="text" pInputText id="RequestReferenceKey"
+                                            formControlName="RequestReferenceKey" />
+                                        <small
+                                            *ngIf="addInvoicePaymentRequestForm.get('RequestReferenceKey')?.invalid && (addInvoicePaymentRequestForm.get('RequestReferenceKey')?.dirty || submitted)"
+                                            class="p-error">{{ 'shared.validation.required' | translate }}</small>
+                                    </div>
+
+                                    <div class="field">
+                                        <label for="RequestPaymentNote">{{ 'user.user-tenant-profile.requestPaymentNote'
+                                            | translate }}</label>
+                                        <textarea id="RequestPaymentNote" pInputTextarea
+                                            formControlName="RequestPaymentNote" rows="3" cols="20"></textarea>
+                                        <small
+                                            *ngIf="addInvoicePaymentRequestForm.get('RequestPaymentNote')?.invalid && (addInvoicePaymentRequestForm.get('RequestPaymentNote')?.dirty || submitted)"
+                                            class="p-error">{{ 'shared.validation.required' | translate }}</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <div class="text-center p-3 border-round-sm font-bold">
+                                    <div class="flex justify-content-center flex-wrap">
+                                        <div class="md:col-6 flex flex-column">
+                                            <div class="flex align-items-center justify-content-center">
+                                                <img [src]="invoiceImageURL" alt="Avatar" class="invoiceImage"
+                                                    style="cursor: pointer"
+                                                    (click)="onUploadPaymentReuqestImageClick()" />
+                                            </div>
+                                            <label class="flex justify-content-center">{{
+                                                'user.user-tenant-profile.paymentReuqestImage' | translate }}</label>
+                                            <div class="flex align-items-center justify-content-center mt-2">
+                                                <p-button label="{{ 'shared.actions.upload' | translate }}"
+                                                    icon="pi pi-upload"
+                                                    (click)="onUploadPaymentReuqestImageClick()"></p-button>
+                                                <input type="file" id="PaymentReuqestImage" style="display: none"
+                                                    (change)="onPaymentReuqestImageSelected($event)" />
+                                            </div>
+                                            <small
+                                                *ngIf="addInvoicePaymentRequestForm.get('RequestReferenceImageUrl')?.invalid && (addInvoicePaymentRequestForm.get('RequestReferenceImageUrl')?.dirty || submitted)"
+                                                class="p-error">{{ 'shared.validation.required' | translate }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 flex flex-wrap justify-content-center">
+                            <button type="submit" pButton pRipple [disabled]="addInvoicePaymentRequestForm.invalid">{{
+                                'shared.actions.submit' | translate }}</button>
+                        </div>
+                    </form>
+                    <div class="m-auto" style="width: 500px; height: 500px; margin: auto"
+                        *ngIf="selectedPaymentMethod !== null && selectedPaymentMethod == PaymentTypeEnum.BitCoin"
+                        class="coming-soon-container">
+                        <img src="assets/media/fe547d7e2f8ebf8722fdefd259f47e8d.jpg" alt="Coming Soon"
+                            class="coming-soon-image" />
+                    </div>
+
+                    <div class="m-auto" style="width: 500px; height: 500px; margin: auto"
+                        *ngIf="selectedPaymentMethod !== null && selectedPaymentMethod == PaymentTypeEnum.CreditCard"
+                        class="coming-soon-container">
+                        <img src="assets/media/fe547d7e2f8ebf8722fdefd259f47e8d.jpg" alt="Coming Soon"
+                            class="coming-soon-image" />
+                    </div>
+
+                    <div class="m-auto" style="width: 500px; height: 500px; margin: auto"
+                        *ngIf="selectedPaymentMethod !== null && selectedPaymentMethod == PaymentTypeEnum.PayPal"
+                        class="coming-soon-container">
+                        <img src="assets/media/fe547d7e2f8ebf8722fdefd259f47e8d.jpg" alt="Coming Soon"
+                            class="coming-soon-image" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="currentPage === 'pricing'">
+    <div class="grid">
+        <div class="col-12">
+            <div class="px-4 py-8 md:px-6 lg:px-8">
+                <div class="flex justify-content-between align-items-center">
+                    <div>
+                        <p-button (onClick)="navigateTo('SubscriptionOverview')" icon="pi pi-arrow-left"
+                            label="Back"></p-button>
+                    </div>
+                    <div class="text-900 font-bold text-6xl mb-4 text-center" style="flex-grow: 1">
+                        {{'user.user-tenant-profile.pricingPlans' | translate}}</div>
+                    <div style="width: 100px"></div>
+                </div>
+
+                <div class="text-700 text-xl mb-6 text-center line-height-3">
+                    {{'user.user-tenant-profile.pricingPlansMessage' | translate}}
+                </div>
+
+                <div class="grid">
+                    <div class="col-12 lg:col-4" *ngFor="let sub of subscriptionsList">
+                        <div class="p-3 h-full">
+                            <div class="shadow-2 p-3 h-full flex flex-column surface-card-price"
+                                style="border-radius: 6px; cursor: pointer">
+                                <div class="w-full m-auto" [ngClass]="{
+                                        'platinum-background': sub.title === 'Platinum',
+                                        'gold-background': sub.title === 'Gold',
+                                        'silver-background': sub.title === 'Silver',
+                                        'diamond-background': sub.title === 'Diamond',
+                                        'free-plan-background': sub.title === 'Free Plan'
+                                    }">
+                                    <div class="text-900 font-medium text-2xl mb-2">{{ sub.title }}</div>
+                                </div>
+
+                                <div class="text-600">{{ sub.description }}</div>
+                                <hr class="my-3 mx-0 border-top-1 border-none surface-border" />
+                                <div class="flex align-items-center">
+                                    <span class="font-bold text-2xl text-900">${{ sub.userPrice }}</span><span
+                                        class="ml-2 font-medium text-600">{{'user.user-tenant-profile.peruser' |
+                                        translate}}</span>
+                                </div>
+                                <hr class="my-3 mx-0 border-top-1 border-none surface-border" />
+
+                                <strong>{{'user.user-tenant-profile.activeLanguages' | translate}}</strong>
+                                <div *ngFor="let subb of sub.languagesName" class="flex align-items-center">
+                                    <span class="text-black-500 mt-2 mb-2 mr-2">
+                                        <i class="pi pi-check-circle text-green-500 mr-2"></i> {{ subb }}</span><span
+                                        class="ml-2 font-medium text-600"> </span>
+                                </div>
+                                <hr class="my-3 mx-0 border-top-1 border-none surface-border" />
+
+                                <strong class="mb-2">{{'user.user-tenant-profile.features' | translate}}</strong>
+                                <ul class="list-none p-0 m-0 flex-grow-1">
+                                    <li class="flex align-items-center mb-3" *ngIf="sub.unlimitedPhishingSimulation">
+                                        <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                            class="text-900">{{'user.user-tenant-profile.unlimitedPhishingSimulations' |
+                                            translate}}</span>
+                                    </li>
+                                    <li class="flex align-items-center mb-3" *ngIf="sub.awarenessVideos">
+                                        <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                            class="text-900">{{'user.user-tenant-profile.awarenessVideos' |
+                                            translate}}</span>
+                                    </li>
+                                    <li class="flex align-items-center mb-3" *ngIf="sub.comicBooks">
+                                        <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                            class="text-900">{{'user.user-tenant-profile.comicBooks' |
+                                            translate}}</span>
+                                    </li>
+                                    <li class="flex align-items-center mb-3" *ngIf="sub.knowledgeQuiz">
+                                        <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                            class="text-900">{{'user.user-tenant-profile.knowledgeQuiz' |
+                                            translate}}</span>
+                                    </li>
+                                    <li class="flex align-items-center mb-3" *ngIf="sub.securityQuotesAndTips">
+                                        <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                            class="text-900">{{'user.user-tenant-profile.securityQuotes&Tips' |
+                                            translate}}</span>
+                                    </li>
+                                    <li class="flex align-items-center mb-3" *ngIf="sub.awarenessEmails">
+                                        <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                            class="text-900">{{'user.user-tenant-profile.awarenessEmails' |
+                                            translate}}</span>
+                                    </li>
+                                    <li class="flex align-items-center mb-3" *ngIf="sub.wallpapers">
+                                        <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                            class="text-900">{{'user.user-tenant-profile.wallpapers' |
+                                            translate}}</span>
+                                    </li>
+                                    <li class="flex align-items-center mb-3" *ngIf="sub.screenSavers">
+                                        <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                            class="text-900">{{'user.user-tenant-profile.screenSavers' |
+                                            translate}}</span>
+                                    </li>
+                                    <li class="flex align-items-center mb-3" *ngIf="sub.games">
+                                        <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                            class="text-900">{{'user.user-tenant-profile.games' | translate}}</span>
+                                    </li>
+                                    <li class="flex align-items-center mb-3" *ngIf="sub.vrGamesAndTraining">
+                                        <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                            class="text-900">{{'user.user-tenant-profile.vRGames&Training' |
+                                            translate}}</span>
+                                    </li>
+                                    <li class="flex align-items-center mb-3" *ngIf="sub.localization">
+                                        <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                            class="text-900">{{'user.user-tenant-profile.localization' |
+                                            translate}}</span>
+                                    </li>
+                                    <li class="flex align-items-center mb-3" *ngIf="sub.onSiteDeployment">
+                                        <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                            class="text-900">{{'user.user-tenant-profile.onSiteDeployment' |
+                                            translate}}</span>
+                                    </li>
+                                    <li class="flex align-items-center mb-3" *ngIf="sub.iawareMobileApp">
+                                        <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                            class="text-900">{{'user.user-tenant-profile.iAwareMobileApp' |
+                                            translate}}</span>
+                                    </li>
+                                    <li class="flex align-items-center mb-3" *ngIf="sub.automatedTrainingCampaigns">
+                                        <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                            class="text-900">{{'user.user-tenant-profile.automatedTrainingCampaigns' |
+                                            translate}}</span>
+                                    </li>
+                                    <li class="flex align-items-center mb-3" *ngIf="sub.brandableContent">
+                                        <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                            class="text-900">{{'user.user-tenant-profile.brandableContent' |
+                                            translate}}</span>
+                                    </li>
+                                    <li class="flex align-items-center mb-3" *ngIf="sub.phishAlertButton">
+                                        <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                            class="text-900">{{'user.user-tenant-profile.phishAlertButton' |
+                                            translate}}</span>
+                                    </li>
+                                    <li class="flex align-items-center mb-3"
+                                        *ngIf="sub.userProvisioningViaActiveDirectory">
+                                        <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                            class="text-900">{{'user.user-tenant-profile.userProvisioningviaActiveDirectory'
+                                            | translate}}</span>
+                                    </li>
+                                    <li class="flex align-items-center mb-3" *ngIf="sub.advancedReporting">
+                                        <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                            class="text-900">{{'user.user-tenant-profile.advancedReporting' |
+                                            translate}}</span>
+                                    </li>
+                                    <li class="flex align-items-center mb-3" *ngIf="sub.technicalSupport">
+                                        <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                            class="text-900">{{'user.user-tenant-profile.technicalSupport' |
+                                            translate}}</span>
+                                    </li>
+                                    <li class="flex align-items-center mb-3" *ngIf="sub.smartGroups">
+                                        <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                            class="text-900">{{'user.user-tenant-profile.smartGroups' |
+                                            translate}}</span>
+                                    </li>
+                                    <li class="flex align-items-center mb-3" *ngIf="sub.customizedPhishingExperience">
+                                        <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                            class="text-900">{{'user.user-tenant-profile.customizedPhishingExperience' |
+                                            translate}}</span>
+                                    </li>
+                                </ul>
+
+                                <hr class="mb-3 mx-0 border-top-1 border-none surface-border mt-auto" />
+                                <button (click)="openGetAQuoteDialog(sub)" pbutton pripple label="Request A Quote"
+                                    class="p-element p-ripple p-3 w-full mt-auto p-button p-component">
+                                    <span class="p-button-label text-xl">{{'shared.actions.upgrade' |
+                                        translate}}</span><span class="p-ink"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="currentPage === 'finalStep'" class="page-content final-step-page">
+    <div class="final-step-container">
+        <div class="text-900 font-bold text-6xl mb-4 text-center">
+            {{'user.user-tenant-profile.yourRequestCompletedSuccessfully' | translate}}</div>
+
+        <div class="final-step-message-card">
+            <div class="final-step-message-icon">📧</div>
+            <div class="final-step-message">
+                {{'user.user-tenant-profile.yourRequestCompletedSuccessfullyMessage' | translate}}
+            </div>
+        </div>
+        <div class="m-4">
+            <p-button routerLink="/invoice" severity="info"
+                label="{{'user.user-tenant-profile.checkInvoice' | translate}}"></p-button>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="currentPage === 'PurchaseUsersInvoice'" class="page-content ">
+    <div class="px-4 py-3 md:px-6 lg:px-8">
+        <div class="flex justify-content-between align-items-center">
+            <div>
+                <p-button (onClick)="navigateTo('SubscriptionOverview')" icon="pi pi-arrow-left"
+                    label="Back"></p-button>
+            </div>
+            <div class="text-900 font-bold text-6xl mb-4 text-center" style="flex-grow: 1">
+                {{'user.user-tenant-profile.purchaseUsers' | translate}}</div>
+            <!-- Empty div to maintain spacing on the right (if needed for alignment) -->
+            <div style="width: 100px"></div>
+        </div>
+
+        <div class="field col-4">
+            <label for="RequestAmount">{{'user.user-tenant-profile.userCountRequest' | translate}}</label>
+            <p-inputNumber class="p-fluid" [(ngModel)]="usersCountRequest"></p-inputNumber>
+            <!-- Error message for invalid input -->
+            <div *ngIf="showPurchasingUsersError" style="margin-top: 0.2rem; font-size: 0.875rem; color: red">
+                {{'user.user-tenant-profile.userCountRequestValidation' | translate}}
+            </div>
+        </div>
+        <div class="mb-4 flex flex-wrap justify-content-center">
+            <p-button (onClick)="calculatePurchasingUsersInvoice()"
+                label="{{'user.user-tenant-profile.calculateTotalPrice' | translate}}"></p-button>
+        </div>
+
+        <div class="grid" *ngIf="showPurchaseUsersInvoiceDetails">
+            <div class="col-12">
+                <!-- Invoice Details Card -->
+                <div class="invoice-card">
+                    <div class="card">
+                        <p-table #dt [value]="previewPurchaseUsersInvoice" responsiveLayout="scroll" [rows]="10"
+                            styleClass="p-datatable-striped">
+                            <ng-template pTemplate="caption">
+                                <div
+                                    class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                                    <h5 class="m-0">Invoice</h5>
+                                </div>
+                            </ng-template>
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th>{{'user.user-tenant-profile.subscriptionPlann' | translate}}</th>
+                                    <th class="text-center">{{'user.user-tenant-profile.userCount' | translate}}</th>
+                                    <th class="text-center">{{'user.user-tenant-profile.priceUser' | translate}}</th>
+                                    <th class="text-center">{{'user.user-tenant-profile.total' | translate}}</th>
+                                </tr>
+                            </ng-template>
+
+                            <ng-template pTemplate="body" let-invoice>
+                                <tr>
+                                    <td>{{ invoice.subscriptionPlanName }}</td>
+                                    <td class="text-center">{{ invoice.userCount }} <i class="pi pi-user"></i></td>
+                                    <td class="text-center">{{ invoice.userPrice | currency }}</td>
+                                    <td class="text-center">{{ invoice.totalAmount | currency }}</td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </div>
+
+                    <div class="ng-star-inserted">
+                        <div class="px-4 py-4 md:px-6 lg:px-8">
+                            <div class="text-900 text-xl font-medium mb-3 text-center">
+                                {{'user.user-tenant-profile.paymentMethods' | translate}}</div>
+                            <p class="text-700 mt-0 mb-4 text-center">
+                                {{'user.user-tenant-profile.paymentMethodsMessages' | translate}}
+                            </p>
+
+                            <div class="grid">
+                                <!-- Credit Card -->
+                                <div class="col-12 lg:col-6 p-3"
+                                    (click)="selectPaymentMethod(PaymentTypeEnum.CreditCard)">
+                                    <div class="shadow-2 surface-card p-4 border-2 cursor-pointer"
+                                        [class.border-blue-500]="selectedPaymentMethod === PaymentTypeEnum.CreditCard"
+                                        style="border-radius: 10px">
+                                        <div class="flex align-items-center mb-4">
+                                            <div class="mr-3">
+                                                <span
+                                                    class="inline-flex justify-content-center align-items-center bg-indigo-100"
+                                                    style="border-radius: 4px; width: 45px; height: 45px">
+                                                    <i class="pi pi-credit-card text-2xl text-indigo-600"></i>
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span
+                                                    class="text-900 text-xl mb-2 font-medium">{{'user.user-tenant-profile.creditCard'
+                                                    | translate}}</span>
+                                                <p class="m-0 text-600 font-medium text-sm">
+                                                    {{'user.user-tenant-profile.creditCardMessages' | translate}}
+                                                </p>
+                                            </div>
+                                            <p-radioButton name="payment" class="p-element ml-auto px-5"
+                                                [value]="PaymentTypeEnum.CreditCard"
+                                                [ngModel]="selectedPaymentMethod"></p-radioButton>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- PayPal -->
+                                <div class="col-12 lg:col-6 p-3" (click)="selectPaymentMethod(PaymentTypeEnum.PayPal)">
+                                    <div class="shadow-2 surface-card p-4 border-2 cursor-pointer"
+                                        [class.border-blue-500]="selectedPaymentMethod === PaymentTypeEnum.PayPal"
+                                        style="border-radius: 10px">
+                                        <div class="flex align-items-center mb-4">
+                                            <div class="mr-3">
+                                                <span
+                                                    class="inline-flex justify-content-center align-items-center bg-blue-100"
+                                                    style="border-radius: 4px; width: 45px; height: 45px">
+                                                    <img src="https://blocks.primeng.org/assets/images/blocks/logos/paypal.svg"
+                                                        style="height: 1.5rem" />
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span
+                                                    class="text-900 text-xl mb-2 font-medium">{{'user.user-tenant-profile.payPal'
+                                                    | translate}}</span>
+                                                <p class="m-0 text-600 font-medium text-sm">
+                                                    {{'user.user-tenant-profile.payPalMessages' | translate}}
+                                                </p>
+                                            </div>
+                                            <p-radioButton name="payment" class="p-element ml-auto px-5"
+                                                [value]="PaymentTypeEnum.PayPal"
+                                                [ngModel]="selectedPaymentMethod"></p-radioButton>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Transfer -->
+                                <div class="col-12 lg:col-6 p-3"
+                                    (click)="selectPaymentMethod(PaymentTypeEnum.Transfer)">
+                                    <div class="shadow-2 surface-card p-4 border-2 cursor-pointer"
+                                        [class.border-blue-500]="selectedPaymentMethod === PaymentTypeEnum.Transfer"
+                                        style="border-radius: 10px">
+                                        <div class="flex align-items-center mb-4">
+                                            <div class="mr-3">
+                                                <span
+                                                    class="inline-flex justify-content-center align-items-center bg-green-100"
+                                                    style="border-radius: 4px; width: 45px; height: 45px">
+                                                    <i class="pi pi-money-bill text-2xl text-green-600"></i>
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span
+                                                    class="text-900 text-xl mb-2 font-medium">{{'user.user-tenant-profile.wireTransfer'
+                                                    | translate}}</span>
+                                                <p class="m-0 text-600 font-medium text-sm">
+                                                    {{'user.user-tenant-profile.wireTransferMessages' | translate}}
+                                                </p>
+                                            </div>
+                                            <p-radioButton name="payment" class="p-element ml-auto px-5"
+                                                [value]="PaymentTypeEnum.Transfer"
+                                                [ngModel]="selectedPaymentMethod"></p-radioButton>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- BitCoin -->
+                                <div class="col-12 lg:col-6 p-3" (click)="selectPaymentMethod(PaymentTypeEnum.BitCoin)">
+                                    <div class="shadow-2 surface-card p-4 border-2 cursor-pointer"
+                                        [class.border-blue-500]="selectedPaymentMethod === PaymentTypeEnum.BitCoin"
+                                        style="border-radius: 10px">
+                                        <div class="flex align-items-center mb-4">
+                                            <div class="mr-3">
+                                                <span
+                                                    class="inline-flex justify-content-center align-items-center bg-orange-100"
+                                                    style="border-radius: 4px; width: 45px; height: 45px">
+                                                    <img src="https://blocks.primeng.org/assets/images/blocks/logos/bitcoin.svg"
+                                                        style="height: 1.5rem" />
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span
+                                                    class="text-900 text-xl mb-2 font-medium">{{'user.user-tenant-profile.bitCoin'
+                                                    | translate}}</span>
+                                                <p class="m-0 text-600 font-medium text-sm">
+                                                    {{'user.user-tenant-profile.bitCoin' | translate}}
+                                                </p>
+                                            </div>
+                                            <p-radioButton name="payment" class="px-5 p-element ml-auto"
+                                                [value]="PaymentTypeEnum.BitCoin"
+                                                [ngModel]="selectedPaymentMethod"></p-radioButton>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Conditionally show the form -->
+                    <form class="coming-soonTransfer"
+                        *ngIf="selectedPaymentMethod !== null && selectedPaymentMethod == PaymentTypeEnum.Transfer"
+                        [formGroup]="addInvoicePaymentRequestForm"
+                        (ngSubmit)="SubmitPurchaseUsersSubscriptionInvoicePaymentRequest()">
+                        <div class="grid">
+                            <div class="col">
+                                <div class="p-3 border-round-sm font-bold">
+                                    <div class="field p-fluid">
+                                        <label for="RequestAmount">{{ 'user.user-tenant-profile.amount' | translate
+                                            }}</label>
+                                        <p-inputNumber class="p-fluid" id="RequestAmount"
+                                            formControlName="RequestAmount" mode="decimal" [min]="0"></p-inputNumber>
+                                        <small
+                                            *ngIf="addInvoicePaymentRequestForm.get('RequestAmount')?.invalid && (addInvoicePaymentRequestForm.get('RequestAmount')?.dirty || submitted)"
+                                            class="p-error">{{ 'shared.validation.required' | translate }}</small>
+                                    </div>
+
+                                    <div class="field">
+                                        <label for="RequestReferenceKey">{{
+                                            'user.user-tenant-profile.requestReferenceKey' | translate }}</label>
+                                        <input type="text" pInputText id="RequestReferenceKey"
+                                            formControlName="RequestReferenceKey" />
+                                        <small
+                                            *ngIf="addInvoicePaymentRequestForm.get('RequestReferenceKey')?.invalid && (addInvoicePaymentRequestForm.get('RequestReferenceKey')?.dirty || submitted)"
+                                            class="p-error">{{ 'shared.validation.required' | translate }}</small>
+                                    </div>
+
+                                    <div class="field">
+                                        <label for="RequestPaymentNote">{{ 'user.user-tenant-profile.requestPaymentNote'
+                                            | translate }}</label>
+                                        <textarea id="RequestPaymentNote" pInputTextarea
+                                            formControlName="RequestPaymentNote" rows="3" cols="20"></textarea>
+                                        <small
+                                            *ngIf="addInvoicePaymentRequestForm.get('RequestPaymentNote')?.invalid && (addInvoicePaymentRequestForm.get('RequestPaymentNote')?.dirty || submitted)"
+                                            class="p-error">{{ 'shared.validation.required' | translate }}</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <div class="text-center p-3 border-round-sm font-bold">
+                                    <div class="flex justify-content-center flex-wrap">
+                                        <div class="md:col-6 flex flex-column">
+                                            <div class="flex align-items-center justify-content-center">
+                                                <img [src]="invoiceImageURL" alt="Avatar" class="invoiceImage"
+                                                    style="cursor: pointer"
+                                                    (click)="onUploadPaymentReuqestImageClick()" />
+                                            </div>
+                                            <label class="flex justify-content-center">{{
+                                                'user.user-tenant-profile.paymentReuqestImage' | translate }}</label>
+                                            <div class="flex align-items-center justify-content-center mt-2">
+                                                <p-button label="{{ 'shared.actions.upload' | translate }}"
+                                                    icon="pi pi-upload"
+                                                    (click)="onUploadPaymentReuqestImageClick()"></p-button>
+                                                <input type="file" id="PaymentReuqestImage" style="display: none"
+                                                    (change)="onPaymentReuqestImageSelected($event)" />
+                                            </div>
+                                            <small
+                                                *ngIf="addInvoicePaymentRequestForm.get('RequestReferenceImageUrl')?.invalid && (addInvoicePaymentRequestForm.get('RequestReferenceImageUrl')?.dirty || submitted)"
+                                                class="p-error">{{ 'shared.validation.required' | translate }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 flex flex-wrap justify-content-center">
+                            <button type="submit" pButton pRipple [disabled]="addInvoicePaymentRequestForm.invalid">{{
+                                'shared.actions.submit' | translate }}</button>
+                        </div>
+                    </form>
+
+                    <div class="m-auto" style="width: 500px; height: 500px; margin: auto"
+                        *ngIf="selectedPaymentMethod !== null && selectedPaymentMethod == PaymentTypeEnum.BitCoin"
+                        class="coming-soon-container">
+                        <img src="assets/media/fe547d7e2f8ebf8722fdefd259f47e8d.jpg" alt="Coming Soon"
+                            class="coming-soon-image" />
+                    </div>
+
+                    <div class="m-auto" style="width: 500px; height: 500px; margin: auto"
+                        *ngIf="selectedPaymentMethod !== null && selectedPaymentMethod == PaymentTypeEnum.CreditCard"
+                        class="coming-soon-container">
+                        <img src="assets/media/fe547d7e2f8ebf8722fdefd259f47e8d.jpg" alt="Coming Soon"
+                            class="coming-soon-image" />
+                    </div>
+
+                    <div class="m-auto" style="width: 500px; height: 500px; margin: auto"
+                        *ngIf="selectedPaymentMethod !== null && selectedPaymentMethod == PaymentTypeEnum.PayPal"
+                        class="coming-soon-container">
+                        <img src="assets/media/fe547d7e2f8ebf8722fdefd259f47e8d.jpg" alt="Coming Soon"
+                            class="coming-soon-image" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,101 @@
+.achievements-header {
+    text-align: center;
+}
+
+.achievements-header h2 {
+    text-align: center;
+    font-size: clamp(1.8rem, 2vw, 2.5rem);
+    color: var(--primary-color);
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.achievements-header h2::after {
+    content: "";
+    display: block;
+    width: 100px;
+    height: 4px;
+    background: var(--primary-color);
+    margin: 10px auto 0;
+    border-radius: 10px;
+}
+
+.achievements-header p {
+    font-size: 18px;
+}
+
+/* Achievement Cards */
+.achievement-item {
+    background: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    border-radius: 15px;
+    padding: 20px 30px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    // margin-bottom: 20px;
+}
+
+.achievement-icon {
+    flex-shrink: 0;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6a1b9a, #8e24aa);
+    color: #fff;
+    font-size: 24px;
+}
+
+.achievement-content {
+    flex-grow: 1;
+}
+
+.achievement-content h2 {
+    font-size: 22px;
+    color: #4a148c;
+    margin-bottom: 5px;
+}
+
+.achievement-content p {
+    font-size: 16px;
+    color: #555;
+}
+
+.achievement-item button {
+    font-size: 14px;
+    padding: 10px 20px;
+    color: #fff;
+    background: #6a1b9a;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.achievement-item button:hover {
+    background: #4a148c;
+}
+
+::ng-deep .p-card-body{
+    height: 100%;
+}
+
+::ng-deep .p-card-content{
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.learn-text{
+    color: var(--primary-color);
+}
+
+.learn-text:hover{
+    cursor: pointer;
+    text-decoration: underline !important;
+}

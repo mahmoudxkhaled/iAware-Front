@@ -1,0 +1,140 @@
+<div class="card">
+    <p-toast></p-toast>
+    <div class="iAware-loading-table-container" style="position: relative;">
+        <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+
+        <p-table #dt [value]="industries" [paginator]="true" [rows]="pagibation.size" [showCurrentPageReport]="true"
+            responsiveLayout="scroll" [rowsPerPageOptions]="[10, 25, 50]" 
+            [lazy]="true" [totalRecords]="totalRecords" (onLazyLoad)="onLazyLoad($event)"
+            [globalFilterFields]="['name', 'value']">
+            <ng-template pTemplate="caption">
+                <div class="flex flex-wrap gap-2 align-items-center justify-content-between">
+                    <span class="p-input-icon-left w-full sm:w-20rem flex-order-1 sm:flex-order-0">
+                        <i class="pi pi-search"></i>
+                        <input pInputText type="text" (input)="onGlobalFilter(dt, $event)"
+                            placeholder="{{ 'shared.actions.search' | translate }}" class="w-full" />
+                    </span>
+                    <button *ngIf="hasPermission(actions.add)" (click)="navigateToCreate()" pButton
+                        class="p-button-outlined w-full sm:w-auto flex-order-0 sm:flex-order-1" icon="pi pi-user-plus"
+                        label="{{ 'industry.add' | translate }} "></button>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="header">
+                <tr>
+                    <th pSortableColumn="name" class="white-space-nowrap" style="width: 25%">{{
+                        'industry.name' | translate }} <p-sortIcon field="name"></p-sortIcon></th>
+                    <th pSortableColumn="value" class="white-space-nowrap" style="width: 25%">{{
+                        'industry.value' | translate }}<p-sortIcon field="value"></p-sortIcon>
+                    </th>
+                    <th style="width: 25% " class="text-center">{{ 'shared.actions.action' | translate }}</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-industry>
+                <tr>
+                    <td>{{ industry?.name }}</td>
+                    <td>{{ industry?.value }}</td>
+                    <td>
+                        <div class="flex align-items-center justify-content-around">
+                            <div>
+                                <button *ngIf="hasPermission(actions.edit)" pButton pRipple icon="pi pi-pencil"
+                                    class="p-button-rounded p-button-success mr-2"
+                                    (click)="openEditDialog(industry)"></button>
+                            </div>
+                            <div>
+                                <button *ngIf="hasPermission(actions.delete)" pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger"
+                                    (click)="openDeleteDialog(industry)"></button>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+
+<p-dialog [(visible)]="editeDialog" [style]="{ width: '50%' , height : '60%'}"
+    header="{{ 'industry.editHeader' | translate }} " [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <form [formGroup]="editForm" (ngSubmit)="editIndustry()">
+            <div class="grid">
+                <div class="col-12">
+                    <div class="grid formgrid p-fluid">
+                        <div class="field mb-4 col-12">
+                            <label for="name" class="font-medium text-900">{{ 'industry.name' | translate }} :</label>
+                            <input id="name" type="text" pInputText formControlName="name">
+                            <div *ngIf="editForm.controls['name'].invalid && editForm.controls['name'].touched"
+                                class="p-error">
+                                {{ 'industry.nameValidation' | translate }}
+                            </div>
+                        </div>
+
+                        <div class="field mb-4 col-12">
+                            <label for="value" class="font-medium text-900">{{ 'industry.value' | translate }} :</label>
+                            <p-inputNumber mode="decimal" [useGrouping]="false"  formControlName="value"></p-inputNumber>
+                            <div *ngIf="editForm.controls['value'].invalid && editForm.controls['value'].touched"
+                                class="p-error">
+                                {{ 'industry.valueValidation' | translate }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+            class="p-button-text" (click)="hideDialog()"></button>
+        <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check" class="p-button-text"
+            [disabled]="editForm.invalid" (click)="editIndustry()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="addDialog" [style]="{ width: '50%', height : '60%' }"
+    header="{{ 'Add New Industry' | translate }}" [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <form [formGroup]="addForm" (ngSubmit)="addIndustry()">
+            <div class="grid">
+                <div class="col-12">
+                    <div class="grid formgrid p-fluid">
+                        <div class="field mb-4 col-12">
+                            <label for="name" class="font-medium text-900">{{ 'industry.name' | translate }} :</label>
+                            <input id="name" type="text" pInputText formControlName="name">
+                            <div *ngIf="addForm.controls['name'].invalid && addForm.controls['name'].touched"
+                                class="p-error">
+                                {{ 'industry.nameValidation' | translate }}
+                            </div>
+                        </div>
+
+                        <div class="field mb-4 col-12">
+                            <label for="value" class="font-medium text-900">{{ 'industry.value' | translate }} :</label>
+                            <p-inputNumber mode="decimal" [useGrouping]="false"  formControlName="value"></p-inputNumber>
+                            <div *ngIf="addForm.controls['value'].invalid && addForm.controls['value'].touched"
+                                class="p-error">
+                                {{ 'industry.valueValidation' | translate }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+        <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check" class="p-button-text"
+            [disabled]="addForm.invalid" (click)="addIndustry()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="deleteDialog" header="{{ 'shared.headers.delete' | translate }}" [modal]="true"
+    [style]="{width:'50%'}">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="currentSelected">{{ 'shared.messages.delete' | translate }} <b> {{currentSelected.name}} </b>?</span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"  label="{{ 'shared.actions.cancel' | translate }}" (click)="deleteDialog = false"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{ 'shared.actions.save' | translate }}"
+            (click)="deleteIndustry()"></button>
+    </ng-template>
+</p-dialog>

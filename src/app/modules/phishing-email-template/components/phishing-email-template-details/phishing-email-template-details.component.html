@@ -1,0 +1,766 @@
+<div class="card">
+    <p-toast key="missingKeysToast">
+        <ng-template let-message pTemplate="message">
+            <div class="p-toast-message-container">
+                <div class="p-toast-content">
+                    <div class="p-toast-header">
+                        <i class="p-toast-icon pi pi-exclamation-triangle"></i>
+                        <div class="p-toast-summary" [innerHTML]="message.summary"></div>
+                    </div>
+                    <div class="p-toast-detail" [innerHTML]="message.detail"></div>
+                </div>
+            </div>
+        </ng-template>
+    </p-toast>
+    <p-toast></p-toast>
+    <h5>{{ 'phishing-email-template.listTitle' | translate }}</h5>
+    <p-dataView #dv [value]="phishingTemplateLanguges" [paginator]="true" [rows]="10" layout="grid">
+        <ng-template pTemplate="header">
+            <div class="flex flex-column md:flex-row justify-content-end gap-2">
+                <button pButton pRipple label="{{ 'phishing-email-template.addLanguage' | translate }}"
+                    *ngIf="!isDefaultPhishingTemplates && !isIAwareTeamUser" icon="pi pi-plus" class="p-button mr-2"
+                    (click)="createPhishingTemplateEmail()"></button>
+
+                <button pButton pRipple label="{{ 'phishing-email-template.addLanguage' | translate }}"
+                    *ngIf="isDefaultPhishingTemplates && isIAwareTeamUser" icon="pi pi-plus" class="p-button mr-2"
+                    (click)="createPhishingTemplateEmail()"></button>
+            </div>
+        </ng-template>
+
+        <ng-template let-templates pTemplate="gridItem">
+            <div class="iAware-loading-table-container" style="position: relative">
+                <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                <div class="grid grid-nogutter">
+
+                    <div class="col-12 md:col-4 phishing-see-more" *ngFor="let template of templates">
+                        <div class="p-3 m-3">
+                            <div
+                                class="surface-card shadow-3 border-round overflow-hidden hover:shadow-5 transition-all relative">
+                                <div class="object-cover">
+
+                                    <img [src]="template.phishingEmailImageUrl ?? defaultImageUrl"
+                                        [alt]="template.emailName" class="w-full" />
+
+                                </div>
+
+                                <button *ngIf="normalMenuItems.length > 0 && !template.canEdit" pButton pRipple
+                                    type="button" icon="pi pi-ellipsis-v"
+                                    class="p-button-rounded p-button-text p-button-plain absolute top-0 right-0 m-2 bg-gray-200 shadow-lg border border-gray-300"
+                                    (click)="
+                                        normalMenu.toggle($event); assigneCurrentSelect(template)
+                                    "></button>
+
+                                <button *ngIf="ownerMenuItems.length > 0 && template.canEdit" pButton pRipple
+                                    type="button" icon="pi pi-ellipsis-v"
+                                    class="p-button-rounded p-button-text p-button-plain absolute top-0 right-0 m-2 bg-gray-200 shadow-lg border border-gray-300"
+                                    (click)="ownerMenu.toggle($event); assigneCurrentSelect(template)"></button>
+
+                                <p-menu #ownerMenu [model]="ownerMenuItems" [appendTo]="'body'" [popup]="true"></p-menu>
+
+                                <p-menu #normalMenu [model]="normalMenuItems" [appendTo]="'body'"
+                                    [popup]="true"></p-menu>
+
+                                <!-- Content Section -->
+                                <div class="text-center mt-2 mb-2">
+                                    <div class="text-2xl font-bold">{{ template.emailName }}</div>
+                                    <strong>{{ template.languageName }}</strong>
+                                    <p>{{ template.description }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+    </p-dataView>
+</div>
+
+<p-dialog [(visible)]="addDialog" [style]="{ width: '100%', height: '100%' }"
+    header="{{ 'phishing-email-template.addEmailHeader' | translate }}" [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <p-card>
+            <div class="p-col-12">
+                <form [formGroup]="addForm" (ngSubmit)="addNewPhishingTemplateLanguage()">
+                    <p-tabView [style]="{ width: '100%' }">
+
+                        <p-tabPanel header="{{ 'phishing-email-template.taps.info' | translate }}">
+                            <div class="grid formgrid p-fluid">
+                                <div class="field mb-4 col-6">
+                                    <label for="emailName" class="font-medium text-900">{{
+                                        'phishing-email-template.name' | translate }}</label>
+                                    <input id="emailName" type="text" pInputText name="emailName"
+                                        placeholder="{{ 'phishing-email-template.nameField' | translate}}"
+                                        formControlName="emailName" />
+                                    <div *ngIf="addForm.get('emailName')?.invalid && addForm.get('emailName')?.touched"
+                                        class="p-error">
+                                        {{ 'phishing-email-template.nameValidation' | translate }}
+                                    </div>
+                                </div>
+                                <div class="field mb-4 col-6">
+                                    <label class="font-medium text-900">{{
+                                        'phishing-email-template.language' | translate
+                                        }}</label>
+                                    <p-dropdown formControlName="languageId" [options]="activeLanguage"
+                                        optionLabel="name" optionValue="id"
+                                        placeholder="{{ 'phishing-email-template.languagePlaceholder' | translate }}">
+                                    </p-dropdown>
+                                    <div *ngIf="addForm.get('languageId')?.invalid && addForm.get('languageId')?.touched"
+                                        class="p-error">
+                                        {{ 'phishing-email-template.languageValidation' | translate }}
+                                    </div>
+                                </div>
+                                <div class="field mb-4 col-12">
+                                    <label class="font-medium text-900">{{
+                                        'phishing-email-template.description' | translate
+                                        }}</label>
+                                    <textarea id="description"
+                                        placeholder="{{ 'phishing-email-template.descriptionField' | translate}}"
+                                        type="text" pInputText name="description"
+                                        formControlName="description"></textarea>
+                                    <div *ngIf="
+                                            addForm.get('description')?.invalid && addForm.get('description')?.touched
+                                        " class="p-error">
+                                        {{ 'phishing-email-template.descriptionValidation' | translate }}
+                                    </div>
+                                </div>
+                                <div class="field mb-4 col-12">
+                                    <label class="font-medium text-900">{{
+                                        'phishing-email-template.emailInstruction' | translate
+                                        }}</label>
+                                    <app-iAware-rich-text id="emailInstruction"
+                                        placeholder="{{ 'phishing-email-template.emailInstructionField' | translate}}"
+                                        formControlName="emailInstruction"></app-iAware-rich-text>
+                                </div>
+
+                                <div class="field mb-4 col-12">
+                                    <p-panel header="{{'phishing-email-template.phishingTemplateImage' | translate}}"
+                                        class="mb-3">
+
+                                        <div class="flex align-items-center justify-content-center">
+                                            <img [src]="imageUrlToAdd" alt="Avatar" class="avatar"
+                                                style="width: 100%; max-width: 150px; border-radius: 8px; border: 1px solid #ccc"
+                                                (click)="onUploadImageToAddClick()">
+                                        </div>
+
+                                        <!-- Recommended Dimensions -->
+                                        <small class="text-center block m-2">{{ 'shared.messages.recommendedDimensions'
+                                            | translate}} <strong>{{ 'shared.messages.800x449' | translate}}</strong> {{
+                                            'shared.messages.pixels' | translate}}</small>
+
+                                        <div class="flex align-items-center justify-content-center mt-2"
+                                            style="display: none;">
+                                            <p-button label="{{ 'shared.actions.upload' | translate }}"
+                                                icon="pi pi-upload" (click)="onUploadImageToAddClick()"></p-button>
+                                            <input type="file" id="imagetoadd" style="display: none;"
+                                                (change)="onImageToAddSelected($event)">
+                                        </div>
+                                    </p-panel>
+                                </div>
+                            </div>
+                        </p-tabPanel>
+
+                        <p-tabPanel header="{{ 'phishing-email-template.taps.emailDeatails' | translate }}">
+                            <div class="grid formgrid p-fluid">
+                                <div class="field mb-4 col-12">
+                                    <label for="phishingEmailSubject"
+                                        class="font-medium text-900">{{'phishing-email-template.phishingEmailSubject' |
+                                        translate }}</label>
+                                    <input id="phishingEmailSubject" type="text" pInputText
+                                        placeholder="{{'phishing-email-template.phishingEmailSubjectField' | translate }}"
+                                        name="phishingEmailSubject" formControlName="phishingEmailSubject" />
+                                </div>
+                                <div class="field mb-4 col-12">
+                                    <div class="flex flex-wrap justify-content-between align-items-center">
+                                        <div class="field mb-4 col-6">
+                                            <p-inputGroup>
+                                                <input type="text" readonly pInputText
+                                                    [value]="getTextCopiedValue('landingPage')" class="p-2" />
+                                                <button type="button" pButton icon="pi pi-copy"
+                                                    class="p-button-primary border-round-right"
+                                                    (click)="copylandingPageLinkText()"></button>
+                                                <i class="pi pi-question-circle mt-3 ml-3"
+                                                    pTooltip="{{ landingPageInstruction }}"></i>
+                                            </p-inputGroup>
+                                        </div>
+
+                                        <div class="field mb-4 col-6">
+                                            <p-checkbox [binary]="true" class="font-medium text-900"
+                                                label="{{ 'phishing-email-template.IsQrCodeChecked' | translate }}"
+                                                [value]="false" formControlName="isQrCodeChecked">
+                                            </p-checkbox>
+                                            <i class="pi pi-question-circle ml-1" style="font-size: 0.9rem"
+                                                pTooltip="this option mean that the email template will have QRCode"></i>
+
+                                            <div class="mt-3" *ngIf="addForm.value.isQrCodeChecked">
+                                                <p-inputGroup>
+                                                    <input type="text" readonly pInputText
+                                                        [value]="getTextCopiedValue('qrCode')" class="p-2" />
+                                                    <button type="button" pButton icon="pi pi-copy"
+                                                        class="p-button-primary border-round-right"
+                                                        (click)="copylandingPageQRCodeText()"></button>
+                                                </p-inputGroup>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <label class="font-medium text-900">{{
+                                        'phishing-email-template.phishingEmailContent' | translate
+                                        }}</label>
+                                    <app-iAware-rich-text
+                                        placeholder="{{ 'phishing-email-template.phishingEmailContentField' | translate}}"
+                                        id="phishingEmailContent"
+                                        formControlName="phishingEmailContent"></app-iAware-rich-text>
+                                </div>
+                                <!-- <div class="field mb-4 col-12">
+                                    <label for="phishingEmailSubject" class="font-medium text-900">Phishing Email
+                                        Keys:</label>
+                                    <div formArrayName="phishingLandingPageInputs" class="mb-4 mt-4">
+                                        <div *ngFor="let group of phishingLandingPageInputsForAddForm.controls; let i = index"
+                                            [formGroupName]="i" class="grid">
+                                            <div class="field mb-4 col-12 lg:col-6">
+                                                <label class="font-medium text-900">Phishing Landing Page Input Key
+                                                    :</label>
+                                                <input readonly pInputText name="phishingLandingPageInputKey"
+                                                    formControlName="phishingLandingPageInputKey">
+                                            </div>
+                                            <div class="field mb-4 col-12 lg:col-6">
+                                                <label for="phishingLandingPageInputType"
+                                                    class="font-medium text-900">Phishing
+                                                    Landing Page Input Type :</label>
+                                                <p-dropdown formControlName="phishingLandingPageInputType"
+                                                    [options]="typs" optionLabel="value" optionValue="code"
+                                                    [filter]="true" placeholder="Select a Type">
+                                                </p-dropdown>
+                                            </div>
+                                            <div class="field mb-4 col-12 lg:col-6">
+                                                <label for="phishingLandingPageInputTitle"
+                                                    class="font-medium text-900">Phishing Landing Page Input Title
+                                                    :</label>
+                                                <input pInputText id="phishingLandingPageInputTitle"
+                                                    name="phishingLandingPageInputTitle"
+                                                    formControlName="phishingLandingPageInputTitle">
+                                            </div>
+                                            <div class="field mb-4 col-12 lg:col-6">
+                                                <label for="phishingLandingPageInputEvent"
+                                                    class="font-medium text-900">Phishing Landing Page Input Event
+                                                    :</label>
+                                                <p-dropdown formControlName="phishingLandingPageInputEvent"
+                                                    [options]="events" optionLabel="value" optionValue="code"
+                                                    [filter]="true" placeholder="Select a Event">
+                                                </p-dropdown>
+                                            </div>
+                                            <div class="field mb-4 col-6 flex justify-content-between">
+                                                <p-button icon="pi pi-trash"
+                                                    [style]="{ 'width.px': 50, 'color':'white', 'background-color':'red', 'border':'none' }"
+                                                    class="w-auto mt-3" type="button"
+                                                    (click)="removePhishingLandingPageInputForAddForm(i)"></p-button>
+                                                <p-button icon="pi pi-plus"
+                                                    [style]="{ 'width.px': 50, 'margin-right.px': 5 }"
+                                                    class="w-auto mt-3" type="button"
+                                                    (click)="addPhishingLandingPageInputForAddForm()"></p-button>
+                                                <hr>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div> -->
+                            </div>
+                        </p-tabPanel>
+
+                        <p-tabPanel header="{{ 'phishing-email-template.taps.landingPage' | translate }}">
+                            <div class="grid formgrid p-fluid">
+                                <div class="field mb-4 col-12">
+                                    <label for="landingPageTitle" class="font-medium text-900">{{
+                                        'phishing-email-template.landingPageTitle' | translate }}</label>
+                                    <input id="landingPageTitle" type="text" pInputText
+                                        placeholder="{{ 'phishing-email-template.landingPageTitleField' | translate }}"
+                                        name="landingPageTitle" formControlName="landingPageTitle" />
+                                </div>
+                                <div class="field mb-4 col-12">
+                                    <label for="landingPageDescription" class="font-medium text-900">{{
+                                        'phishing-email-template.landingPageDescription' | translate
+                                        }}</label>
+                                    <textarea id="landingPageDescription" type="text" pInputText
+                                        placeholder="{{ 'phishing-email-template.landingPageDescriptionField' | translate }}"
+                                        name="landingPageDescription"
+                                        formControlName="landingPageDescription"></textarea>
+                                </div>
+                                <!-- <div class="col-12 mb-4">
+                                    <label class="font-medium text-900">Landing Page Keys:</label>
+                                    <div *ngFor="let group of phishingLandingPageInpuAddValues" class="mt-3 mb-2">
+                                        <label [for]="group.phishingLandingPageInputTitle"
+                                            class="font-medium text-900">{{group.phishingLandingPageInputTitle}}({{group.phishingLandingPageInputType}})</label>
+                                        <p-inputGroup>
+                                            <input type="text" readonly pInputText [value]="getCopyText(group)"
+                                                [id]="group.phishingLandingPageInputTitle" />
+                                            <button type="button" pButton icon="pi pi-copy" class="p-button-primary"
+                                                (click)="copyText(group)"></button>
+                                        </p-inputGroup>
+                                    </div>
+                                </div> -->
+                                <div class="field mb-4 col-12">
+                                    <div class="flex justify-content-between">
+                                        <div class="flex flex-column justify-content-center">
+                                            <label class="font-medium text-900">{{
+                                                'phishing-email-template.landingPageContentHtml' | translate}}</label>
+                                        </div>
+
+                                        <div class="advanced-feature-container">
+                                            <p-button label="{{ 'phishing-email-template.clone' | translate }}"
+                                                icon="pi pi-clone" styleClass="animated-button"
+                                                (onClick)="cloneDialog = true">
+                                            </p-button>
+                                        </div>
+                                    </div>
+                                    <div style="height: 400px" class="mt-3">
+                                        <ngx-monaco-editor style="height: 100%;" [options]="editorOptions"
+                                            formControlName="landingPageContentHtml"></ngx-monaco-editor>
+                                    </div>
+                                </div>
+                            </div>
+                        </p-tabPanel>
+
+                        <p-tabPanel header="{{ 'phishing-email-template.taps.feedbackPage' | translate }}">
+                            <div class="grid formgrid p-fluid">
+                                <div class="field mb-4 col-12">
+                                    <label for="phishingEmailSuccessMessageTitle" class="font-medium text-900">{{
+                                        'phishing-email-template.phishingEmailSuccessMessageTitle' | translate
+                                        }}</label>
+                                    <input id="phishingEmailSuccessMessageTitle" type="text" pInputText
+                                        placeholder="{{ 'phishing-email-template.phishingEmailSuccessMessageTitleField' | translate }}"
+                                        name="phishingEmailSuccessMessageTitle"
+                                        formControlName="phishingEmailSuccessMessageTitle" />
+                                </div>
+                                <div class="field mb-4 col-12">
+                                    <label class="font-medium text-900">{{
+                                        'phishing-email-template.phishingEmailSuccessMessagePageHtml' | translate
+                                        }}</label>
+                                    <app-iAware-rich-text
+                                        placeholder="{{ 'phishing-email-template.phishingEmailSuccessMessagePageHtmlField' | translate }}"
+                                        id="phishingEmailSuccessMessagePageHtml"
+                                        formControlName="phishingEmailSuccessMessagePageHtml"></app-iAware-rich-text>
+                                </div>
+                            </div>
+                        </p-tabPanel>
+
+                    </p-tabView>
+                </form>
+            </div>
+        </p-card>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+            class="p-button-text" (click)="hideDialog()"></button>
+        <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check" class="p-button-text"
+            (click)="addNewPhishingTemplateLanguage()" [disabled]="!addForm.valid"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="editDialog" [style]="{ width: '100%', height: '100%' }"
+    header="{{ 'phishing-email-template.editEmailHeader' | translate }}" [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <p-card>
+            <div class="p-col-12" dir="ltr">
+                <form [formGroup]="editForm" (ngSubmit)="editPhishingTemplateLanguage()">
+                    <p-tabView [style]="{ width: '100%' }">
+
+                        <p-tabPanel header="{{ 'phishing-email-template.taps.info' | translate }}">
+                            <div class="grid formgrid p-fluid">
+                                <div class="field mb-4 col-6">
+                                    <label for="emailName" class="font-medium text-900">{{
+                                        'phishing-email-template.name' | translate
+                                        }}</label>
+                                    <input id="emailName" type="text" pInputText name="emailName"
+                                        placeholder="{{ 'phishing-email-template.nameField' | translate}}"
+                                        formControlName="emailName" />
+                                    <div *ngIf="editForm.get('emailName')?.invalid && editForm.get('emailName')?.touched"
+                                        class="p-error">
+                                        {{ 'phishing-email-template.nameValidation' | translate }}
+                                    </div>
+                                </div>
+                                <div class="field mb-4 col-6">
+                                    <label class="font-medium text-900">{{
+                                        'phishing-email-template.language' | translate
+                                        }}</label>
+                                    <span class="p-float-label">
+                                        <p-dropdown formControlName="languageId" [options]="activeLanguage"
+                                            optionLabel="name" optionValue="id" placeholder="{{
+                                                'phishing-email-template.languagePlaceholder' | translate
+                                            }}">
+                                        </p-dropdown>
+                                        <div *ngIf="
+                                                editForm.get('languageId')?.invalid &&
+                                                editForm.get('languageId')?.touched
+                                            " class="p-error">
+                                            {{ 'phishing-email-template.languageValidation' | translate }}
+                                        </div>
+                                    </span>
+                                </div>
+                                <div class="field mb-4 col-12">
+                                    <label class="font-medium text-900">{{
+                                        'phishing-email-template.description' | translate
+                                        }}</label>
+                                    <textarea id="description" type="text"
+                                        placeholder="{{ 'phishing-email-template.descriptionField' | translate}}"
+                                        pInputText name="description" formControlName="description"></textarea>
+                                    <div *ngIf="
+                                            editForm.get('description')?.invalid && editForm.get('description')?.touched
+                                        " class="p-error">
+                                        {{ 'phishing-email-template.descriptionValidation' | translate }}
+                                    </div>
+                                </div>
+                                <div class="field mb-4 col-12">
+                                    <label class="font-medium text-900">{{
+                                        'phishing-email-template.emailInstruction' | translate
+                                        }}</label>
+                                    <app-iAware-rich-text
+                                        placeholder="{{ 'phishing-email-template.emailInstructionField' | translate}}"
+                                        id="emailInstruction" formControlName="emailInstruction"></app-iAware-rich-text>
+                                </div>
+
+                                <div class="field mb-4 col-12">
+                                    <p-panel header="{{'phishing-email-template.phishingTemplateImage' | translate}}"
+                                        class="mb-3">
+
+                                        <div class="flex align-items-center justify-content-center">
+                                            <img [src]="imageUrlToEdit" alt="Avatar" class="avatar"
+                                                style="width: 100%; max-width: 150px; border-radius: 8px; border: 1px solid #ccc"
+                                                (click)="onUploadImageToEditClick()">
+                                        </div>
+
+                                        <!-- Recommended Dimensions -->
+                                        <small class="text-center block m-2">{{ 'shared.messages.recommendedDimensions'
+                                            | translate}} <strong>{{ 'shared.messages.800x449' | translate}}</strong> {{
+                                            'shared.messages.pixels' | translate}}</small>
+
+                                        <div class="flex align-items-center justify-content-center mt-2"
+                                            style="display: none;">
+                                            <p-button label="{{ 'shared.actions.upload' | translate }}"
+                                                icon="pi pi-upload" (click)="onUploadImageToEditClick()"></p-button>
+                                            <input type="file" id="imagetoedit" style="display: none;"
+                                                (change)="onImageToEditSelected($event)">
+                                        </div>
+                                    </p-panel>
+                                </div>
+
+                            </div>
+                        </p-tabPanel>
+
+                        <p-tabPanel header="{{ 'phishing-email-template.taps.emailDeatails' | translate }}">
+                            <div class="grid formgrid p-fluid">
+                                <div class="field mb-4 col-12">
+                                    <label for="phishingEmailSubject" class="font-medium text-900">{{
+                                        'phishing-email-template.phishingEmailSubject' | translate
+                                        }}</label>
+                                    <input id="phishingEmailSubject" type="text" pInputText
+                                        placeholder="{{'phishing-email-template.phishingEmailSubjectField' | translate }}"
+                                        name="phishingEmailSubject" formControlName="phishingEmailSubject" />
+                                </div>
+                                <div class="field mb-4 col-12">
+                                    <div class="flex flex-wrap justify-content-between align-items-center">
+                                        <div class="field mb-4 col-6">
+                                            <p-inputGroup>
+                                                <input type="text" readonly pInputText
+                                                    [value]="getTextCopiedValue('landingPage')" class="p-2" />
+                                                <button type="button" pButton icon="pi pi-copy"
+                                                    class="p-button-primary border-round-right"
+                                                    (click)="copylandingPageLinkText()"></button>
+                                                <i class="pi pi-question-circle mt-3 ml-3"
+                                                    pTooltip="{{ landingPageInstruction }}"></i>
+                                            </p-inputGroup>
+                                        </div>
+
+                                        <div class="field mb-4 col-6">
+                                            <p-checkbox [binary]="true" class="font-medium text-900"
+                                                label="{{ 'phishing-email-template.IsQrCodeChecked' | translate }}"
+                                                [value]="false" formControlName="isQrCodeChecked">
+                                            </p-checkbox>
+                                            <i class="pi pi-question-circle ml-1" style="font-size: 0.9rem"
+                                                pTooltip="this option mean that the email template will have QRCode"></i>
+
+                                            <div class="mt-3" *ngIf="editForm.value.isQrCodeChecked">
+                                                <p-inputGroup>
+                                                    <input type="text" readonly pInputText
+                                                        [value]="getTextCopiedValue('qrCode')" class="p-2" />
+                                                    <button type="button" pButton icon="pi pi-copy"
+                                                        class="p-button-primary border-round-right"
+                                                        (click)="copylandingPageQRCodeText()"></button>
+                                                </p-inputGroup>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field mb-4 col-12">
+                                        <label class="font-medium text-900">{{
+                                            'phishing-email-template.phishingEmailContent' | translate
+                                            }}</label>
+                                        <app-iAware-rich-text
+                                            placeholder="{{ 'phishing-email-template.phishingEmailContentField' | translate}}"
+                                            id="phishingEmailContent"
+                                            formControlName="phishingEmailContent"></app-iAware-rich-text>
+                                    </div>
+                                </div>
+                                <!-- <div class="field mb-4 col-12">
+                                    <label for="phishingEmailSubject" class="font-medium text-900">Phishing Email
+                                        Keys:</label>
+                                    <div formArrayName="phishingLandingPageInputs" class="mb-4 mt-4">
+                                        <div *ngFor="let group of phishingLandingPageInputsForEditForm.controls; let i = index"
+                                            [formGroupName]="i" class="grid">
+                                            <div class="field mb-4 col-12 lg:col-6">
+                                                <label class="font-medium text-900">Phishing Landing Page Input Key
+                                                    :</label>
+                                                <input readonly pInputText name="phishingLandingPageInputKey"
+                                                    formControlName="phishingLandingPageInputKey">
+                                            </div>
+                                            <div class="field mb-4 col-12 lg:col-6">
+                                                <label for="phishingLandingPageInputType"
+                                                    class="font-medium text-900">Phishing
+                                                    Landing Page Input Type :</label>
+                                                <p-dropdown formControlName="phishingLandingPageInputType"
+                                                    [options]="typs" optionLabel="value" optionValue="code"
+                                                    [filter]="true" placeholder="Select a Type">
+                                                </p-dropdown>
+                                            </div>
+                                            <div class="field mb-4 col-12 lg:col-6">
+                                                <label for="phishingLandingPageInputTitle"
+                                                    class="font-medium text-900">Phishing Landing Page Input Title
+                                                    :</label>
+                                                <input pInputText id="phishingLandingPageInputTitle"
+                                                    name="phishingLandingPageInputTitle"
+                                                    formControlName="phishingLandingPageInputTitle">
+                                            </div>
+                                            <div class="field mb-4 col-12 lg:col-6">
+                                                <label for="phishingLandingPageInputEvent"
+                                                    class="font-medium text-900">Phishing Landing Page Input Event
+                                                    :</label>
+                                                <p-dropdown formControlName="phishingLandingPageInputEvent"
+                                                    [options]="events" optionLabel="value" optionValue="code"
+                                                    [filter]="true" placeholder="Select a Event">
+                                                </p-dropdown>
+                                            </div>
+                                            <div class="field mb-4 col-6 flex justify-content-between">
+                                                <p-button icon="pi pi-trash"
+                                                    [style]="{ 'width.px': 50, 'color':'white', 'background-color':'red', 'border':'none' }"
+                                                    class="w-auto mt-3" type="button"
+                                                    (click)="removePhishingLandingPageInputForEditForm(i)"></p-button>
+                                                <p-button icon="pi pi-plus"
+                                                    [style]="{ 'width.px': 50, 'margin-right.px': 5 }"
+                                                    class="w-auto mt-3" type="button"
+                                                    (click)="addPhishingLandingPageInputForEditForm()"></p-button>
+                                                <hr>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div> -->
+                            </div>
+                        </p-tabPanel>
+
+                        <p-tabPanel header="{{ 'phishing-email-template.taps.landingPage' | translate }}">
+                            <div class="grid formgrid p-fluid">
+                                <div class="field mb-4 col-12">
+                                    <label for="landingPageTitle" class="font-medium text-900">{{
+                                        'phishing-email-template.landingPageTitle' | translate
+                                        }}</label>
+                                    <input id="landingPageTitle" type="text" pInputText
+                                        placeholder="{{ 'phishing-email-template.landingPageTitleField' | translate }}"
+                                        name="landingPageTitle" formControlName="landingPageTitle" />
+                                </div>
+                                <div class="field mb-4 col-12">
+                                    <label for="landingPageDescription" class="font-medium text-900">{{
+                                        'phishing-email-template.landingPageDescription' | translate
+                                        }}</label>
+                                    <textarea id="landingPageDescription" type="text"
+                                        placeholder="{{ 'phishing-email-template.landingPageDescriptionField' | translate }}"
+                                        pInputText name="landingPageDescription"
+                                        formControlName="landingPageDescription"></textarea>
+                                </div>
+                                <!-- <div class="mb-4 col-12">
+                                    <label class="font-medium text-900">Landing Page Keys:</label>
+                                    <div *ngFor="let group of phishingLandingPageInpuEditValues"
+                                        class="mt-3 mb-2 col-12">
+                                        <label [for]="group.phishingLandingPageInputTitle"
+                                            class="font-medium text-900">{{group.phishingLandingPageInputTitle}}({{group.phishingLandingPageInputType}})</label>
+                                        <p-inputGroup>
+                                            <input type="text" readonly pInputText [value]="getCopyText(group)"
+                                                [id]="group.phishingLandingPageInputTitle" />
+                                            <button type="button" pButton icon="pi pi-copy" class="p-button-primary"
+                                                (click)="copyText(group)"></button>
+                                        </p-inputGroup>
+                                    </div>
+                                </div> -->
+                                <div class="field mb-4 col-12">
+                                    <div class="flex justify-content-between">
+                                        <div class="flex flex-column justify-content-center">
+                                            <label class="font-medium text-900">{{
+                                                'phishing-email-template.landingPageContentHtml' | translate}}</label>
+                                        </div>
+
+                                        <div class="advanced-feature-container">
+                                            <p-button label="{{ 'phishing-email-template.clone' | translate }}"
+                                                icon="pi pi-clone" styleClass="animated-button"
+                                                (onClick)="cloneDialog = true">
+                                            </p-button>
+                                        </div>
+                                    </div>
+                                    <div style="height: 400px" class="mt-3">
+                                        <ngx-monaco-editor style="height: 100%;" [options]="editorOptions"
+                                            formControlName="landingPageContentHtml"></ngx-monaco-editor>
+                                    </div>
+                                </div>
+                            </div>
+                        </p-tabPanel>
+
+                        <p-tabPanel header="{{ 'phishing-email-template.taps.feedbackPage' | translate }}">
+                            <div class="grid formgrid p-fluid">
+                                <div class="field mb-4 col-12">
+                                    <label for="phishingEmailSuccessMessageTitle" class="font-medium text-900">{{
+                                        'phishing-email-template.phishingEmailSuccessMessageTitle' | translate
+                                        }}</label>
+                                    <input id="phishingEmailSuccessMessageTitle" type="text" pInputText
+                                        placeholder="{{ 'phishing-email-template.phishingEmailSuccessMessageTitleField' | translate }}"
+                                        name="phishingEmailSuccessMessageTitle"
+                                        formControlName="phishingEmailSuccessMessageTitle" />
+                                </div>
+                                <div class="field mb-4 col-12">
+                                    <label class="font-medium text-900">{{
+                                        'phishing-email-template.phishingEmailSuccessMessagePageHtml' | translate
+                                        }}</label>
+                                    <app-iAware-rich-text
+                                        placeholder="{{ 'phishing-email-template.phishingEmailSuccessMessagePageHtmlField' | translate }}"
+                                        id="phishingEmailSuccessMessagePageHtml"
+                                        formControlName="phishingEmailSuccessMessagePageHtml"></app-iAware-rich-text>
+                                </div>
+                            </div>
+                        </p-tabPanel>
+                    </p-tabView>
+                </form>
+            </div>
+        </p-card>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+            class="p-button-text" (click)="hideDialog()"></button>
+        <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check" class="p-button-text"
+            (click)="editPhishingTemplateLanguage()" [disabled]="!editForm.valid"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="activationDialog" header="{{ 'shared.headers.active' | translate }}" [modal]="true"
+    [style]="{ width: '450px' }">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        @if (currentSelected.isActive) {
+        <span>{{ 'shared.messages.deactive' | translate }} <b>{{ currentSelected.emailName }}</b></span>
+        }@else {
+        <span>{{ 'shared.messages.active' | translate }} <b>{{ currentSelected.emailName }}</b></span>
+        }
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="activationDialog = false"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{ 'shared.actions.save' | translate }}"
+            (click)="currentSelected.isActive ? activation(false) : activation(true)"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="deleteDialog" header="{{ 'shared.headers.delete' | translate }}" [modal]="true"
+    [style]="{ width: '450px' }">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="currentSelected">{{ 'shared.messages.delete' | translate }} <b> {{ currentSelected.emailName }}
+            </b>?</span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="deleteDialog = false"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{ 'shared.actions.delete' | translate }}"
+            (click)="delete()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="inputChecklistEditDialog" [modal]="true" [style]="{ width: '30%', height: '60%' }"
+    header="{{ 'phishing-email-template.inputChecklistDialogHeader' | translate }}">
+    <div class="flex flex-column align-items-start">
+        <div *ngFor="let input of inputsToCheck">
+            <p-checkbox [binary]="true" [(ngModel)]="input.checked" [disabled]="input.disabled"
+                (onChange)="addToCheckList($event, input)" label="{{ input.title }} (Type: {{ input.type }})"
+                class="my-1">
+            </p-checkbox>
+        </div>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="cancelChecklist()"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{ 'shared.actions.save' | translate }}"
+            (click)="confirmChecklistEditForm()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="inputChecklistAddDialog" [modal]="true" [style]="{ width: '70%', height: '60%' }"
+    header="{{ 'phishing-email-template.inputChecklistDialogHeader' | translate }}">
+    <div class="flex flex-column align-items-start">
+        <div *ngFor="let input of inputsToCheck">
+            <p-checkbox [binary]="true" [(ngModel)]="input.checked" [disabled]="input.disabled"
+                (onChange)="addToCheckList($event, input)" label="{{ input.title }} (Type: {{ input.type }})"
+                class="my-1">
+            </p-checkbox>
+        </div>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="cancelChecklist()"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{ 'shared.actions.save' | translate }}"
+            (click)="confirmChecklistCreateForm()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="cloneDialog" [style]="{ width: '50%', height:'61%' }" [showHeader]="false"
+    [dismissableMask]="true" [modal]="true" class="p-fluid">
+    <div class="grid">
+
+        <div class="col-12 text-center p-3 mt-3 mb-3">
+            <h3>
+                {{ 'phishing-email-template.cloneDialogHeader' | translate}}
+            </h3>
+        </div>
+
+        <div class="col-12">
+            <app-iAware-info severity="info"
+                [description]="'phishing-email-template.cloningDescription' | translate"></app-iAware-info>
+        </div>
+
+
+        <div class="col-12">
+            <div class="grid formgrid p-fluid">
+                <div class="field mb-4 col-12">
+                    <label for="cloneUrl" class="font-medium text-900">{{ 'phishing-email-template.pageUrl' |
+                        translate}}</label>
+                    <input id="cloneUrl" type="text" [(ngModel)]="urlToClone" pInputText name="cloneUrl" />
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 gap-2 flex flex-row-reverse flex-wrap">
+            <div class="flex align-items-center justify-content-center">
+                <button pButton pRipple label="{{ 'shared.actions.clone' | translate }}" icon="pi pi-check"
+                    class="p-button-text" (click)="cloneTemplate()"></button>
+            </div>
+            <div class="flex align-items-center justify-content-center">
+                <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+                    class="p-button-text" (click)="cloneDialog = false"></button>
+            </div>
+        </div>
+
+    </div>
+</p-dialog>
+
+<p-dialog [(visible)]="previewDialog" header="{{ currentSelected.emailName }}" [modal]="true"
+    [style]="{ width: '80%', height: '80%' }">
+    <div class="flex align-items-center justify-content-center">
+        <img *ngIf="imageSrc" [src]="imageSrc" alt="Preview" />
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="previewDialog = false"></button>
+    </ng-template>
+</p-dialog>

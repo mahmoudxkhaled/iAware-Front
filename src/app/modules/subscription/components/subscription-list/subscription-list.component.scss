@@ -1,0 +1,103 @@
+.checkbox-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.checkbox-column {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+// .subscription-info {
+//   padding: 5px;
+//   background-color: #f9f9f9;
+// }
+
+// .subscription-roles {
+//   font-weight: bold;
+//   color: #4a4a4a;
+//   font-size: 1.2em;
+// }
+
+// .subscription-roles span {
+//   color: #007bff;
+// }
+
+// .checkbox-container {
+//   display: flex;
+//   flex-wrap: wrap;
+//   justify-content: space-between;
+// }
+
+// .checkbox-row {
+//   display: none;
+// }
+
+// /* For mobile devices */
+// @media screen and (max-width: 767px) {
+//   .checkbox-container {
+//     flex-direction: column; /* Change flex direction to column */
+//   }
+// }
+
+// /* For larger screens */
+// @media screen and (min-width: 768px) {
+//   .checkbox-row {
+//     display: table-row; /* Show the row containing checkboxes */
+//   }
+// }
+
+@media (max-width: 768px) {
+    /* Hide the normal mode row on screens smaller than 768px */
+    .normal-mode-row {
+        display: none;
+    }
+}
+
+@media (min-width: 769px) {
+    /* Hide the mobile mode row on screens larger than 768px */
+    .mobile-mode-row {
+        display: none;
+    }
+}
+/* General styling for the input field */
+.startDate {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    width: 100%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+/* On focus styling */
+.startDate:focus {
+    outline: 0 none;
+    outline-offset: 0;
+    box-shadow: 0 0 0 0.2rem rgba(136, 60, 174, 0.5);
+    border-color: #883cae;
+}
+
+/* Styling the calendar icon */
+.startDate::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+
+/* Placeholder styling */
+.startDate::placeholder {
+    color: #aaa;
+    font-style: italic;
+}
+
+/* Adjust for different screen sizes */
+@media (max-width: 600px) {
+    .startDate {
+        width: 100%;
+        font-size: 16px;
+    }
+}

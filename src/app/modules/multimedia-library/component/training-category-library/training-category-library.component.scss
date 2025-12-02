@@ -1,0 +1,286 @@
+.truncated-description {
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: relative;
+    line-height: 1.5em;
+    min-height: 6em;
+    max-height: 6em;
+}
+
+.header {
+    font-size: 65px;
+    font-weight: 600;
+    background-image: linear-gradient(to left, #440ae5, #8f68b7);
+    color: transparent;
+    background-clip: text;
+    -webkit-background-clip: text;
+}
+
+@keyframes shake {
+    0% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-5px);
+    }
+
+    50% {
+        transform: translateX(5px);
+    }
+
+    75% {
+        transform: translateX(-5px);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+}
+
+.shadow-2 {
+    transition: transform 0.3s ease-in-out;
+}
+
+.shadow-2:hover {
+    animation: shake 0.5s ease-in-out;
+}
+
+.full-width-image-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.full-width-image-container img {
+    width: 100%;
+    object-fit: fill;
+    height: 222px;
+    background-color: black;
+}
+
+:host ::ng-deep .p-dataview-emptymessage {
+    display: none !important;
+}
+
+.hover\:shadow-5 {
+    transition: box-shadow 0.3s ease;
+}
+
+.hover\:shadow-5:hover {
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.h-15rem {
+    height: 15rem;
+}
+
+.object-cover {
+    // width: 100%;
+    // height: auto;
+    // object-fit: cover;
+    // border-top-left-radius: 8px;
+    // border-top-right-radius: 8px;
+    transition: transform 0.3s ease-in-out;
+    // max-height: 200px;
+}
+
+.object-cover:hover {
+    transform: scale(1.01); /* Slight zoom on hover */
+}
+
+/* Responsive design adjustments */
+@media (max-width: 768px) {
+    .object-cover {
+        max-height: 150px;
+    }
+}
+
+@media (max-width: 576px) {
+    .object-cover {
+        max-height: 120px;
+    }
+}
+
+/* Container for maintaining consistent image aspect ratio */
+.image-container {
+    width: 100%; 
+    height: auto; 
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; 
+    position: relative;
+    background-color: #f0f0f0;
+}
+
+/* Surface styling */
+.surface-card {
+    background-color: #fff;
+}
+
+/* Lesson badge */
+.bg-blue-50 {
+    background-color: #e0f2fe;
+}
+
+.text-blue-600 {
+    color: #0284c7;
+}
+
+/* Container for Description */
+.truncate-description-container {
+    position: relative;
+    margin-top: 10px;
+    text-align: left;
+}
+
+/* Description Styling */
+.truncate-description {
+    font-size: 0.9rem;
+    line-height: 1.3;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    text-overflow: ellipsis;
+    white-space: normal;
+}
+
+.expanded-description {
+    -webkit-line-clamp: unset;
+    white-space: normal;
+}
+
+/* Show More Styling */
+.show-more a {
+    text-decoration: none;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.show-more a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .md\:col-4 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+}
+
+@media (max-width: 576px) {
+
+    .md\:col-4,
+    .lg\:col-3 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+/* Link Styling */
+.show-less-link {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 1.5rem;
+    transition: transform 0.3s ease;
+}
+
+/* Arrow Icon */
+.arrow-icon {
+    transition: transform 0.3s ease;
+}
+
+/* Hover Effect */
+.show-less-link:hover {
+    transform: scale(1.05);
+}
+
+.show-less-link:hover .arrow-icon {
+    transform: translateX(5px);
+}
+
+/* General styles for the disabled link */
+.disabled-link {
+    pointer-events: none;
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Disable hover styles */
+.disabled-link:hover,
+.disabled-link:focus {
+    background-color: transparent;
+    color: inherit;
+    text-decoration: none;
+}
+
+
+ 
+
+
+@media only screen and (min-width: 767px)  {
+
+    .see-more {
+        h1, h2, h3, h4, p {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: var(--transition);
+        }
+
+        h1, h2, h3, h4, h5 {
+            -webkit-line-clamp: 1; /* Minimum of 2 lines */
+            // min-height: 3.2em; /* Adjust based on font size and line-height */
+        }
+
+        p {
+            -webkit-line-clamp: 3; /* Minimum of 3 lines */
+            min-height: 4.8em; /* Adjust based on font size and line-height */
+        }
+        h1, h2, h3, h4, h5 {
+            font-weight: bold; /* Ensures bold font weight */
+          }
+          
+          &:hover {
+            transform: translateY(-5px);
+            transition: transform 1s ease-in-out; /* Transition for transform */
+
+            h1, h2, h3, h4, h5, p {
+                -webkit-line-clamp: unset; /* Remove line limit */
+                overflow: visible; /* Show full content */
+                transition: var(--transition, all 0.8s ease-in-out); /* Apply transition */
+            }
+        }
+    }
+}
+
+
+
+.card-image-container {
+    position: relative;
+    width: 100%; /* Makes the image container responsive */
+    padding-top: 66.67%; /* Aspect ratio 16:9 (change if needed) */
+    // padding-top: 75%; /* Aspect ratio 4:3 (change if needed) */
+
+    overflow: hidden;
+    border-radius: 8px; /* Optional: add rounded corners */
+    background-color: #f4f4f4; /* Fallback background color */
+  }
+  
+  .card-image-container img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures the image covers the container without distortion */
+    border-radius: 8px; /* Optional: match the container's rounded corners */
+  }

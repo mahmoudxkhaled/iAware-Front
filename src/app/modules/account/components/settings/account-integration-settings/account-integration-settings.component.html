@@ -1,0 +1,101 @@
+<div class="card">
+  <p-toast></p-toast>
+  <form [formGroup]="form" (ngSubmit)="saveSettings()">
+    <div class="col-12">
+      <div class="card">
+        <h5>{{'account.account-integration-settings.title' | translate}}</h5>
+        <div class="p-fluid p-formgrid grid">
+          <div class="field col-12">
+            <label htmlFor="samlNotificationRecipients">{{'account.account-integration-settings.samlNotificationRecipients' |
+              translate}}</label>
+            <input pInputText id="samlNotificationRecipients" type="text"
+              formControlName="samlNotificationRecipients" />
+          </div>
+          <div class="field col-12 md:col-6">
+            <label htmlFor="idPSSOTargetURL">{{'account.account-integration-settings.idPSSOTargetURL' | translate}}</label>
+            <input pInputText id="idPSSOTargetURL" type="text" formControlName="idPSSOTargetURL" />
+          </div>
+          <div class="field col-12 md:col-6">
+            <label htmlFor="currentAuthnRequestCertificate">{{'account.account-integration-settings.currentAuthnRequestCertificate' | translate}}</label>
+            <input pInputText id="currentAuthnRequestCertificate" type="text"
+              formControlName="currentAuthnRequestCertificate" />
+          </div>
+          <div class="field col-12 md:col-6">
+            <label htmlFor="entityId">{{'account.account-integration-settings.entityId' | translate}}</label>
+            <input pInputText id="entityId" type="text" formControlName="entityId" />
+          </div>
+          <div class="field col-12 md:col-6">
+            <label htmlFor="ssoSignInURL">{{'account.account-integration-settings.ssoSignInURL' | translate}}</label>
+            <input pInputText id="ssoSignInURL" type="text" formControlName="ssoSignInURL" />
+          </div>
+          <div class="field col-12 md:col-6">
+            <label htmlFor="ssoSignOutURL">{{'account.account-integration-settings.ssoSignOutURL' | translate}}</label>
+            <input pInputText id="ssoSignOutURL" type="text" formControlName="ssoSignOutURL" />
+          </div>
+          <div class="field col-12 md:col-6">
+            <label htmlFor="ssoCallbackURL">{{'account.account-integration-settings.ssoCallbackURL' | translate}}</label>
+            <input pInputText id="ssoCallbackURL" type="text" formControlName="ssoCallbackURL" />
+          </div>
+          <div class="field col-12 md:col-6">
+            <label htmlFor="smalId">{{'account.account-integration-settings.smalId' | translate}}</label>
+            <input pInputText id="smalId" type="text" formControlName="smalId" />
+          </div>
+          <div class="field col-12 md:col-6">
+            <label htmlFor="metadataURL">{{'account.account-integration-settings.metadataURL' | translate}}</label>
+            <input pInputText id="metadataURL" type="text" formControlName="metadataURL" />
+          </div>
+          <div class="field col-12 md:col-6">
+            <label htmlFor="bypassSSOLoginURL">{{'account.account-integration-settings.bypassSSOLoginURL' | translate}}</label>
+            <input pInputText id="bypassSSOLoginURL" type="text" formControlName="bypassSSOLoginURL" />
+          </div>
+          <div class="field col-12 md:col-6">
+            <label htmlFor="currentAuthnRequestCertificateValidFrom">{{'account.account-integration-settings.currentAuthnRequestCertificateValidFrom' | translate}}</label>
+            <p-calendar dateFormat="MM/dd/yy" [showIcon]="true" inputId="icon"
+              formControlName="currentAuthnRequestCertificateValidFrom"></p-calendar>
+            </div>
+          <div class="field col-12 md:col-6">
+            <label htmlFor="currentAuthnRequestCertificateValidTo">{{'account.account-integration-settings.currentAuthnRequestCertificateValidTo' | translate}}</label>
+            <p-calendar dateFormat="MM/dd/yy" [showIcon]="true" inputId="icon"
+              formControlName="currentAuthnRequestCertificateValidTo"></p-calendar>
+          </div>
+          <div class="field col-12 flex justify-content-between">
+            <label htmlFor="enableSAMLSSO">{{'account.account-integration-settings.enableSAMLSSO' | translate}}</label>
+            <p-inputSwitch formControlName="enableSAMLSSO"></p-inputSwitch>
+          </div>
+          <div class="field col-12 flex justify-content-between">
+            <label htmlFor="disableNonSMALLoginsForAllUsers">{{'account.account-integration-settings.disableNonSMALLoginsForAllUsers' | translate}}</label>
+            <p-inputSwitch formControlName="disableNonSMALLoginsForAllUsers"></p-inputSwitch>
+          </div>
+          <div class="field col-12 flex justify-content-between">
+            <label htmlFor="allowAdminswMFAToByPassSMALLogin">{{'account.account-integration-settings.allowAdminswMFAToByPassSMALLogin' | translate}}</label>
+            <p-inputSwitch formControlName="allowAdminswMFAToByPassSMALLogin"></p-inputSwitch>
+          </div>
+          <div class="field col-12 flex justify-content-between">
+            <label htmlFor="allowAccountCreationFromSAMLLogin">{{'account.account-integration-settings.allowAccountCreationFromSAMLLogin' | translate}}</label>
+            <p-inputSwitch formControlName="allowAccountCreationFromSAMLLogin"></p-inputSwitch>
+          </div>
+          <div class="field col-12 flex justify-content-between">
+            <label htmlFor="sha_1">{{'account.account-integration-settings.sha_1' | translate}}</label>
+            <p-inputSwitch formControlName="sha_1"></p-inputSwitch>
+          </div>
+          <div class="field col-12 flex justify-content-between">
+            <label htmlFor="sha_256">{{'account.account-integration-settings.sha_256' | translate}}</label>
+            <p-inputSwitch formControlName="sha_256"></p-inputSwitch>
+          </div>
+          <div class="field col-12 flex justify-content-between">
+            <label htmlFor="signUpAuthnRequest">{{'account.account-integration-settings.signUpAuthnRequest' | translate}}</label>
+            <p-inputSwitch formControlName="signUpAuthnRequest"></p-inputSwitch>
+          </div>
+          <div class="field col-12 flex justify-content-between">
+            <label htmlFor="enableSPAuthnRequesExpirationNotifications">{{'account.account-integration-settings.enableSPAuthnRequesExpirationNotifications' | translate}}</label>
+            <p-inputSwitch formControlName="enableSPAuthnRequesExpirationNotifications"></p-inputSwitch>
+          </div>
+          <div class="col-12">
+            <button pButton pRipple label="{{'shared.actions.saveChanges' | translate}}" class="w-auto mt-3"
+              type="submit" [disabled]="!form.valid"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

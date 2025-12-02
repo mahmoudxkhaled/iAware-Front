@@ -1,0 +1,24 @@
+.layout-support-button {
+    position: relative;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -10px; /* Adjust as needed */
+    right: -10px; /* Adjust as needed */
+    background-color: red; /* Or any color you prefer */
+    color: white;
+    border-radius: 50%;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+}
+
+.unread-ticket {
+    background-color: #f0f0f0; /* Light gray background for unread notifications */
+    border-left: 4px solid #6f42c1; /* Blue border to indicate unread */
+}
+
+.read-ticket {
+    background-color: #ffffff; /* White background for read notifications */
+    border-left: 4px solid transparent; /* No border for read */
+}

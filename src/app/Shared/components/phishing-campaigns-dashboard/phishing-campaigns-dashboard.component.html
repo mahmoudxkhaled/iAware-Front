@@ -1,0 +1,233 @@
+<p-toast></p-toast>
+
+<div class="grid h-full">
+    <div class="col-12 md:col-4 pt-0 h-full">
+        <div class="col-12 pt-0 animation-duration-1000 animation-ease-in-out" pAnimateOnScroll enterClass="fadein"
+            leaveClass="fadeoutleft">
+            <p-card styleClass="phishingCampaignLeaderboard">
+                <ng-template pTemplate="header">
+                    <div class="flex align-items-center p-4 pb-0">
+                        <span class="p-card-title">{{ 'phishingCampaignsDashboard.campaignLeaderboard' | translate
+                            }}</span>
+                        <app-iAware-info
+                            description="{{ 'phishingCampaignsDashboard.campaignLeaderboardMessage' | translate }}"
+                            icon="fa fa-solid fa-circle-info text-3xl" severity="info"
+                            [isDashboard]="true"></app-iAware-info>
+                    </div>
+                </ng-template>
+                <ng-template pTemplate="body">
+                    <div class="col-12 pt-0" *ngIf="leaderboardDataForUsers.rankedUsers.length > 0">
+                        <div class="col-12 pl-0 pr-0 ranking-container">
+                            <ul class="flex p-0" style="list-style-type: none">
+                                <li class="ranking-row-header col-5">
+                                    {{ 'phishingCampaignsDashboard.ranking' | translate }}
+                                </li>
+                                <li class="ranking-row-header col-3">
+                                    {{ 'phishingCampaignsDashboard.name' | translate }}
+                                </li>
+                                <li class="ranking-row-header col-4">
+                                    <span>{{ 'phishingCampaignsDashboard.points' | translate }}</span>
+                                </li>
+                            </ul>
+                            <p-scrollPanel [style]="{ height: '100vh' }">
+
+                                <ul class="ranking-list" style="list-style-type: none">
+                                    <li *ngFor="let user of leaderboardDataForUsers.rankedUsers"
+                                        [ngClass]="{ 'unique-row': user.isUnique }" class="ranking-row mb-1">
+                                        <span class="ranking-no">{{ user.rankingNo }}</span>
+
+                                        <div class="user-info">
+                                            <p-avatar
+                                                [image]="user.userImageUrl ? user.userImageUrl : '../../assets/media/avatar.png'"
+                                                shape="circle" size="large">
+                                            </p-avatar>
+
+                                            <div class="user-text">
+                                                <span class="user-name">{{ user.userName }}</span>
+                                                <span class="you-badge" *ngIf="user.isUnique"></span>
+                                            </div>
+                                        </div>
+                                        <span class="user-points justify-content-center">{{ user.userPoints | number :
+                                            '1.0-0' }}</span>
+                                    </li>
+                                </ul>
+                            </p-scrollPanel>
+                        </div>
+                    </div>
+
+                    <div class="col-12 pb-0" *ngIf="leaderboardDataForUsers.rankedUsers.length == 0">
+                        <app-iAware-info
+                            description="{{ 'phishingCampaignsDashboard.campaignLeaderboardNoDataMessage' | translate }}"
+                            icon="fa fa-solid fa-circle-info text-3xl" severity="info"></app-iAware-info>
+                    </div>
+                </ng-template>
+            </p-card>
+        </div>
+    </div>
+    <div class="col-12 md:col-8 pt-0 h-full">
+        <div class="grid">
+            <div class="col-12 md:col-6 animation-duration-1000 animation-ease-in-out" pAnimateOnScroll
+                enterClass="fadein" leaveClass="fadeoutleft">
+                <p-card header="{{ 'phishingCampaignsDashboard.currentCampaigns' | translate }}">
+                    <div class="grid">
+                        <div class="col-12">
+                            <p-dropdown [options]="currentPhishingAwarenessCampaignsForDashboardDropDown"
+                                optionLabel="campaignName" optionValue="campaignId" [style]="{width:'100%'}"
+                                (onChange)="onCurrentPhishingCampaignsDashboardDropdownChanged($event)"
+                                placeholder="{{ 'phishingCampaignsDashboard.selectACampaign' | translate }}" />
+                        </div>
+                        <div class="p-fluid col-6 pb-0 pt-0 flex flex-column justify-content-around">
+                            <div class="col-12 flex flex-column justify-content-center">
+                                <div class="flex gap-1 mb-3">
+                                    <span class="label">{{ 'phishingCampaignsDashboard.reportedd' | translate }}</span>
+                                    <span class="value">{{ currentPhishingCampaignsDashboard.reported }}</span>
+                                </div>
+                                <div class="flex gap-1 mb-3">
+                                    <span class="label">{{ 'phishingCampaignsDashboard.noActionn' | translate }}</span>
+                                    <span class="value">{{ currentPhishingCampaignsDashboard.noAction }}</span>
+                                </div>
+                                <div class="flex gap-1 mb-3">
+                                    <span class="label">{{ 'phishingCampaignsDashboard.failedd' | translate }}</span>
+                                    <span class="value">{{ currentPhishingCampaignsDashboard.failed }}</span>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="mb-1">
+                                    <p-button label="{{ 'shared.actions.csv' | translate }}" icon="pi pi-file-excel"
+                                        (onClick)="downloadAllCurrentPhishingCampaignUsersReportAsCSV()"></p-button>
+                                </div>
+                                <div class="">
+                                    <p-button label="{{ 'shared.actions.pdf' | translate }}" icon="pi pi-file-pdf"
+                                        (onClick)="downloadAllCurrentPhishingCampaignUsersReportAsPDF()"></p-button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 p-0 ltr">
+                            <p-chart type="pie" width="100%" height="300"
+                                [data]="currentPhishingCampaignsDashboardPiehartData"
+                                [options]="currentPhishingCampaignsDashboardPieChartOptions"></p-chart>
+                        </div>
+                    </div>
+                </p-card>
+            </div>
+            <div class="col-12 md:col-6 animation-duration-1000 animation-ease-in-out" pAnimateOnScroll
+                enterClass="fadein" leaveClass="fadeoutleft">
+                <p-card header="{{ 'phishingCampaignsDashboard.completedCampaigns' | translate }}">
+                    <div class="grid">
+                        <div class="col-12">
+                            <p-dropdown [options]="historyPhishingCampaignsDataForDashboardDropDown"
+                                optionLabel="campaignName" optionValue="campaignId" [style]="{width:'100%'}"
+                                (onChange)="onCompletedPhishingCampaignsDashboardDropdownChanged($event)"
+                                placeholder="{{ 'phishingCampaignsDashboard.selectACampaign' | translate }}" />
+                        </div>
+                        <div class="p-fluid col-6 pb-0 pt-0 flex flex-column justify-content-around">
+                            <div class="col-12 flex flex-column justify-content-center">
+                                <div class="flex gap-1 mb-3">
+                                    <span class="label">{{ 'phishingCampaignsDashboard.reportedd' | translate }}</span>
+                                    <span class="value">{{ completedPhishingCampaignsDashboard.reported }}</span>
+                                </div>
+                                <div class="flex gap-1 mb-3">
+                                    <span class="label">{{ 'phishingCampaignsDashboard.noActionn' | translate }}</span>
+                                    <span class="value">{{ completedPhishingCampaignsDashboard.noAction }}</span>
+                                </div>
+                                <div class="flex gap-1 mb-3">
+                                    <span class="label">{{ 'phishingCampaignsDashboard.failedd' | translate }}</span>
+                                    <span class="value">{{ completedPhishingCampaignsDashboard.failed }}</span>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="mb-1">
+                                    <p-button label="{{ 'shared.actions.csv' | translate }}" icon="pi pi-file-excel"
+                                        (onClick)="downloadAllCompletedPhishingCampaignUsersReportAsCSV()"></p-button>
+                                </div>
+                                <div class="">
+                                    <p-button label="{{ 'shared.actions.pdf' | translate }}" icon="pi pi-file-pdf"
+                                        (onClick)="downloadAllCompletedPhishingCampaignUsersReportAsPDF()"></p-button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 p-0 ltr">
+                            <p-chart type="pie" width="100%" height="300"
+                                [data]="completedPhishingCampaignsDashboardPiehartData"
+                                [options]="completedPhishingCampaignsDashboardPieChartOptions"></p-chart>
+                        </div>
+                    </div>
+                </p-card>
+            </div>
+            <div class="col-12 animation-duration-1000 animation-ease-in-out" pAnimateOnScroll enterClass="fadein"
+                leaveClass="fadeoutleft">
+                <p-card>
+                    <ng-template pTemplate="header">
+                        <div class="flex align-items-center p-4 pb-0">
+                            <span class="p-card-title">{{ 'phishingCampaignsDashboard.trendAnalysis' | translate
+                                }}</span>
+                            <app-iAware-info
+                                description="{{ 'phishingCampaignsDashboard.trendAnalysisMessage' | translate }}"
+                                icon="fa fa-solid fa-circle-info text-3xl" severity="info"
+                                [isDashboard]="true"></app-iAware-info>
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate="body">
+                        <div class="grid">
+                            <div class="col-12 pb-0">
+                                <p-dropdown [options]="months" [style]="{width:'100%'}"
+                                    placeholder="{{ 'phishingCampaignsDashboard.selectAMonth' | translate }}"
+                                    optionLabel="name" optionValue="id" [ngModel]="selectedMonth"
+                                    (onChange)="onCompletedTrendAnalysisDashboardDropdownChanged($event)" />
+                            </div>
+                            <div class="col-12 pb-0">
+                                <p-chart type="line" [responsive]="true" width="100%" height="300"
+                                    [data]="campaignsDashboardTrendAnalysisChartData"
+                                    [options]="campaignsDashboardTrendAnalysisChartOptions"></p-chart>
+                            </div>
+                        </div>
+                    </ng-template>
+                </p-card>
+            </div>
+        </div>
+    </div>
+</div>
+
+<app-user-phishing-list-dialog [dialogHeader]="'phishingCampaignsDashboard.reportedUsers' | translate"
+    [displayDialog]="displayCurrentPhishingCampaignReportedDialog" [userStatus]="'Reported'" [campaignType]="'current'"
+    [filteredPhishingCampaignUsers]="getPhishingCampaignUsers()" [phishingCampaignUsers]="phishingCampaignUsers"
+    [currentCampaignNameForReport]="currentCampaignNameForReport"
+    (onHide)="displayCurrentPhishingCampaignReportedDialog = false">
+</app-user-phishing-list-dialog>
+
+<app-user-phishing-list-dialog [dialogHeader]="'phishingCampaignsDashboard.noActionUsers' | translate"
+    [displayDialog]="displayCurrentPhishingCampaignNoActionDialog" [userStatus]="'No Action'" [campaignType]="'current'"
+    [filteredPhishingCampaignUsers]="getPhishingCampaignUsers()" [phishingCampaignUsers]="phishingCampaignUsers"
+    [currentCampaignNameForReport]="currentCampaignNameForReport"
+    (onHide)="displayCurrentPhishingCampaignNoActionDialog = false">
+</app-user-phishing-list-dialog>
+
+<app-user-phishing-list-dialog [dialogHeader]="'phishingCampaignsDashboard.failedUsers' | translate"
+    [displayDialog]="displayCurrentPhishingCampaignFailedDialog" [userStatus]="'Failed'" [campaignType]="'current'"
+    [filteredPhishingCampaignUsers]="getPhishingCampaignUsers()" [phishingCampaignUsers]="phishingCampaignUsers"
+    [currentCampaignNameForReport]="currentCampaignNameForReport"
+    (onHide)="displayCurrentPhishingCampaignFailedDialog = false">
+</app-user-phishing-list-dialog>
+
+<app-user-phishing-list-dialog [dialogHeader]="'phishingCampaignsDashboard.reportedUsers' | translate"
+    [displayDialog]="displayCompletedPhishingCampaignReportedDialog" [userStatus]="'Reported'"
+    [campaignType]="'completed'" [phishingCampaignUsers]="phishingCampaignUsers"
+    [filteredPhishingCampaignUsers]="getPhishingCampaignUsers()"
+    [currentCampaignNameForReport]="currentCampaignNameForReport"
+    (onHide)="displayCompletedPhishingCampaignReportedDialog = false">
+</app-user-phishing-list-dialog>
+
+<app-user-phishing-list-dialog [dialogHeader]="'phishingCampaignsDashboard.noActionUsers' | translate"
+    [displayDialog]="displayCompletedPhishingCampaignNoActionDialog" [userStatus]="'No Action'"
+    [campaignType]="'completed'" [filteredPhishingCampaignUsers]="getPhishingCampaignUsers()"
+    [phishingCampaignUsers]="phishingCampaignUsers" [currentCampaignNameForReport]="currentCampaignNameForReport"
+    (onHide)="displayCompletedPhishingCampaignNoActionDialog = false">
+</app-user-phishing-list-dialog>
+
+<app-user-phishing-list-dialog [dialogHeader]="'phishingCampaignsDashboard.failedUsers' | translate"
+    [displayDialog]="displayCompletedPhishingCampaignFailedDialog" [userStatus]="'Failed'" [campaignType]="'completed'"
+    [filteredPhishingCampaignUsers]="getPhishingCampaignUsers()" [phishingCampaignUsers]="phishingCampaignUsers"
+    [currentCampaignNameForReport]="currentCampaignNameForReport"
+    (onHide)="displayCompletedPhishingCampaignFailedDialog = false">
+</app-user-phishing-list-dialog>

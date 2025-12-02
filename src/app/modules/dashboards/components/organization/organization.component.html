@@ -1,0 +1,28 @@
+<p-card header="{{ 'dashboards.organization.header' | translate }}"
+        class="shadow-xl border-round-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white">
+    <div class="grid h-full">
+        <!-- Pointing System -->
+        <div class="col-12 md:col-6 lg:col-4 h-full flex flex-column">
+            <app-iaware-points [points]="organizationPoints" class="h-full"></app-iaware-points>
+        </div> 
+
+        <!-- Risk History -->
+        <div class="col-12 md:col-6 lg:col-4 h-full flex flex-column">
+            <p-card [header]="'dashboards.organization.riskHistory' | translate"
+                    styleClass="flex-grow-1 shadow-md border-round-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                <div class="h-full" *ngIf="tenantRiskHistroy">
+                    <p-chart type="line" [data]="lineData" [options]="lineOptions" [style]="{ height: '100%' }"></p-chart>
+                </div>
+            </p-card>
+        </div>
+
+        <!-- Risk Score -->
+        <div class="col-12 md:col-6 lg:col-4 h-full flex flex-column">
+            <div class="border-round-lg shadow-md flex-grow-1 bg-white transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                <app-gauge-chart class="h-full" needleChartTitle="{{ 'dashboards.organization.riskScore' | translate }}"
+                    [chartWidth]="250" [isTextCentered]="false" [showInCard]="true" [needleValue]="getTheNeedleValue()">
+                </app-gauge-chart>
+            </div>
+        </div>
+    </div>
+</p-card>

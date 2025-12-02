@@ -1,0 +1,338 @@
+<div class="card">
+    <p-tabView class="w-full h-full" styleClass="tabview-custom" [activeIndex]="selectedTabIndex">
+        <p-tabPanel *ngIf="isIAwareTeamUser"
+            [header]="isIAwareTeamUser ? ('shared.headers.defaultBackgrounds' | translate) : ('shared.headers.companyBackgrounds' | translate)">
+            <div class="iAware-loading-table-container" style="position: relative">
+                <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                <p-dataView #dv [value]="systemLibraryBackgrounds" [paginator]="true" [rows]="12" layout="grid">
+                    <h5>{{ 'wallpaper-wizard.wallpaper-list-wizard.library-background-wizard.title' | translate }}</h5>
+                    <ng-template pTemplate="header">
+                        <div class="flex flex-wrap justify-content-between">
+                            <p-button label="{{ 'shared.actions.back' | translate }}" (onClick)="Cancel()"
+                                icon="pi pi-arrow-left"></p-button>
+
+                            <button *ngIf="hasPermission(actions.add)" pButton pRipple label="{{
+                                    'wallpaper-wizard.wallpaper-list-wizard.library-background-wizard.actions.add'
+                                        | translate
+                                }}" icon="pi pi-plus" class="p-button mr-2"
+                                (click)="CreateLibraryBackground()"></button>
+
+                            <p-button label="{{ 'shared.actions.next' | translate }}" (onClick)="nextPage()"
+                                icon="pi pi-arrow-right" iconPos="right" [disabled]="!selectedBackground">
+                            </p-button>
+                        </div>
+                    </ng-template>
+
+                    <ng-template let-cats pTemplate="gridItem">
+                        <div class="grid grid-nogutter">
+                            <div class="col-12 md:col-3" *ngFor="let cat of cats">
+                                <div class="m-3" #img>
+                                    <div class="mb-3">
+                                        <p-checkbox [id]="cat?.id" [ngModel]="isCharSelected(cat)" [binary]="true"
+                                            (onChange)="toggleSelection(cat)">
+                                        </p-checkbox>
+                                        <div class="flex flex-wrap justify-content-center">
+                                            <img (click)="toggleSelection(cat)" [src]="cat.backgroundImageThumbnailUrl"
+                                                class="shadow-2 my-3 mx-0" style="
+                                                    width: 200px;
+                                                    height: 200px;
+                                                    cursor: pointer;
+                                                    border-radius: 8px;
+                                                " />
+
+                                            <button *ngIf="!isIAwareTeamUser" pButton pRipple type="button"
+                                                icon="pi pi-ellipsis-v"
+                                                class="p-button-rounded p-button-text p-button-plain"
+                                                (click)="adminMenu.toggle($event); assigneCurrentSelect(cat)"></button>
+
+                                            <button *ngIf="isIAwareTeamUser" pButton pRipple type="button"
+                                                icon="pi pi-ellipsis-v"
+                                                class="p-button-rounded p-button-text p-button-plain"
+                                                (click)="iAwareMenu.toggle($event); assigneCurrentSelect(cat)"></button>
+
+                                            <p-menu #adminMenu [model]="normalMenuItems" [appendTo]="'body'"
+                                                [popup]="true"></p-menu>
+
+                                            <p-menu #iAwareMenu [model]="ownerMenuItems" [appendTo]="'body'"
+                                                [popup]="true"></p-menu>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-template>
+                </p-dataView>
+            </div>
+        </p-tabPanel>
+
+        <p-tabPanel *ngIf="!isIAwareTeamUser"
+            [header]="!isIAwareTeamUser ? ('shared.headers.defaultBackgrounds' | translate) : ('shared.headers.companyBackgrounds' | translate)">
+            <div class="iAware-loading-table-container" style="position: relative">
+                <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                <p-dataView #dv [value]="tenantLibraryBackgrounds" [paginator]="true" [rows]="12" layout="grid">
+                    <h5>{{ 'wallpaper-wizard.wallpaper-list-wizard.library-background-wizard.title' | translate }}</h5>
+                    <ng-template pTemplate="header">
+                        <div class="flex flex-wrap justify-content-between">
+                            <p-button label="{{ 'shared.actions.back' | translate }}" (onClick)="Cancel()"
+                                icon="pi pi-arrow-left"></p-button>
+                            <button *ngIf="hasPermission(actions.add) && isIAwareTeamUser" pButton pRipple label="{{
+                                    'wallpaper-wizard.wallpaper-list-wizard.library-background-wizard.actions.add'
+                                        | translate
+                                }}" icon="pi pi-plus" class="p-button mr-2"
+                                (click)="CreateLibraryBackground()"></button>
+                            <p-button label="{{ 'shared.actions.next' | translate }}" (onClick)="nextPage()"
+                                icon="pi pi-arrow-right" iconPos="right" [disabled]="!selectedBackground">
+                            </p-button>
+                        </div>
+                    </ng-template>
+                    <ng-template let-cats pTemplate="gridItem">
+                        <div class="grid grid-nogutter">
+                            <div class="col-12 md:col-3" *ngFor="let cat of cats">
+                                <div class="m-3" #img>
+                                    <div class="mb-3">
+                                        <p-checkbox [id]="cat?.id" [ngModel]="isCharSelected(cat)" [binary]="true"
+                                            (onChange)="toggleSelection(cat)">
+                                        </p-checkbox>
+                                        <div class="flex flex-wrap justify-content-center">
+                                            <img (click)="toggleSelection(cat)" [src]="cat.backgroundImageThumbnailUrl"
+                                                class="shadow-2 my-3 mx-0" style="
+                                                    width: 200px;
+                                                    height: 200px;
+                                                    cursor: pointer;
+                                                    border-radius: 8px;
+                                                " />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-template>
+                </p-dataView>
+            </div>
+        </p-tabPanel>
+
+        <p-tabPanel *ngIf="!isIAwareTeamUser"
+            [header]="isIAwareTeamUser ? ('shared.headers.defaultBackgrounds' | translate) : ('shared.headers.companyBackgrounds' | translate)">
+            <div class="iAware-loading-table-container" style="position: relative">
+                <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                <p-dataView #dv [value]="systemLibraryBackgrounds" [paginator]="true" [rows]="12" layout="grid">
+                    <h5>{{ 'wallpaper-wizard.wallpaper-list-wizard.library-background-wizard.title' | translate }}</h5>
+                    <ng-template pTemplate="header">
+                        <div class="flex flex-wrap justify-content-between">
+                            <p-button label="{{ 'shared.actions.back' | translate }}" (onClick)="Cancel()"
+                                icon="pi pi-arrow-left"></p-button>
+
+                            <button *ngIf="hasPermission(actions.add) && !isIAwareTeamUser" pButton pRipple label="{{
+                                    'wallpaper-wizard.wallpaper-list-wizard.library-background-wizard.actions.add'
+                                        | translate
+                                }}" icon="pi pi-plus" class="p-button mr-2"
+                                (click)="CreateLibraryBackground()"></button>
+
+                            <p-button label="{{ 'shared.actions.next' | translate }}" (onClick)="nextPage()"
+                                icon="pi pi-arrow-right" iconPos="right" [disabled]="!selectedBackground">
+                            </p-button>
+                        </div>
+                    </ng-template>
+                    <ng-template let-cats pTemplate="gridItem">
+                        <div class="grid grid-nogutter">
+                            <div class="col-12 md:col-3" *ngFor="let cat of cats">
+                                <div class="m-3" #img>
+                                    <div class="mb-3">
+                                        <p-checkbox [id]="cat?.id" [ngModel]="isCharSelected(cat)" [binary]="true"
+                                            (onChange)="toggleSelection(cat)">
+                                        </p-checkbox>
+                                        <div class="flex flex-wrap justify-content-center">
+                                            <img (click)="toggleSelection(cat)" [src]="cat.backgroundImageThumbnailUrl"
+                                                class="shadow-2 my-3 mx-0" style="
+                                                    width: 200px;
+                                                    height: 200px;
+                                                    cursor: pointer;
+                                                    border-radius: 8px;
+                                                " />
+
+                                            <button *ngIf="!isIAwareTeamUser" pButton pRipple type="button"
+                                                icon="pi pi-ellipsis-v"
+                                                class="p-button-rounded p-button-text p-button-plain"
+                                                (click)="adminMenu.toggle($event); assigneCurrentSelect(cat)"></button>
+
+                                            <button *ngIf="isIAwareTeamUser" pButton pRipple type="button"
+                                                icon="pi pi-ellipsis-v"
+                                                class="p-button-rounded p-button-text p-button-plain"
+                                                (click)="iAwareMenu.toggle($event); assigneCurrentSelect(cat)"></button>
+
+                                            <p-menu #adminMenu [model]="normalMenuItems" [appendTo]="'body'"
+                                                [popup]="true"></p-menu>
+
+                                            <p-menu #iAwareMenu [model]="ownerMenuItems" [appendTo]="'body'"
+                                                [popup]="true"></p-menu>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-template>
+                </p-dataView>
+            </div>
+        </p-tabPanel>
+    </p-tabView>
+</div>
+
+<p-dialog [(visible)]="addLibraryBackgroundDialog" [style]="{ width: '50%', height: '70%' }"
+    header="{{ 'wallpaper-wizard.wallpaper-list-wizard.library-background-wizard.addDialog.header' | translate }}"
+    [modal]="true" class="p-fluid">
+
+    <ng-template pTemplate="content">
+        <form [formGroup]="addLibraryBackgroundForm" (ngSubmit)="saveAddLibraryBackground()">
+            <div class="flex justify-content-center flex-wrap">
+                <div class="col-12 md:col-6">
+
+                    <p-panel
+                        [header]="'wallpaper-wizard.wallpaper-list-wizard.library-background-wizard.addDialog.title' | translate"
+                        class="mb-3">
+                        <div class="flex align-items-center justify-content-center">
+                            <img [src]="imageUrl1" alt="Avatar" class="avatar"
+                                style="width: 100%; max-width: 300px; border-radius: 8px; border: 1px solid #ccc;"
+                                (click)="onUploadBackgroundImageClick()" />
+                        </div>
+
+                       
+                    <small class="text-center block m-2">{{ 'shared.messages.recommendedDimensions' | translate}} <strong>{{ 'shared.messages.1920x1080' | translate}}</strong> {{ 'shared.messages.pixels' | translate}}</small>
+
+                        <div class="flex align-items-center justify-content-center mt-2" style="display: none">
+                            <p-button label="{{ 'shared.actions.upload' | translate }}" icon="pi pi-upload"
+                                (click)="onUploadBackgroundImageClick()"></p-button>
+                            <input type="file" id="myBackgroundImage" style="display: none"
+                                (change)="onBackgroundImageSelected($event)" />
+                        </div>
+
+
+                    </p-panel>
+                </div>
+
+                <div class="col-12 md:col-6">
+                    <p-panel
+                        [header]="'wallpaper-wizard.wallpaper-list-wizard.library-background-wizard.addDialog.titleThumbnail' | translate"
+                        class="mb-3">
+                        <div class="flex align-items-center justify-content-center">
+                            <img [src]="imageUrlThumbnail" alt="Avatar" class="avatar"
+                                style="width: 100%; max-width: 150px; border-radius: 8px; border: 1px solid #ccc;"
+                                (click)="onUploadBackgroundImageThumbnailClick()" />
+                        </div>
+
+                        <small class="text-center block m-2">{{ 'shared.messages.recommendedDimensions' | translate}} <strong>{{ 'shared.messages.300x300' | translate}}</strong> {{ 'shared.messages.pixels' | translate}}</small>
+
+                        <div class="flex align-items-center justify-content-center mt-2" style="display: none">
+                            <p-button label="{{ 'shared.actions.upload' | translate }}" icon="pi pi-upload"
+                                (click)="onUploadBackgroundImageThumbnailClick()"></p-button>
+                            <input type="file" id="myBackgroundImageThumbnail" style="display: none"
+                                (change)="onBackgroundImageThumbnailSelected($event)" />
+                        </div>
+
+                    </p-panel>
+                </div>
+            </div>
+        </form>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <div class="flex justify-content-between">
+            <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+                class="p-button-text" (click)="declineAddLibraryBackgroundDialog()"></button>
+            <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check"
+                class="p-button-text" (click)="saveAddLibraryBackground()"></button>
+        </div>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="editLibraryBackgroundDialog" [style]="{ width: '50%', height: '70%' }"
+    header="{{ 'wallpaper-wizard.wallpaper-list-wizard.library-background-wizard.editDialog.header' | translate }}"
+    [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <form [formGroup]="editLibraryBackgroundForm" (ngSubmit)="saveEditLibraryBackground()">
+            <div class="flex justify-content-center flex-wrap">
+                <div class="col-12 md:col-6">
+                    <p-panel
+                        [header]="'wallpaper-wizard.wallpaper-list-wizard.library-background-wizard.editDialog.title' | translate"
+                        class="mb-3">
+                        <div class="flex align-items-center justify-content-center">
+                            <img [src]="imageUrl1" alt="Avatar" class="avatar" 
+                            style="width: 100%; max-width: 300px; border-radius: 8px; border: 1px solid #ccc;"
+                                (click)="onUploadBackgroundImageClick()" />
+                        </div>
+
+                        <!-- Recommended Dimensions -->
+                    <small class="text-center block m-2">{{ 'shared.messages.recommendedDimensions' | translate}} <strong>{{ 'shared.messages.1920x1080' | translate}}</strong> {{ 'shared.messages.pixels' | translate}}</small>
+
+                        <div class="flex align-items-center justify-content-center mt-2">
+                            <p-button label="{{ 'shared.actions.upload' | translate }}" icon="pi pi-upload"
+                                (click)="onUploadBackgroundImageClick()"></p-button>
+                            <input type="file" id="myBackgroundImage" style="display: none"
+                                (change)="onBackgroundImageSelected($event)" />
+                        </div>
+                    </p-panel>
+                </div>
+
+                <div class="col-12 md:col-6">
+                    <p-panel
+                        [header]="'wallpaper-wizard.wallpaper-list-wizard.library-background-wizard.addDialog.titleThumbnail' | translate"
+                        class="mb-3">
+                        <div class="flex align-items-center justify-content-center">
+                            <img [src]="imageUrlThumbnail" alt="Avatar" class="avatar"
+                                style="width: 100%; max-width: 150px; border-radius: 8px; border: 1px solid #ccc;"
+                                (click)="onUploadBackgroundImageThumbnailClick()" />
+                        </div>
+                        <!-- Recommended Dimensions -->
+                    <small class="text-center block m-2">{{ 'shared.messages.recommendedDimensions' | translate}} <strong>{{ 'shared.messages.300x300' | translate}}</strong> {{ 'shared.messages.pixels' | translate}}</small>
+
+                        <div class="flex align-items-center justify-content-center mt-2" style="display: none">
+                            <p-button label="{{ 'shared.actions.upload' | translate }}" icon="pi pi-upload"
+                                (click)="onUploadBackgroundImageThumbnailClick()"></p-button>
+                            <input type="file" id="myBackgroundImageThumbnail" style="display: none"
+                                (change)="onBackgroundImageThumbnailSelected($event)" />
+                        </div>
+
+                    </p-panel>
+                </div>
+            </div>
+        </form>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <div class="flex justify-content-between">
+            <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+                class="p-button-text" (click)="declineEditLibraryBackground()"></button>
+            <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check"
+                class="p-button-text" (click)="saveEditLibraryBackground()"></button>
+        </div>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="switchActivationLibraryBackgroundDialog" header="{{ 'shared.headers.active' | translate }}"
+    [modal]="true" [style]="{ width: '450px' }">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        @if (libraryBackground && libraryBackground.isActive) {
+        <span> {{ 'shared.messages.deactive' | translate }} </span>
+        }@else {
+        <span>{{ 'shared.messages.active' | translate }} </span>
+        }
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="declineActivation()"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{ 'shared.actions.save' | translate }}"
+            (click)="confirmtActivation()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="deletionLibraryBackgroundDialog" header="{{ 'shared.headers.delete' | translate }}"
+    [modal]="true" [style]="{ width: '450px' }">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="libraryBackground">{{ 'shared.messages.delete' | translate }} </span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="declineDeletion()"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{ 'shared.actions.save' | translate }}"
+            (click)="confirmDeletion()"></button>
+    </ng-template>
+</p-dialog>

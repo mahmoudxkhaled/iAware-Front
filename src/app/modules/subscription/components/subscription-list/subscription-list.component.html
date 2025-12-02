@@ -1,0 +1,1055 @@
+<div class="card">
+    <p-toast></p-toast>
+
+    <div class="iAware-loading-table-container" style="position: relative">
+        <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+
+        <p-table
+            #dt
+            [value]="subscriptions"
+            responsiveLayout="scroll"
+            [rows]="10"
+            styleClass="p-datatable-striped"
+            [paginator]="true"
+            [rowsPerPageOptions]="[10, 20, 30]"
+            [globalFilterFields]="['title', 'price']">
+            <ng-template pTemplate="caption">
+                <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                    <h5 class="m-0">{{ 'subscription.subscription-list.title' | translate }}</h5>
+                    <div class="my-1">
+                        <button
+                            *ngIf="hasPermission(actions.add)"
+                            pButton
+                            pRipple
+                            label="{{ 'subscription.subscription-list.actions.add' | translate }}"
+                            icon="pi pi-plus"
+                            class="p-button-success mr-2"
+                            (click)="openNew()"></button>
+                        <span class="mt-2 md:mt-0 p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input
+                                pInputText
+                                type="text"
+                                (input)="onGlobalFilter(dt, $event)"
+                                placeholder="{{ 'shared.search.subscription' | translate }}"
+                                class="w-full sm:w-auto" />
+                        </span>
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="header">
+                <tr>
+                    <th style="width: 20%" pSortableColumn="title" style="width: 20%">
+                        {{ 'subscription.subscription-list.fields.name' | translate }}
+                        <p-sortIcon field="title"></p-sortIcon>
+                        <p-columnFilter type="text" field="title" display="menu"></p-columnFilter>
+                    </th>
+                    <th style="text-align: center" pSortableColumn="userPrice">
+                        {{ 'subscription.subscription-list.fields.userPrice' | translate }}
+                        <p-sortIcon field="userPrice"></p-sortIcon>
+                    </th>
+                    <th style="text-align: center">
+                        {{ 'subscription.subscription-list.fields.duration' | translate }}
+                    </th>
+                    <th style="text-align: center">Languages</th>
+                    <th style="text-align: center">
+                        {{ 'subscription.subscription-list.fields.features' | translate }}
+                    </th>
+                    <th style="text-align: center">
+                        {{ 'subscription.subscription-list.fields.freePlane' | translate }}
+                    </th>
+                    <th style="text-align: center">iAware Team Plan</th>
+                    <!-- <th style="width: 20%;">{{'subscription.subscription-list.fields.status' | translate}}</th> -->
+                    <th class="text-right"></th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-subscription>
+                <tr>
+                    <td>{{ subscription.title }}</td>
+                    <td style="text-align: center">{{ subscription.userPrice }}</td>
+                    <td style="text-align: center">
+                        {{ subscription.durationNumber }} - {{ getDurationTypeName(subscription.durationType) }}
+                    </td>
+                    <td style="text-align: center">{{ subscription.languagesName }}</td>
+                    <td style="text-align: center">
+                        <a (click)="openFeatures(subscription)">
+                            <i class="pi pi-book" style="cursor: pointer"></i>
+                        </a>
+                    </td>
+
+                    <td style="text-align: center">
+                        <p-inputSwitch
+                            *ngIf="hasPermission(actions.active)"
+                            [ngModel]="subscription.isFreePlan"
+                            (onChange)="checkFreePlan(subscription)" />
+                    </td>
+
+                    <td style="text-align: center">
+                        <p-inputSwitch
+                            *ngIf="hasPermission(actions.active)"
+                            [ngModel]="subscription.isIAwarePlan"
+                            (onChange)="checkIAwarePlan(subscription)" />
+                    </td>
+                    <!-- <td>
+          <p-inputSwitch *ngIf="hasPermission(actions.active)" [ngModel]="subscription.isActive"
+            (onChange)="switchActivation(subscription)" />
+        </td> -->
+
+                    <td>
+                        <button
+                            *ngIf="menuItems.length > 0"
+                            pButton
+                            pRipple
+                            type="button"
+                            icon="pi pi-ellipsis-v"
+                            class="p-button-rounded p-button-text p-button-plain ml-3"
+                            (click)="menu.toggle($event); assigneCurrentSelect(subscription)"></button>
+                        <p-menu #menu [model]="menuItems" [appendTo]="'body'" [popup]="true"></p-menu>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+
+<p-dialog
+    [(visible)]="subscriptionDialog"
+    [style]="{ width: '70%', height: '90%' }"
+    header="{{ 'subscription.subscription-list.dialogs.subscriptionDialog.header' | translate }}"
+    [modal]="true"
+    class="p-fluid">
+    <ng-template pTemplate="content">
+        <form [formGroup]="subscriptionForm" (ngSubmit)="saveSubscription()">
+            <div class="field">
+                <label class="font-medium text-900" for="title">{{
+                    'subscription.subscription-list.dialogs.subscriptionDialog.fields.title' | translate
+                }}</label>
+                <input
+                    type="text"
+                    pInputText
+                    id="title"
+                    formControlName="title"
+                    required
+                    [ngClass]="{ 'ng-invalid ng-dirty': submitted && !subscriptionForm.controls['title'].valid }" />
+                <small
+                    *ngIf="submitted && !subscriptionForm.controls['title'].valid"
+                    class="ng-dirty ng-invalid text-red-500"
+                    >{{
+                        'subscription.subscription-list.dialogs.subscriptionDialog.validation.title' | translate
+                    }}</small
+                >
+            </div>
+            <div class="field">
+                <label class="font-medium text-900" for="description">{{
+                    'subscription.subscription-list.dialogs.subscriptionDialog.fields.description' | translate
+                }}</label>
+                <textarea
+                    id="description"
+                    pInputTextarea
+                    formControlName="description"
+                    required
+                    rows="3"
+                    cols="20"></textarea>
+            </div>
+            <div class="flex flex-wrap">
+                <div class="md:col-6">
+                    <div class="field">
+                        <label class="font-medium text-900" for="durationNumber">{{
+                            'subscription.subscription-list.dialogs.subscriptionDialog.fields.durationNumber'
+                                | translate
+                        }}</label>
+                        <p-inputNumber id="durationNumber" formControlName="durationNumber"></p-inputNumber>
+                    </div>
+
+                    <div class="field">
+                        <label class="font-medium text-900" for="roles">
+                            {{
+                                'subscription.subscription-list.dialogs.subscriptionDialog.fields.roles' | translate
+                            }}</label
+                        >
+                        <p-multiSelect
+                            [options]="roles"
+                            (onChange)="getSelectedRoles($event)"
+                            formControlName="roles"
+                            optionLabel="name"
+                            optionValue="id"
+                            scrollHeight="250px"
+                            placeholder="{{
+                                'subscription.subscription-list.dialogs.subscriptionDialog.fields.rolesPlaceholder'
+                                    | translate
+                            }}"
+                            [ngClass]="{
+                                'ng-invalid ng-dirty': submitted && !subscriptionForm.controls['defaultRole'].valid
+                            }">
+                        </p-multiSelect>
+                        <small
+                            *ngIf="submitted && !subscriptionForm.controls['defaultRole'].valid"
+                            class="ng-dirty ng-invalid text-red-500"
+                            >{{
+                                'subscription.subscription-list.dialogs.subscriptionDialog.validation.roles' | translate
+                            }}</small
+                        >
+                    </div>
+
+                    <div class="field mb-4">
+                        <label class="mb-4 mt-2 font-medium text-900" for="userPrice">{{
+                            'subscription.subscription-list.dialogs.subscriptionDialog.fields.userPrice' | translate
+                        }}</label>
+                        <p-inputNumber
+                            id="userPrice"
+                            formControlName="userPrice"
+                            mode="currency"
+                            currency="USD"
+                            locale="en-US"></p-inputNumber>
+                    </div>
+
+                    <div class="field">
+                        <label class="font-medium text-900" for="roles">Languages</label>
+                        <p-multiSelect
+                            [options]="activeLanguages"
+                            formControlName="languages"
+                            optionLabel="name"
+                            optionValue="id"
+                            scrollHeight="250px"
+                            placeholder="selected Languages"
+                            [ngClass]="{
+                                'ng-invalid ng-dirty': submitted && !subscriptionForm.controls['languages'].valid
+                            }">
+                        </p-multiSelect>
+                        <!-- <small *ngIf="submitted && !subscriptionForm.controls['defaultRole'].valid"
+              class="ng-dirty ng-invalid text-red-500">{{
+              'subscription.subscription-list.dialogs.subscriptionDialog.validation.roles' | translate}}</small> -->
+                    </div>
+
+                    <div class="field">
+                        <label class="font-medium text-900" for="trainingLessons">
+                            {{
+                                'subscription.subscription-list.dialogs.subscriptionDialog.fields.trainingLessons'
+                                    | translate
+                            }}</label
+                        >
+                        <p-tree
+                            [value]="data"
+                            selectionMode="checkbox"
+                            [(selection)]="selectedLessons"
+                            expanded="true"></p-tree>
+                    </div>
+                </div>
+                <div class="md:col-6">
+                    <div class="field">
+                        <label class="font-medium text-900" for="durationType">{{
+                            'subscription.subscription-list.dialogs.subscriptionDialog.fields.durationType' | translate
+                        }}</label>
+                        <p-dropdown
+                            [options]="durationTypes"
+                            formControlName="durationType"
+                            optionLabel="name"
+                            optionValue="id"
+                            scrollHeight="250px"
+                            placeholder="{{
+                                'subscription.subscription-list.dialogs.subscriptionDialog.fields.durationType'
+                                    | translate
+                            }}"
+                            [ngClass]="{
+                                'ng-invalid ng-dirty': submitted && !subscriptionForm.controls['durationType'].valid
+                            }">
+                        </p-dropdown>
+                    </div>
+
+                    <div class="field">
+                        <label class="font-medium text-900" for="defaultRole">{{
+                            'subscription.subscription-list.dialogs.subscriptionDialog.fields.defaultRole' | translate
+                        }}</label>
+                        <p-dropdown
+                            [options]="selectedRoles"
+                            formControlName="defaultRole"
+                            optionLabel="name"
+                            optionValue="id"
+                            scrollHeight="250px"
+                            placeholder="{{
+                                'subscription.subscription-list.dialogs.subscriptionDialog.fields.defaultRolePlaceholder'
+                                    | translate
+                            }}"
+                            [ngClass]="{
+                                'ng-invalid ng-dirty': submitted && !subscriptionForm.controls['defaultRole'].valid
+                            }">
+                        </p-dropdown>
+                        <small
+                            *ngIf="submitted && !subscriptionForm.controls['defaultRole'].valid"
+                            class="ng-dirty ng-invalid text-red-500"
+                            >{{
+                                'subscription.subscription-list.dialogs.subscriptionDialog.validation.defaultRole'
+                                    | translate
+                            }}</small
+                        >
+                    </div>
+
+                    <!-- <div class="field">
+            <label class="font-medium text-900" for="reminders">{{
+              'subscription.subscription-list.dialogs.subscriptionDialog.fields.reminders'
+              | translate}}</label>
+            <p-multiSelect [options]="reminders" formControlName="reminders" optionLabel="title" optionValue="id"
+              scrollHeight="250px"
+              placeholder="{{ 'subscription.subscription-list.dialogs.subscriptionDialog.fields.remindersPlaceholder' | translate}}">
+            </p-multiSelect>
+          </div> -->
+
+                    <div class="field col-12 lg:col-6 p-fluid">
+                        <label class="mb-2 font-medium text-900"> Active Data </label>
+                        <input
+                            class="mt-2 startDate"
+                            type="datetime-local"
+                            formControlName="activeDate"
+                            id="activeDate"
+                            (change)="onActivetDateChange($event)" />
+                    </div>
+
+                    <div class="field">
+                        <label class="font-medium text-900" for="phishingTemplates">
+                            {{
+                                'subscription.subscription-list.dialogs.subscriptionDialog.fields.phishingTemplates'
+                                    | translate
+                            }}</label
+                        >
+                        <p-tree
+                            [value]="data2"
+                            selectionMode="checkbox"
+                            [(selection)]="selectedTemplates"
+                            expanded="true"></p-tree>
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <div class="checkbox-container mx-8">
+                <div class="checkbox-column">
+                    <p-checkbox
+                        formControlName="unlimitedPhishingSimulation"
+                        [binary]="true"
+                        label="{{
+                            'subscription.subscription-list.dialogs.subscriptionDialog.fields.unlimitedPhishingSimulation'
+                                | translate
+                        }}"></p-checkbox>
+                    <p-checkbox
+                        formControlName="awarenessVideos"
+                        [binary]="true"
+                        label="{{
+                            'subscription.subscription-list.dialogs.subscriptionDialog.fields.awarenessVideos'
+                                | translate
+                        }}"></p-checkbox>
+                    <p-checkbox
+                        formControlName="comicBooks"
+                        [binary]="true"
+                        label="{{
+                            'subscription.subscription-list.dialogs.subscriptionDialog.fields.comicBooks' | translate
+                        }}"></p-checkbox>
+                    <p-checkbox
+                        formControlName="knowledgeQuiz"
+                        [binary]="true"
+                        label="{{
+                            'subscription.subscription-list.dialogs.subscriptionDialog.fields.knowledgeQuiz' | translate
+                        }}"></p-checkbox>
+                    <p-checkbox
+                        formControlName="securityQuotesAndTips"
+                        [binary]="true"
+                        label="{{
+                            'subscription.subscription-list.dialogs.subscriptionDialog.fields.securityQuotesAndTips'
+                                | translate
+                        }}"></p-checkbox>
+                    <p-checkbox
+                        formControlName="advancedReporting"
+                        [binary]="true"
+                        label="{{
+                            'subscription.subscription-list.dialogs.subscriptionDialog.fields.advancedReporting'
+                                | translate
+                        }}"></p-checkbox>
+                    <p-checkbox
+                        formControlName="awarenessEmails"
+                        [binary]="true"
+                        label="{{
+                            'subscription.subscription-list.dialogs.subscriptionDialog.fields.awarenessEmails'
+                                | translate
+                        }}"></p-checkbox>
+                    <p-checkbox
+                        formControlName="wallpapers"
+                        [binary]="true"
+                        label="{{
+                            'subscription.subscription-list.dialogs.subscriptionDialog.fields.wallpapers' | translate
+                        }}"></p-checkbox>
+                    <p-checkbox
+                        formControlName="screenSavers"
+                        [binary]="true"
+                        label="{{
+                            'subscription.subscription-list.dialogs.subscriptionDialog.fields.screenSavers' | translate
+                        }}"></p-checkbox>
+                    <p-checkbox
+                        formControlName="games"
+                        [binary]="true"
+                        label="{{
+                            'subscription.subscription-list.dialogs.subscriptionDialog.fields.games' | translate
+                        }}"></p-checkbox>
+                    <p-checkbox
+                        formControlName="customizedPhishingExperience"
+                        [binary]="true"
+                        label="{{
+                            'subscription.subscription-list.dialogs.subscriptionDialog.fields.customizedPhishingExperience'
+                                | translate
+                        }}"></p-checkbox>
+                </div>
+                <div class="checkbox-column">
+                    <p-checkbox
+                        formControlName="vrGamesAndTraining"
+                        [binary]="true"
+                        label="{{
+                            'subscription.subscription-list.dialogs.subscriptionDialog.fields.vrGamesAndTraining'
+                                | translate
+                        }}"></p-checkbox>
+                    <p-checkbox
+                        formControlName="localization"
+                        [binary]="true"
+                        label="{{
+                            'subscription.subscription-list.dialogs.subscriptionDialog.fields.localization' | translate
+                        }}"></p-checkbox>
+                    <p-checkbox
+                        formControlName="onSiteDeployment"
+                        [binary]="true"
+                        label="{{
+                            'subscription.subscription-list.dialogs.subscriptionDialog.fields.onSiteDeployment'
+                                | translate
+                        }}"></p-checkbox>
+                    <p-checkbox
+                        formControlName="iawareMobileApp"
+                        [binary]="true"
+                        label="{{
+                            'subscription.subscription-list.dialogs.subscriptionDialog.fields.iawareMobileApp'
+                                | translate
+                        }}"></p-checkbox>
+                    <p-checkbox
+                        formControlName="automatedTrainingCampaigns"
+                        [binary]="true"
+                        label="{{
+                            'subscription.subscription-list.dialogs.subscriptionDialog.fields.automatedTrainingCampaigns'
+                                | translate
+                        }}"></p-checkbox>
+                    <p-checkbox
+                        formControlName="brandableContent"
+                        [binary]="true"
+                        label="{{
+                            'subscription.subscription-list.dialogs.subscriptionDialog.fields.brandableContent'
+                                | translate
+                        }}"></p-checkbox>
+                    <p-checkbox
+                        formControlName="phishAlertButton"
+                        [binary]="true"
+                        label="{{
+                            'subscription.subscription-list.dialogs.subscriptionDialog.fields.phishAlertButton'
+                                | translate
+                        }}"></p-checkbox>
+                    <p-checkbox
+                        formControlName="userProvisioningViaActiveDirectory"
+                        [binary]="true"
+                        label="{{
+                            'subscription.subscription-list.dialogs.subscriptionDialog.fields.userProvisioningViaActiveDirectory'
+                                | translate
+                        }}"></p-checkbox>
+                    <p-checkbox
+                        formControlName="technicalSupport"
+                        [binary]="true"
+                        label="{{
+                            'subscription.subscription-list.dialogs.subscriptionDialog.fields.technicalSupport'
+                                | translate
+                        }}"></p-checkbox>
+                    <p-checkbox
+                        formControlName="smartGroups"
+                        [binary]="true"
+                        label="{{
+                            'subscription.subscription-list.dialogs.subscriptionDialog.fields.smartGroups' | translate
+                        }}"></p-checkbox>
+                </div>
+            </div>
+        </form>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button
+            pButton
+            pRipple
+            label="{{ 'shared.actions.cancel' | translate }}"
+            icon="pi pi-times"
+            class="p-button-text"
+            (click)="hideDialog()"></button>
+        <button
+            pButton
+            pRipple
+            label="{{ 'shared.actions.save' | translate }}"
+            icon="pi pi-check"
+            class="p-button-text"
+            (click)="saveSubscription()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog
+    [(visible)]="switchActivationSubscriptionDialog"
+    header="{{ 'shared.headers.active' | translate }}"
+    [modal]="true"
+    [style]="{ width: '450px' }">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        @if (subscription.isActive) {
+        <span>
+            {{ 'shared.messages.deactive' | translate }} <b>{{ subscription.title }}</b></span
+        >
+        }@else {
+        <span
+            >{{ 'shared.messages.active' | translate }} <b>{{ subscription.title }}</b></span
+        >
+        }
+    </div>
+    <ng-template pTemplate="footer">
+        <button
+            pButton
+            pRipple
+            icon="pi pi-times"
+            class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}"
+            (click)="declineActivation()"></button>
+        <button
+            pButton
+            pRipple
+            icon="pi pi-check"
+            class="p-button-text"
+            label="{{ 'shared.actions.save' | translate }}"
+            (click)="confirmtActivation()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog
+    [(visible)]="featuresDetailsDialog"
+    header="{{ 'subscription.subscription-list.dialogs.featuresDetailsDialog.header' | translate }}"
+    [modal]="true"
+    [style]="{ width: '600px' }">
+    <div class="flex align-items-center justify-content-center">
+        <div class="checkbox-container">
+            <div class="checkbox-column">
+                <p-checkbox
+                    [disabled]="true"
+                    [(ngModel)]="subscription.unlimitedPhishingSimulation"
+                    [binary]="true"
+                    label="{{
+                        'subscription.subscription-list.dialogs.featuresDetailsDialog.fields.unlimitedPhishingSimulation'
+                            | translate
+                    }}{{
+                        'subscription.subscription-list.dialogs.featuresDetailsDialog.fields.unlimitedPhishingSimulation'
+                            | translate
+                    }}"></p-checkbox>
+                <p-checkbox
+                    [disabled]="true"
+                    [(ngModel)]="subscription.awarenessVideos"
+                    [binary]="true"
+                    label="{{
+                        'subscription.subscription-list.dialogs.featuresDetailsDialog.fields.awarenessVideos'
+                            | translate
+                    }}"></p-checkbox>
+                <p-checkbox
+                    [disabled]="true"
+                    [(ngModel)]="subscription.comicBooks"
+                    [binary]="true"
+                    label="{{
+                        'subscription.subscription-list.dialogs.featuresDetailsDialog.fields.comicBooks' | translate
+                    }}"></p-checkbox>
+                <p-checkbox
+                    [disabled]="true"
+                    [(ngModel)]="subscription.knowledgeQuiz"
+                    [binary]="true"
+                    label="{{
+                        'subscription.subscription-list.dialogs.featuresDetailsDialog.fields.knowledgeQuiz' | translate
+                    }}"></p-checkbox>
+                <p-checkbox
+                    [disabled]="true"
+                    [(ngModel)]="subscription.securityQuotesAndTips"
+                    [binary]="true"
+                    label="{{
+                        'subscription.subscription-list.dialogs.featuresDetailsDialog.fields.securityQuotesAndTips'
+                            | translate
+                    }}"></p-checkbox>
+                <p-checkbox
+                    [disabled]="true"
+                    [(ngModel)]="subscription.advancedReporting"
+                    [binary]="true"
+                    label="{{
+                        'subscription.subscription-list.dialogs.featuresDetailsDialog.fields.advancedReporting'
+                            | translate
+                    }}"></p-checkbox>
+                <p-checkbox
+                    [disabled]="true"
+                    [(ngModel)]="subscription.awarenessEmails"
+                    [binary]="true"
+                    label="{{
+                        'subscription.subscription-list.dialogs.featuresDetailsDialog.fields.awarenessEmails'
+                            | translate
+                    }}"></p-checkbox>
+                <p-checkbox
+                    [disabled]="true"
+                    [(ngModel)]="subscription.wallpapers"
+                    [binary]="true"
+                    label="{{
+                        'subscription.subscription-list.dialogs.featuresDetailsDialog.fields.wallpapers' | translate
+                    }}"></p-checkbox>
+                <p-checkbox
+                    [disabled]="true"
+                    [(ngModel)]="subscription.screenSavers"
+                    [binary]="true"
+                    label="{{
+                        'subscription.subscription-list.dialogs.featuresDetailsDialog.fields.screenSavers' | translate
+                    }}"></p-checkbox>
+                <p-checkbox
+                    [disabled]="true"
+                    [(ngModel)]="subscription.games"
+                    [binary]="true"
+                    label="{{
+                        'subscription.subscription-list.dialogs.featuresDetailsDialog.fields.games' | translate
+                    }}"></p-checkbox>
+                <p-checkbox
+                    [disabled]="true"
+                    [(ngModel)]="subscription.customizedPhishingExperience"
+                    [binary]="true"
+                    label="{{
+                        'subscription.subscription-list.dialogs.featuresDetailsDialog.fields.customizedPhishingExperience'
+                            | translate
+                    }}"></p-checkbox>
+            </div>
+            <div class="checkbox-column">
+                <p-checkbox
+                    [disabled]="true"
+                    [(ngModel)]="subscription.vrGamesAndTraining"
+                    [binary]="true"
+                    label="{{
+                        'subscription.subscription-list.dialogs.featuresDetailsDialog.fields.vrGamesAndTraining'
+                            | translate
+                    }}"></p-checkbox>
+                <p-checkbox
+                    [disabled]="true"
+                    [(ngModel)]="subscription.localization"
+                    [binary]="true"
+                    label="{{
+                        'subscription.subscription-list.dialogs.featuresDetailsDialog.fields.localization' | translate
+                    }}"></p-checkbox>
+                <p-checkbox
+                    [disabled]="true"
+                    [(ngModel)]="subscription.onSiteDeployment"
+                    [binary]="true"
+                    label="{{
+                        'subscription.subscription-list.dialogs.featuresDetailsDialog.fields.onSiteDeployment'
+                            | translate
+                    }}"></p-checkbox>
+                <p-checkbox
+                    [disabled]="true"
+                    [(ngModel)]="subscription.iawareMobileApp"
+                    [binary]="true"
+                    label="{{
+                        'subscription.subscription-list.dialogs.featuresDetailsDialog.fields.iawareMobileApp'
+                            | translate
+                    }}"></p-checkbox>
+                <p-checkbox
+                    [disabled]="true"
+                    [(ngModel)]="subscription.automatedTrainingCampaigns"
+                    [binary]="true"
+                    label="{{
+                        'subscription.subscription-list.dialogs.featuresDetailsDialog.fields.automatedTrainingCampaigns'
+                            | translate
+                    }}"></p-checkbox>
+                <p-checkbox
+                    [disabled]="true"
+                    [(ngModel)]="subscription.brandableContent"
+                    [binary]="true"
+                    label="{{
+                        'subscription.subscription-list.dialogs.featuresDetailsDialog.fields.brandableContent'
+                            | translate
+                    }}"></p-checkbox>
+                <p-checkbox
+                    [disabled]="true"
+                    [(ngModel)]="subscription.phishAlertButton"
+                    [binary]="true"
+                    label="{{
+                        'subscription.subscription-list.dialogs.featuresDetailsDialog.fields.phishAlertButton'
+                            | translate
+                    }}"></p-checkbox>
+                <p-checkbox
+                    [disabled]="true"
+                    [(ngModel)]="subscription.userProvisioningViaActiveDirectory"
+                    [binary]="true"
+                    label="{{
+                        'subscription.subscription-list.dialogs.featuresDetailsDialog.fields.userProvisioningViaActiveDirectory'
+                            | translate
+                    }}"></p-checkbox>
+                <p-checkbox
+                    [disabled]="true"
+                    [(ngModel)]="subscription.technicalSupport"
+                    [binary]="true"
+                    label="{{
+                        'subscription.subscription-list.dialogs.featuresDetailsDialog.fields.technicalSupport'
+                            | translate
+                    }}"></p-checkbox>
+                <p-checkbox
+                    [disabled]="true"
+                    [(ngModel)]="subscription.smartGroups"
+                    [binary]="true"
+                    label="{{
+                        'subscription.subscription-list.dialogs.featuresDetailsDialog.fields.smartGroups' | translate
+                    }}"></p-checkbox>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<p-dialog
+    [(visible)]="deleteSubscriptionDialog"
+    header="{{ 'shared.headers.delete' | translate }}"
+    [modal]="true"
+    [style]="{ width: '450px' }">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="subscription"
+            >{{ 'shared.messages.delete' | translate }} <b>{{ subscription.title }}</b> ?</span
+        >
+    </div>
+    <ng-template pTemplate="footer">
+        <button
+            pButton
+            pRipple
+            icon="pi pi-times"
+            class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}"
+            (click)="declineDeletion()"></button>
+        <button
+            pButton
+            pRipple
+            icon="pi pi-check"
+            class="p-button-text"
+            label="{{ 'shared.actions.save' | translate }}"
+            (click)="confirmDelete()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog
+    [(visible)]="freeSubscriptionDialog"
+    header="{{ 'subscription.subscription-list.dialogs.freeSubscriptionDialog.header' | translate }}"
+    [modal]="true"
+    [style]="{ width: '450px' }">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="selectedSubscription?.isFreePlan"
+            >{{ 'subscription.subscription-list.dialogs.freeSubscriptionDialog.freeMessageI' | translate }}
+            <b>{{ selectedSubscription?.title }} </b
+            >{{ 'subscription.subscription-list.dialogs.freeSubscriptionDialog.notFreeMessageI' | translate }}</span
+        >
+        <span *ngIf="!selectedSubscription?.isFreePlan"
+            >{{ 'subscription.subscription-list.dialogs.freeSubscriptionDialog.freeMessageI' | translate }}
+            <b>{{ selectedSubscription?.title }} </b
+            >{{ 'subscription.subscription-list.dialogs.freeSubscriptionDialog.freeMessageII' | translate }}</span
+        >
+    </div>
+    <ng-template pTemplate="footer">
+        <button
+            pButton
+            pRipple
+            icon="pi pi-times"
+            class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}"
+            (click)="declineFreePlan()"></button>
+        <button
+            pButton
+            pRipple
+            icon="pi pi-check"
+            class="p-button-text"
+            label="{{ 'shared.actions.save' | translate }}"
+            (click)="confirmFreePlan()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog
+    [(visible)]="iAwareSubscriptionDialog"
+    header="Switch iAware Plan Confirmation"
+    [modal]="true"
+    [style]="{ width: '450px' }">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="selectedSubscription?.isIAwarePlan">
+            Are you sure you want to make <b>{{ selectedSubscription?.title }} </b>Not iAware Plan ?</span
+        >
+        <span *ngIf="!selectedSubscription?.isIAwarePlan">
+            Are you sure you want to make <b>{{ selectedSubscription?.title }} </b> iAware Plan ?</span
+        >
+    </div>
+    <ng-template pTemplate="footer">
+        <button
+            pButton
+            pRipple
+            icon="pi pi-times"
+            class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}"
+            (click)="declineIAwarePlan()"></button>
+        <button
+            pButton
+            pRipple
+            icon="pi pi-check"
+            class="p-button-text"
+            label="{{ 'shared.actions.save' | translate }}"
+            (click)="confirmIAwarePlan()"></button>
+    </ng-template>
+</p-dialog>
+
+<!-- 
+<button label="Primary" data-action="create" (click)="openNew()"
+  class="p-element p-ripple p-button-raised p-button p-component mb-5" ng-reflect-label="Primary">
+  <span class="p-button-label">Add New Subscription</span>
+  <span class="p-ink" aria-hidden="true" role="presentation"></span>
+</button>
+<div class="">
+  <p-toast></p-toast>
+
+
+  <p-table #dt [value]="subscriptions" [paginator]="true" [rows]="5" [rowsPerPageOptions]="[10, 20, 30]"
+    [globalFilterFields]="['title', 'roles']" [showCurrentPageReport]="true"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
+
+    <ng-template pTemplate="caption">
+      <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+        <h5 class="m-0">Manage Subscriptions</h5>
+        <span class="block mt-2 md:mt-0 p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..."
+            class="w-full sm:w-auto" />
+        </span>
+      </div>
+    </ng-template>
+
+   
+
+    <ng-template pTemplate="body" let-subscription>
+      <tr style="border-bottom: 1px solid #ccc;">
+        <td style="text-align: center;">
+          <h2>{{ subscription.title }}</h2>
+        </td>
+        <td style="text-align: center;">
+          <div class="subscription-info mb-3 border-round">
+            <div class="fw-bold text-gray-600 mb-2">
+              Roles :
+              <ng-container *ngIf="subscription.roles && subscription.roles.length > 0; else noRoles">
+                {{ subscription.roles }}
+              </ng-container>
+              <ng-template #noRoles>
+                No Roles Assigned
+              </ng-template>
+            </div>
+          </div>
+        </td>
+
+
+
+
+        <td style="text-align: center;">
+          <p-inputSwitch [ngModel]="subscription.isActive" (onChange)="switchActivation(subscription)" />
+        </td>
+
+
+        <td style="text-align: center;">
+          <div class=" " style="text-align: center;">
+            <p-button (click)="editSubscription(subscription)" type="button" class="  btn-active-light-primary my-1"
+              [attr.data-id]="subscription.id" data-action="edit">
+              Edit Subscription
+            </p-button>
+          </div>
+        </td>
+      </tr>
+
+      <tr class="normal-mode-row">
+
+        <td colspan="4">
+          <div class="flex flex-row justify-content-between">
+            <div class="w-1/4">
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.unlimitedPhishingSimulation" [binary]="true"
+                  label="Unlimited Phishing Simulation"></p-checkbox>
+              </div>
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.awarenessVideos" [binary]="true"
+                  label="Awareness Videos"></p-checkbox>
+              </div>
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.comicBooks" [binary]="true"
+                  label="Comic Books"></p-checkbox>
+              </div>
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.knowledgeQuiz" [binary]="true"
+                  label="Knowledge Quiz"></p-checkbox>
+              </div>
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.securityQuotesAndTips" [binary]="true"
+                  label="Security Quotes and Tips"></p-checkbox>
+              </div>
+            </div>
+            <div class="w-1/4">
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.advancedReporting" [binary]="true"
+                  label="Advanced Reporting"></p-checkbox>
+              </div>
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.awarenessEmails" [binary]="true"
+                  label="Awareness Emails"></p-checkbox>
+              </div>
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.wallpapers" [binary]="true"
+                  label="Wallpapers"></p-checkbox>
+              </div>
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.screenSavers" [binary]="true"
+                  label="Screen Savers"></p-checkbox>
+              </div>
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.games" [binary]="true" label="Games"></p-checkbox>
+              </div>
+            </div>
+            <div class="w-1/4">
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.customizedPhishingExperience" [binary]="true"
+                  label="Customized Phishing Experience"></p-checkbox>
+              </div>
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.vrGamesAndTraining" [binary]="true"
+                  label="VR Games and Training"></p-checkbox>
+              </div>
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.localization" [binary]="true"
+                  label="Localization"></p-checkbox>
+              </div>
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.onSiteDeployment" [binary]="true"
+                  label="On-Site Deployment"></p-checkbox>
+              </div>
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.iawareMobileApp" [binary]="true"
+                  label="iAware Mobile App"></p-checkbox>
+              </div>
+            </div>
+            <div class="w-1/4">
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.automatedTrainingCampaigns" [binary]="true"
+                  label="Automated Training Campaigns"></p-checkbox>
+              </div>
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.brandableContent" [binary]="true"
+                  label="Brandable Content"></p-checkbox>
+              </div>
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.phishAlertButton" [binary]="true"
+                  label="Phish Alert Button"></p-checkbox>
+              </div>
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.userProvisioningViaActiveDirectory"
+                  [binary]="true" label="User Provisioning via Active Directory"></p-checkbox>
+              </div>
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.technicalSupport" [binary]="true"
+                  label="Technical Support"></p-checkbox>
+              </div>
+            </div>
+          </div>
+        </td>
+      </tr>
+
+      <tr class="mobile-mode-row">
+
+        <td colspan="4">
+          <div class="flex flex-row justify-content-between">
+            <div class="w-1/4">
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.unlimitedPhishingSimulation" [binary]="true"
+                  label="Unlimited Phishing Simulation"></p-checkbox>
+              </div>
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.awarenessVideos" [binary]="true"
+                  label="Awareness Videos"></p-checkbox>
+              </div>
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.comicBooks" [binary]="true"
+                  label="Comic Books"></p-checkbox>
+              </div>
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.knowledgeQuiz" [binary]="true"
+                  label="Knowledge Quiz"></p-checkbox>
+              </div>
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.securityQuotesAndTips" [binary]="true"
+                  label="Security Quotes and Tips"></p-checkbox>
+              </div>
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.advancedReporting" [binary]="true"
+                  label="Advanced Reporting"></p-checkbox>
+              </div>
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.awarenessEmails" [binary]="true"
+                  label="Awareness Emails"></p-checkbox>
+              </div>
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.wallpapers" [binary]="true"
+                  label="Wallpapers"></p-checkbox>
+              </div>
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.screenSavers" [binary]="true"
+                  label="Screen Savers"></p-checkbox>
+              </div>
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.games" [binary]="true" label="Games"></p-checkbox>
+              </div>
+            </div>
+
+            <div class="w-1/4">
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.customizedPhishingExperience" [binary]="true"
+                  label="Customized Phishing Experience"></p-checkbox>
+              </div>
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.vrGamesAndTraining" [binary]="true"
+                  label="VR Games and Training"></p-checkbox>
+              </div>
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.localization" [binary]="true"
+                  label="Localization"></p-checkbox>
+              </div>
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.onSiteDeployment" [binary]="true"
+                  label="On-Site Deployment"></p-checkbox>
+              </div>
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.iawareMobileApp" [binary]="true"
+                  label="iAware Mobile App"></p-checkbox>
+              </div>
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.automatedTrainingCampaigns" [binary]="true"
+                  label="Automated Training Campaigns"></p-checkbox>
+              </div>
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.brandableContent" [binary]="true"
+                  label="Brandable Content"></p-checkbox>
+              </div>
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.phishAlertButton" [binary]="true"
+                  label="Phish Alert Button"></p-checkbox>
+              </div>
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.userProvisioningViaActiveDirectory"
+                  [binary]="true" label="User Provisioning via Active Directory"></p-checkbox>
+              </div>
+              <div class="mb-3 mr-5 mt-3">
+                <p-checkbox [disabled]="true" [ngModel]="subscription.technicalSupport" [binary]="true"
+                  label="Technical Support"></p-checkbox>
+              </div>
+            </div>
+
+          </div>
+        </td>
+      </tr>
+
+    </ng-template>
+
+  </p-table>
+</div> -->

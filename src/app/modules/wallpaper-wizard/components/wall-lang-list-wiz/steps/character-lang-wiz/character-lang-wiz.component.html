@@ -1,0 +1,276 @@
+<div class="field col-12">
+    <p-tabView [style]="{ width: '100%' }" [(activeIndex)]="selectedTabIndex">
+        <ng-container *ngFor="let language of CharacterLanguageGroups">
+            <p-tabPanel [header]="language.languageName">
+                <div class="iAware-loading-table-container" style="position: relative">
+                    <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                    <p-dataView #dv [value]="language.characters" [paginator]="true" [rows]="12" layout="grid">
+                        <ng-template pTemplate="header">
+                            <div class="flex flex-wrap justify-content-between">
+                                <p-button label="{{ 'shared.actions.back' | translate }}" (onClick)="prevPage()"
+                                    icon="pi pi-arrow-left"></p-button>
+                                <button *ngIf="hasPermission(actions.add) && isIAwareTeamUser" pButton pRipple label="{{
+                                        'wallpaper-wizard.wall-lang-list-wiz.character-lang-wiz.actions.add' | translate
+                                    }}" icon="pi pi-plus" class="p-button mr-2"
+                                    (click)="CreateLibraryCharacter(language.languageId)"></button>
+                                <p-button label="{{ 'shared.actions.next' | translate }}" (onClick)="nextPage()"
+                                    icon="pi pi-arrow-right" iconPos="right" [disabled]="!selectedCharacter"></p-button>
+                            </div>
+                        </ng-template>
+                        <ng-template let-cats pTemplate="gridItem">
+                            <div class="grid grid-nogutter">
+                                <div class="col-12 md:col-3" *ngFor="let char of cats">
+                                    <div class="m-3" #img>
+                                        <div class="mb-3">
+                                            <p-checkbox [id]="char?.id" [ngModel]="isCharSelected(char)" [binary]="true"
+                                                (onChange)="toggleSelection(char)">
+                                                >
+                                            </p-checkbox>
+
+                                            <div class="flex flex-wrap justify-content-center">
+                                                <img (click)="toggleSelection(char)"
+                                                    [src]="char.characterImageThumbnailUrl" [alt]="char.characterName"
+                                                    class="my-3 mx-0"
+                                                    style="width: 200px; height: 200px; cursor: pointer" />
+                                                <button *ngIf="normalMenuItems.length > 0 && !char.canEdit" pButton
+                                                    pRipple type="button" icon="pi pi-ellipsis-v"
+                                                    class="p-button-rounded p-button-text p-button-plain" (click)="
+                                                        normalMenu.toggle($event);
+                                                        assigneCurrentSelect(char, language.languageId)
+                                                    "></button>
+
+                                                <button *ngIf="ownerMenuItems.length > 0 && char.canEdit" pButton
+                                                    pRipple type="button" icon="pi pi-ellipsis-v"
+                                                    class="p-button-rounded p-button-text p-button-plain" (click)="
+                                                        ownerMenu.toggle($event);
+                                                        assigneCurrentSelect(char, language.languageId)
+                                                    "></button>
+
+                                                <p-menu #ownerMenu [model]="ownerMenuItems" [appendTo]="'body'"
+                                                    [popup]="true"></p-menu>
+
+                                                <p-menu #normalMenu [model]="normalMenuItems" [appendTo]="'body'"
+                                                    [popup]="true"></p-menu>
+                                            </div>
+                                            <div class="text-center">
+                                                <div style="cursor: pointer" class="text-md">
+                                                    {{ char.languageName }}
+                                                </div>
+                                            </div>
+                                            <div class="text-center">
+                                                <div style="cursor: pointer" class="text-2xl font-bold">
+                                                    {{ char.characterName }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </p-dataView>
+                </div>
+            </p-tabPanel>
+        </ng-container>
+    </p-tabView>
+</div>
+
+<p-dialog [(visible)]="addLibraryCharacterDialog" [style]="{ width: '50%', height: '90%' }"
+    header="{{ 'wallpaper-wizard.wall-lang-list-wiz.character-lang-wiz.addDialog.header' | translate }}" [modal]="true"
+    class="p-fluid">
+    <ng-template pTemplate="content">
+        <form [formGroup]="addLibraryCharacterForm" (ngSubmit)="saveAddLibraryCharacter()">
+            <div class="field">
+                <label for="languageId" class="font-medium text-900">{{
+                    'wallpaper-wizard.wall-lang-list-wiz.character-lang-wiz.addDialog.language' | translate
+                    }}</label>
+                <p-dropdown formControlName="languageId" [options]="selectedLanguageAdd" optionLabel="name" placeholder="{{
+                        'wallpaper-wizard.wall-lang-list-wiz.character-lang-wiz.addDialog.languagePlaceholder'
+                            | translate
+                    }}" optionValue="id">
+                </p-dropdown>
+            </div>
+
+            <div class="field">
+                <label for="characterName" class="font-medium text-900">{{
+                    'wallpaper-wizard.wall-lang-list-wiz.character-lang-wiz.addDialog.name' | translate
+                    }}</label>
+                <input type="text" pInputText id="characterName" formControlName="characterName" required [ngClass]="{
+                        'ng-invalid ng-dirty': submitted && !addLibraryCharacterForm.controls['characterName'].valid
+                    }" />
+                <small *ngIf="submitted && !addLibraryCharacterForm.controls['characterName'].valid"
+                    class="ng-dirty ng-invalid text-red-500">{{
+                    'wallpaper-wizard.wall-lang-list-wiz.character-lang-wiz.addDialog.nameValidation' | translate
+                    }}</small>
+            </div>
+
+            <div class="flex justify-content-center flex-wrap">
+                <div class="col-12 md:col-6">
+                    <p-panel
+                        [header]="'wallpaper-wizard.wall-lang-list-wiz.character-lang-wiz.addDialog.image' | translate"
+                        class="mb-3">
+                        <div class="flex align-items-center justify-content-center">
+                            <img [src]="imageUrl1" alt="Avatar" class="avatar"
+                                style="width: 100%; max-width: 300px; border-radius: 8px; border: 1px solid #ccc;"
+                                (click)="onUploadCharacterImageClick()" />
+                        </div>
+
+                       
+                    <small class="text-center block m-2">{{ 'shared.messages.recommendedDimensions' | translate}} <strong>{{ 'shared.messages.1920x1080' | translate}}</strong> {{ 'shared.messages.pixels' | translate}}</small>
+
+                        <div class="flex align-items-center justify-content-center mt-2" style="display: none">
+                            <p-button label="{{ 'shared.actions.upload' | translate }}" icon="pi pi-upload"
+                                (click)="onUploadCharacterImageClick()"></p-button>
+                            <input type="file" id="myCharacterImage" style="display: none"
+                                (change)="onCharacterImageSelected($event)" />
+                        </div>
+                    </p-panel>
+                </div>
+
+                <div class="col-12 md:col-6">
+                    <p-panel
+                        [header]="'wallpaper-wizard.wall-lang-list-wiz.character-lang-wiz.addDialog.imageThumbnail' | translate"
+                        class="mb-3">
+                        <div class="flex align-items-center justify-content-center">
+                            <img [src]="imageUrlThumbnail" alt="Avatar" class="avatar"
+                                style="width: 100%; max-width: 150px; border-radius: 8px; border: 1px solid #ccc;"
+                                (click)="onUploadCharacterImageThumbnailClick()" />
+                        </div>
+
+                        <!-- Recommended Dimensions --> 
+                         <small class="text-center block m-2">{{ 'shared.messages.recommendedDimensions' | translate}} <strong>{{ 'shared.messages.300x300' | translate}}</strong> {{ 'shared.messages.pixels' | translate}}</small>
+
+                        <div class="flex align-items-center justify-content-center mt-2" style="display: none">
+                            <p-button label="{{ 'shared.actions.upload' | translate }}" icon="pi pi-upload"
+                                (click)="onUploadCharacterImageThumbnailClick()"></p-button>
+                            <input type="file" id="myCharacterImageThumbnail" style="display: none"
+                                (change)="onCharacterImageThumbnailSelected($event)" />
+                        </div>
+                    </p-panel>
+                </div>
+            </div>
+        </form>
+    </ng-template>
+    <ng-template pTemplate="footer">
+
+        <div class="flex justify-content-between">
+            <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+                class="p-button-text" (click)="declineAddLibraryCharacterDialog()"></button>
+            <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check"
+                class="p-button-text" (click)="saveAddLibraryCharacter()"></button>
+        </div>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="editLibraryCharacterDialog" [style]="{ width: '50%', height: '90%'}"
+    header="{{ 'wallpaper-wizard.wall-lang-list-wiz.character-lang-wiz.editDialog.header' | translate }}" [modal]="true"
+    class="p-fluid">
+    <ng-template pTemplate="content">
+        <form [formGroup]="editLibraryCharacterForm" (ngSubmit)="saveEditLibraryCharacter()">
+            <div class="field">
+                <label for="languageId" class="font-medium text-900">{{
+                    'wallpaper-wizard.wall-lang-list-wiz.character-lang-wiz.editDialog.language' | translate
+                    }}</label>
+                <p-dropdown formControlName="languageId" [options]="selectedLanguageAdd" optionLabel="name" placeholder="{{
+                        'wallpaper-wizard.wall-lang-list-wiz.character-lang-wiz.editDialog.languagePlaceholder'
+                            | translate
+                    }}" optionValue="id">
+                </p-dropdown>
+            </div>
+            <div class="field">
+                <label for="characterName" class="font-medium text-900">{{
+                    'wallpaper-wizard.wall-lang-list-wiz.character-lang-wiz.editDialog.name' | translate
+                    }}</label>
+                <input type="text" pInputText id="characterName" formControlName="characterName" required [ngClass]="{
+                        'ng-invalid ng-dirty': submitted && !editLibraryCharacterForm.controls['characterName'].valid
+                    }" />
+                <small *ngIf="submitted && !editLibraryCharacterForm.controls['characterName'].valid"
+                    class="ng-dirty ng-invalid text-red-500">{{
+                    'wallpaper-wizard.wall-lang-list-wiz.character-lang-wiz.editDialog.nameValidation' | translate
+                    }}</small>
+            </div>
+            <div class="flex justify-content-center flex-wrap">
+                <div class="col-12 md:col-6">
+                    <p-panel
+                        [header]="'wallpaper-wizard.wall-lang-list-wiz.character-lang-wiz.editDialog.image' | translate"
+                        class="mb-3">
+                        <div class="flex align-items-center justify-content-center">
+                            <img [src]="imageUrl1" alt="Avatar" class="avatar"
+                                style="width: 100%; max-width: 300px; border-radius: 8px; border: 1px solid #ccc;"
+                                (click)="onUploadCharacterImageClick()" />
+                        </div>
+
+                        
+                    <small class="text-center block m-2">{{ 'shared.messages.recommendedDimensions' | translate}} <strong>{{ 'shared.messages.1920x1080' | translate}}</strong> {{ 'shared.messages.pixels' | translate}}</small>
+
+                        <div class="flex align-items-center justify-content-center mt-2" style="display: none">
+                            <p-button label="{{ 'shared.actions.upload' | translate }}" icon="pi pi-upload"
+                                (click)="onUploadCharacterImageClick()"></p-button>
+                            <input type="file" id="myCharacterImage" style="display: none"
+                                (change)="onCharacterImageSelected($event)" />
+                        </div>
+                    </p-panel>
+                </div>
+                <div class="col-12 md:col-6">
+                    <p-panel
+                        [header]="'wallpaper-wizard.wall-lang-list-wiz.character-lang-wiz.addDialog.imageThumbnail' | translate"
+                        class="mb-3">
+                    <div class="flex align-items-center justify-content-center">
+                        <img [src]="imageUrlThumbnail" alt="Avatar" class="avatar" 
+                        style="width: 100%; max-width: 150px; border-radius: 8px; border: 1px solid #ccc;"
+                            (click)="onUploadCharacterImageThumbnailClick()" />
+                    </div>
+                    
+                    <small class="text-center block m-2">{{ 'shared.messages.recommendedDimensions' | translate}} <strong>{{ 'shared.messages.300x300' | translate}}</strong> {{ 'shared.messages.pixels' | translate}}</small>
+                    
+                    <div class="flex align-items-center justify-content-center mt-2" style="display: none">
+                        <p-button label="{{ 'shared.actions.upload' | translate }}" icon="pi pi-upload"
+                            (click)="onUploadCharacterImageThumbnailClick()"></p-button>
+                        <input type="file" id="myCharacterImageThumbnail" style="display: none"
+                            (change)="onCharacterImageThumbnailSelected($event)" />
+                    </div>
+                </p-panel>
+                </div>
+            </div>
+        </form>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <div class="flex justify-content-between">
+            <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+                class="p-button-text" (click)="declineEditLibraryCharacter()"></button>
+            <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check"
+                class="p-button-text" (click)="saveEditLibraryCharacter()"></button>
+        </div>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="deletionLibraryCharacterDialog" header="{{ 'shared.headers.delete' | translate }}" [modal]="true"
+    [style]="{ width: '450px' }">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="libraryCharacter">{{ 'shared.messages.delete' | translate }} </span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="declineDeletion()"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{ 'shared.actions.save' | translate }}"
+            (click)="confirmDeletion()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="switchActivationLibraryCharacterDialog" header="{{ 'shared.headers.active' | translate }}"
+    [modal]="true" [style]="{ width: '450px' }">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        @if (libraryCharacter && libraryCharacter.isActive) {
+        <span> {{ 'shared.messages.deactive' | translate }} </span>
+        }@else {
+        <span>{{ 'shared.messages.active' | translate }} </span>
+        }
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="declineActivation()"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{ 'shared.actions.save' | translate }}"
+            (click)="confirmtActivation()"></button>
+    </ng-template>
+</p-dialog>

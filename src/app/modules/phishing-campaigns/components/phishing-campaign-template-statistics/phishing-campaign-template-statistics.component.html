@@ -1,0 +1,353 @@
+<p-toast></p-toast>
+<p-card>
+<div class="pb-4">
+    <p-button [label]="'shared.actions.back' | translate" icon="pi pi-angle-left" iconPos="left" (onClick)="back()"></p-button>
+</div>
+    <p-tabView>
+        <p-tabPanel header="{{ 'phishing-campaigns.phishing-campaign-template-statistics.overview' | translate }}">
+            <div class="grid">
+                <div class="col-12 md:col-8">
+                    <div class="col-12">
+                        <div>
+                            <h3 class="text-center">
+                                {{ 'phishing-campaigns.phishing-campaign-template-statistics.failures' | translate }}
+                            </h3>
+                        </div>
+                        <div>
+                            <p-chart type="bar" [data]="chartData" [options]="chartOptions"></p-chart>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 md:col-4">
+                    <p-card [header]="'phishing-campaigns.phishing-campaign-template-statistics.thisPhishingTemplateSummary' | translate" styleClass="template-summary-card">
+                        <div class="template-summary-content" *ngIf="currentTemplateSelectedtemplate">
+                            <!-- <div class="detail-row mb-2 mt-2">
+                                <strong class="mt-3">{{'phishing-campaigns.phishing-campaign-template-statistics.status' | translate}}</strong>
+                                <span [ngClass]="{
+                                    'status-active': currentTemplateSelectedtemplate.phishingEmailTemplateStatus === 'Active',
+                                    'status-closed': currentTemplateSelectedtemplate.phishingEmailTemplateStatus === 'Closed',
+                                }">{{ currentTemplateSelectedtemplate.phishingEmailTemplateStatus }}</span>
+                            </div>
+                            <hr> -->
+                            <div class="detail-row mb-2 mt-2">
+                                <strong>{{
+                                    'phishing-campaigns.phishing-campaign-template-statistics.name' | translate
+                                }}</strong>
+                                <span>{{ currentTemplateSelectedtemplate.phishingEmailTemplateName }}</span>
+                            </div>
+                            <hr />
+                            <div class="detail-row mb-2 mt-2">
+                                <strong>{{
+                                    'phishing-campaigns.phishing-campaign-template-statistics.startDate' | translate
+                                }}</strong>
+                                <span>{{
+                                    currentTemplateSelectedtemplate.phishingStartTime | date : 'MM/dd/yyyy'
+                                }}</span>
+                            </div>
+                            <hr />
+                            <div class="detail-row mb-2 mt-2">
+                                <strong>{{
+                                    'phishing-campaigns.phishing-campaign-template-statistics.endDate' | translate
+                                }}</strong>
+                                <span>{{ currentTemplateSelectedtemplate.phishingEndTime | date : 'MM/dd/yyyy' }}</span>
+                            </div>
+                            <hr />
+                            <div class="detail-row mb-2 mt-2">
+                                <strong>{{
+                                    'phishing-campaigns.phishing-campaign-template-statistics.percentage' | translate
+                                }}</strong>
+                                <span class="phishPronePercentage"
+                                    >{{ currentTemplateSelectedtemplate.phishPronePercentage }}%</span
+                                >
+                            </div>
+                            <hr />
+                            <div class="detail-row mb-2 mt-2">
+                                <strong>{{
+                                    'phishing-campaigns.phishing-campaign-template-statistics.recipients' | translate
+                                }}</strong>
+                                <span>{{
+                                    currentTemplateSelectedtemplate
+                                        .awarenessCampaignSimulationPhishingScheduleDataOverview.recipients
+                                }}</span>
+                            </div>
+                        </div>
+                    </p-card>
+                </div>
+            </div>
+        </p-tabPanel>
+
+        <p-tabPanel header="{{ 'phishing-campaigns.phishing-campaign-template-statistics.users' | translate }}">
+            <div class="report-header grid mt-2 mb-2" *ngIf="currentTemplateSelectedtemplate">
+                <div class="col-12 header-container">
+                    <!-- Recipients -->
+                    <div class="header-item special-item" (click)="onSectionClick('Recipients')">
+                        <div class="icon-container">
+                            <i class="pi pi-user icon-large"></i>
+                        </div>
+                        <div class="header-content">
+                            <div class="header-number" style="color: var(--primary-color)">
+                                {{
+                                    currentTemplateSelectedtemplate
+                                        .awarenessCampaignSimulationPhishingScheduleDataOverview.recipients
+                                }}
+                            </div>
+                            <div class="header-text">
+                                {{ 'phishing-campaigns.phishing-campaign-template-statistics.recipient' | translate }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Delivered -->
+                    <div class="header-item" (click)="onSectionClick('Delivered')">
+                        <div class="icon-container">
+                            <i class="pi pi-envelope icon-large"></i>
+                        </div>
+                        <div class="header-content">
+                            <div class="header-percentage">
+                                {{
+                                    currentTemplateSelectedtemplate
+                                        .awarenessCampaignSimulationPhishingScheduleDataOverview.deliveredPercentage
+                                }}%
+                            </div>
+                            <div class="header-number">
+                                {{
+                                    currentTemplateSelectedtemplate
+                                        .awarenessCampaignSimulationPhishingScheduleDataOverview.delivered
+                                }}
+                            </div>
+                            <div class="header-text">
+                                {{ 'phishing-campaigns.phishing-campaign-template-statistics.delivered' | translate }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Opened -->
+                    <div class="header-item" (click)="onSectionClick('Opened')">
+                        <div class="icon-container">
+                            <i class="pi pi-eye icon-large"></i>
+                        </div>
+                        <div class="header-content">
+                            <div class="header-percentage">
+                                {{
+                                    currentTemplateSelectedtemplate
+                                        .awarenessCampaignSimulationPhishingScheduleDataOverview.openedPercentage
+                                }}%
+                            </div>
+                            <div class="header-number">
+                                {{
+                                    currentTemplateSelectedtemplate
+                                        .awarenessCampaignSimulationPhishingScheduleDataOverview.opened
+                                }}
+                            </div>
+                            <div class="header-text">
+                                {{ 'phishing-campaigns.phishing-campaign-template-statistics.opened' | translate }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- QR Code Scanned -->
+                    <div class="header-item" (click)="onSectionClick('QR Code Scanned')">
+                        <div class="icon-container">
+                            <i class="pi pi-qrcode icon-large"></i>
+                        </div>
+                        <div class="header-content">
+                            <div class="header-percentage">
+                                {{
+                                    currentTemplateSelectedtemplate
+                                        .awarenessCampaignSimulationPhishingScheduleDataOverview.qrCodeScanedPercentage
+                                }}%
+                            </div>
+                            <div class="header-number">
+                                {{
+                                    currentTemplateSelectedtemplate
+                                        .awarenessCampaignSimulationPhishingScheduleDataOverview.qrCodeScaned
+                                }}
+                            </div>
+                            <div class="header-text">
+                                {{ 'phishing-campaigns.phishing-campaign-template-statistics.qrCode' | translate }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data Entered -->
+                    <div class="header-item" (click)="onSectionClick('Data Entered')">
+                        <div class="icon-container">
+                            <i class="pi pi-pencil icon-large"></i>
+                        </div>
+                        <div class="header-content">
+                            <div class="header-percentage">
+                                {{
+                                    currentTemplateSelectedtemplate
+                                        .awarenessCampaignSimulationPhishingScheduleDataOverview.dataEnteredPercentage
+                                }}%
+                            </div>
+                            <div class="header-number">
+                                {{
+                                    currentTemplateSelectedtemplate
+                                        .awarenessCampaignSimulationPhishingScheduleDataOverview.dataEntered
+                                }}
+                            </div>
+                            <div class="header-text">
+                                {{ 'phishing-campaigns.phishing-campaign-template-statistics.dataEntered' | translate }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reported -->
+                    <div class="header-item" (click)="onSectionClick('Reported')">
+                        <div class="icon-container">
+                            <i class="pi pi-flag icon-large"></i>
+                        </div>
+                        <div class="header-content">
+                            <div class="header-percentage">
+                                {{
+                                    currentTemplateSelectedtemplate
+                                        .awarenessCampaignSimulationPhishingScheduleDataOverview.reportedPercentage
+                                }}%
+                            </div>
+                            <div class="header-number">
+                                {{
+                                    currentTemplateSelectedtemplate
+                                        .awarenessCampaignSimulationPhishingScheduleDataOverview.reported
+                                }}
+                            </div>
+                            <div class="header-text">
+                                {{ 'phishing-campaigns.phishing-campaign-template-statistics.reported' | translate }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid">
+                <div class="col-12 col-12 flex justify-content-end">
+                    <div class="mx-3">
+                        <p-button [label]="'phishing-campaigns.phishing-campaign-template-statistics.refresh' | translate" icon="pi pi-sync" (onClick)="updatePhishingReport()"></p-button>
+                    </div>
+                    <div class="mx-3">
+                        <p-button
+                            label="{{ 'shared.actions.pdf' | translate }}"
+                            icon="pi pi-file-pdf"
+                            [disabled]="
+                                !currentTemplateSelectedtemplate.awarenessCampaignSimulationPhishingScheduleUsers.length
+                            "
+                            (onClick)="
+                                downloadPhishingReportAsPDF(
+                                    currentTemplateSelectedtemplate.awarenessCampaignSimulationPhishingScheduleUsers
+                                )
+                            "></p-button>
+                    </div>
+                    <div>
+                        <p-button
+                            label="{{ 'shared.actions.csv' | translate }}"
+                            icon="pi pi-file-excel"
+                            [disabled]="
+                                !currentTemplateSelectedtemplate.awarenessCampaignSimulationPhishingScheduleUsers.length
+                            "
+                            (onClick)="
+                                downloadPhishingReportAsCSV(
+                                    currentTemplateSelectedtemplate.awarenessCampaignSimulationPhishingScheduleUsers
+                                )
+                            "></p-button>
+                    </div>
+                </div>
+            </div>
+            <div class="iAware-loading-table-container" style="position: relative">
+                <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+
+                <p-table
+                    [value]="currentTemplateSelectedtemplate.awarenessCampaignSimulationPhishingScheduleUsers || []"
+                    [scrollable]="true"
+                    scrollHeight="400px"
+                    styleClass="p-datatable-striped">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th style="font-weight: 700">
+                                {{
+                                    'phishing-campaigns.phishing-campaign-template-statistics.nameAndEmail' | translate
+                                }}
+                            </th>
+                            <th style="font-weight: 700">
+                                {{ 'phishing-campaigns.phishing-campaign-template-statistics.scheduled' | translate }}
+                            </th>
+                            <th style="text-align: center; font-weight: 700">
+                                {{ 'phishing-campaigns.phishing-campaign-template-statistics.delivered' | translate }}
+                            </th>
+                            <th style="text-align: center; font-weight: 700">
+                                {{ 'phishing-campaigns.phishing-campaign-template-statistics.opened' | translate }}
+                            </th>
+                            <th style="text-align: center; font-weight: 700">
+                                {{ 'phishing-campaigns.phishing-campaign-template-statistics.clicked' | translate }}
+                            </th>
+                            <th style="text-align: center; font-weight: 700">
+                                {{ 'phishing-campaigns.phishing-campaign-template-statistics.qrCode' | translate }}
+                            </th>
+                            <!-- <th style="font-weight: 700">Replied</th> -->
+                            <!-- <th style="font-weight: 700">Attachment Opened</th> -->
+                            <th style="text-align: center; font-weight: 700">
+                                {{ 'phishing-campaigns.phishing-campaign-template-statistics.dataEntered' | translate }}
+                            </th>
+                            <th style="text-align: center; font-weight: 700">
+                                {{ 'phishing-campaigns.phishing-campaign-template-statistics.reported' | translate }}
+                            </th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-user>
+                        <tr>
+                            <td>
+                                <span style="font-size: medium; font-weight: 600">{{ user.userName }}</span>
+                                <br />
+                                <a style="color: var(--primary-color)">{{ user.userEmail }}</a>
+                            </td>
+                            <td>{{ user.emailSendingScheduleTime | date : 'MMM d, yyyy, h:mm' }}</td>
+                            <td style="text-align: center">
+                                <i
+                                    class="pi pi-check"
+                                    style="font-size: larger; color: green; font-weight: 900"
+                                    *ngIf="user.isDelivered"></i>
+                            </td>
+                            <td style="text-align: center">
+                                <i
+                                    class="pi pi-check"
+                                    style="font-size: larger; color: green; font-weight: 900"
+                                    *ngIf="user.isOpened"></i>
+                            </td>
+                            <td style="text-align: center">
+                                <i
+                                    class="pi pi-check"
+                                    style="font-size: larger; color: green; font-weight: 900"
+                                    *ngIf="user.isLinkClicked"></i>
+                            </td>
+                            <td style="text-align: center">
+                                <i
+                                    class="pi pi-check"
+                                    style="font-size: larger; color: green; font-weight: 900"
+                                    *ngIf="user.isQRCodeScanned"></i>
+                            </td>
+                            <!-- <td style="text-align: center;">
+                                <i class="pi pi-check" style="font-size: larger; color: green; font-weight: 900"
+                                    *ngIf="user.isReplied"></i>
+                            </td>
+                            <td style="text-align: center;">
+                                <i class="pi pi-check" style="font-size: larger; color: green; font-weight: 900"
+                                    *ngIf="user.isAttachmentOpened"></i>
+                            </td> -->
+                            <td style="text-align: center">
+                                <i
+                                    class="pi pi-check"
+                                    style="font-size: larger; color: red; font-weight: 900"
+                                    *ngIf="user.isDataEntered"></i>
+                            </td>
+                            <td style="text-align: center">
+                                <i
+                                    class="pi pi-check"
+                                    style="font-size: larger; color: green; font-weight: 900"
+                                    *ngIf="user.isReported"></i>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </p-tabPanel>
+    </p-tabView>
+</p-card>

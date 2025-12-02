@@ -1,0 +1,742 @@
+<!-- user info section -->
+<p-card header="{{'user.user-details.userInfoSection.header' | translate}}" styleClass="userDashboard-userInfoSection">
+    <div class="grid">
+        <div class="col-12 md:col-6 text-center">
+            <div class="logo-container">
+                <img
+                    src="{{ user.profilePhotoPath ?? '../../../../../assets/media/avatar.png' }}"
+                    alt="{{ user.name }}"
+                    class="avatar"/>
+
+            </div>
+        </div>
+        <div class="col-12 md:col-6">
+            <div class="grid formgrid">
+                <div class="col-12 md:col-6" style="padding: 10px">
+                    <label for="firstName" style="display: block; margin-bottom: 5px; font-weight: bold"
+                        >{{'user.user-details.userInfoSection.firstName' | translate}}</label
+                    >
+                    <div *ngIf="user.firstName" class="inputfield" style="width: 100%; padding: 8px">
+                        {{ user.firstName }}
+                    </div>
+                    <span *ngIf="!user.firstName" class="inputfield placeholder" style="width: 100%; padding: 8px"
+                        >{{'user.user-details.userInfoSection.notEntered' | translate}}</span
+                    >
+                </div>
+
+                <div class="col-12 md:col-6" style="padding: 10px">
+                    <label for="lastName" style="display: block; margin-bottom: 5px; font-weight: bold"
+                        >{{'user.user-details.userInfoSection.lastName' | translate}}</label
+                    >
+                    <div *ngIf="user.lastName" class="inputfield" style="width: 100%; padding: 8px">
+                        {{ user.lastName }}
+                    </div>
+                    <span *ngIf="!user.lastName" class="inputfield placeholder" style="width: 100%; padding: 8px"
+                        >{{'user.user-details.userInfoSection.notEntered' | translate}}</span
+                    >
+                </div>
+
+                <div class="col-12 md:col-6" style="padding: 10px">
+                    <label for="email" style="display: block; margin-bottom: 5px; font-weight: bold">{{'user.user-details.userInfoSection.email' | translate}}</label>
+                    <div *ngIf="user.email" class="inputfield" style="width: 100%; padding: 8px">{{ user.email }}</div>
+                    <span *ngIf="!user.email" class="inputfield placeholder" style="width: 100%; padding: 8px"
+                        >{{'user.user-details.userInfoSection.notEntered' | translate}}</span
+                    >
+                </div>
+
+                <div class="col-6 md:col-3" style="padding: 10px">
+                    <label for="isEmailConfirmed" style="display: block; margin-bottom: 5px; font-weight: bold"
+                        >{{'user.user-details.userInfoSection.emailVerified' | translate}}</label
+                    >
+                    <p style="padding: 8px">{{ user.isEmailConfirmed ? ('user.user-details.userInfoSection.emailConfirmedYes' | translate) : ('user.user-details.userInfoSection.emailConfirmedNo' | translate) }}</p>
+                </div>
+
+                <div class="col-12 md:col-6" style="padding: 10px">
+                    <label for="phoneNumber" style="display: block; margin-bottom: 5px; font-weight: bold"
+                        >{{'user.user-details.userInfoSection.phoneNumber' | translate}}</label
+                    >
+                    <div class="inputfield" style="width: 100%; padding: 8px">
+                        {{
+                            user.phoneNumber
+                                ? user.phoneNumber !== 'undefined-undefined'
+                                    ? user.phoneNumber
+                                    : ('user.user-details.userInfoSection.notEntered' | translate)
+                                : ('user.user-details.userInfoSection.notEntered' | translate)
+                        }}
+                    </div>
+                </div>
+
+                <div class="col-12 md:col-6" style="padding: 10px">
+                    <label for="languageId" style="display: block; margin-bottom: 5px; font-weight: bold"
+                        >{{'user.user-details.userInfoSection.language' | translate}}</label
+                    >
+                    <div *ngIf="user.languageId" class="inputfield" style="width: 100%; padding: 8px">
+                        {{ user.languageId }}
+                    </div>
+                    <span *ngIf="!user.languageId" class="inputfield placeholder" style="width: 100%; padding: 8px"
+                        >{{'user.user-details.userInfoSection.notEntered' | translate}}</span
+                    >
+                </div>
+
+                <div class="col-12 md:col-6" style="padding: 10px">
+                    <label for="createdAt" style="display: block; margin-bottom: 5px; font-weight: bold"
+                        >{{'user.user-details.userInfoSection.createdAt' | translate}}</label
+                    >
+                    <div *ngIf="user.createdAt" class="inputfield" style="width: 100%; padding: 8px">
+                        {{ user.createdAt | date : 'dd-MM-yyyy' }}
+                    </div>
+                    <span *ngIf="!user.createdAt" class="inputfield placeholder" style="width: 100%; padding: 8px"
+                        >{{'user.user-details.userInfoSection.notEntered' | translate}}</span
+                    >
+                </div>
+
+                <div class="col-6 md:col-3" style="padding: 10px">
+                    <label for="isActive" style="display: block; margin-bottom: 5px; font-weight: bold"
+                        >{{'user.user-details.userInfoSection.accountStatus' | translate}}</label
+                    >
+                    <p style="padding: 8px">{{ user.isActive ? ('user.user-details.userInfoSection.active' |translate) : ('user.user-details.userInfoSection.inactive' |translate) }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <p-tabView>
+        <p-tabPanel [header]="'user.user-details.userInfoSection.points' |translate">
+            <div class="grid ltr">
+                <div class="col-12">
+                    <app-iaware-points [points]="userPoints"></app-iaware-points>
+                </div>
+
+                <!-- <div class="col-12 text-center p-4">
+                    <ng-container *ngIf="user.rankingNumber; else noRanking">
+                        <p class="text-3xl font-bold text-indigo-300">
+                            {{'user.user-details.userInfoSection.userRanking' | translate}}
+                            <span>
+                                {{ user.rankingNumber }}
+                            </span>
+                        </p>
+                    </ng-container>
+                    <ng-template #noRanking>
+                        <p class="text-2xl text-indigo-300 font-bold">{{'user.user-details.userInfoSection.noRankingAvailable' | translate}}</p>
+                        <p class="text-gray-500 text-lg mt-2">
+                            {{'user.user-details.userInfoSection.noRankingMessage' | translate}}
+                        </p>
+                    </ng-template>
+                </div> -->
+                <div class="col-12 text-center p-4">
+                    <div class="ranking-card p-4 shadow-2 border-round-xl" 
+                         [ngClass]="{'has-ranking': user.rankingNumber, 'no-ranking': !user.rankingNumber}"
+                         pRipple>
+                        
+                        <ng-container *ngIf="user.rankingNumber; else noRanking">
+                            <div class="flex align-items-center justify-content-center mb-3">
+                                <i class="pi pi-trophy text-4xl mr-2" 
+                                   style="background: linear-gradient(45deg, #FFD700, #FFA500);
+                                          -webkit-background-clip: text;
+                                          background-clip: text;
+                                          color: transparent;">
+                                </i>
+                                <p class="text-2xl font-medium m-0">
+                                    {{'user.user-details.userInfoSection.userRanking' | translate}}
+                                </p>
+                            </div>
+                            
+                            <div class="ranking-number">
+                                <span class="text-6xl font-bold gradient-text">
+                                    #{{ user.rankingNumber }}
+                                </span>
+                            </div>
+                
+                        </ng-container>
+                
+                        <ng-template #noRanking>
+                            <div class="flex flex-column align-items-center">
+                                <i class="pi pi-info-circle text-4xl mb-3"></i>
+                                <p class="text-xl font-medium mb-2">
+                                    {{'user.user-details.userInfoSection.noRankingAvailable' | translate}}
+                                </p>
+                                <p class="text-gray-600 line-height-3" style="max-width: 30rem">
+                                    {{'user.user-details.userInfoSection.noRankingMessage' | translate}}
+                                </p>
+                            </div>
+                        </ng-template>
+                    </div>
+                </div>
+                
+            </div>
+        </p-tabPanel>
+        <p-tabPanel [header]="'user.user-details.userInfoSection.badges' |translate">
+            <div class="badge-container">
+                <p *ngIf="userBadges.length === 0" class="text-center text-xl text-indigo-300 font-bold">
+                    {{'user.user-details.userInfoSection.noBadgesMessage' | translate}}
+                </p>
+                <!-- isUserEarnedThisBadge -->
+                <p-scrollPanel [style]="{ height: '50vh' }">
+                    <div *ngIf="userBadges.length > 0" class="badge-list">
+                        <div *ngFor="let badge of userBadges" class="badge-card relative" [ngClass]="{ disabled: badge.badgeEarnedCount === 0 }">
+                            <img [src]="badge.badgeImageURL" alt="{{ badge.name }}" class="badge-image" />
+                            <div class="badge-info">
+                                <!-- <h3 class="badge-name">{{ badge.name }}</h3> -->
+                                <p class="badge-name" *ngIf="badge.name">{{ badge.name }}</p>
+                                <p class="badge-description" *ngIf="badge.descriptionName">{{ badge.descriptionName }}</p>
+                                <p class="badge-earned-count">{{'user.user-tenant-profile.earnedTimes' | translate:{times : badge.badgeEarnedCount} }}</p>
+                            </div>
+                            <div *ngIf="!badge.isUserEarnedThisBadge" class="lock-overlay">
+                                <div class="lock-background"></div>
+                                <img loading="lazy" [src]="'/assets/media/Locker.png'" alt="Locked" class="lock-icon" />
+    
+                                 <!-- Upgrade Overlay -->
+                                 <div class="upgrade-overlay">
+                                    <div class="upgrade-content">
+                                        <p class="upgrade-title text-lg font-bold">
+                                            {{ badge.name }}
+                                        </p>
+                                        <p class="upgrade-description">
+                                            {{ badge.descriptionName }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </p-scrollPanel>
+            </div>
+        </p-tabPanel>
+    </p-tabView>
+    
+</p-card>
+
+<br />
+
+<!-- training section -->
+<p-card styleClass="userDashboard-Training"  [header]="'user.user-details.trainingSection.header' | translate">
+    <div class="grid">
+        <div class="col-12">
+            <div class="grid">
+                <div class="col-12 text-center">
+                    <h4>{{'user.user-details.trainingSection.statusOfAllCampaigns' |translate}} <i class="pi pi-question-circle" style="font-size: 1rem"></i></h4>
+                </div>
+                <div class="col-12 md:col-6 flex justify-content-start">
+                    <div class="col-6 text-center mt-4">
+                        <div class="col-12 p-fluid">
+                            <p-dropdown
+                                [options]="allTrainingCampaigns"
+                                (onChange)="changeTrainingPieChartData($event)"
+                                optionLabel="name"
+                                optionValue="id"
+                                [placeholder]="'user.user-details.trainingSection.selectaCampaign' |translate" />
+                        </div>
+                        <div class="col-12">
+                            <strong style="font-size: xx-large" class="userResultPercenatge" >{{ userTrainingResults.percentage }}%</strong>
+                            <p>{{'user.user-details.trainingSection.totalCompletedAssignments' |translate}}</p>
+                        </div>
+                    </div>
+
+                    <div class="col-6 flex flex-column justify-content-center">
+                        <div class="flex gap-1 mb-3">
+                            <span class="label">{{'user.user-details.trainingSection.completed' |translate}}</span>
+                            <span class="value">{{ userTrainingResults.completed }}</span>
+                        </div>
+                        <div class="flex gap-1 mb-3">
+                            <span class="label">{{'user.user-details.trainingSection.inProgress' |translate}}</span>
+                            <span class="value">{{ userTrainingResults.inProgress }}</span>
+                        </div>
+                        <div class="flex gap-1 mb-3">
+                            <span class="label">{{'user.user-details.trainingSection.notStarted' |translate}}</span>
+                            <span class="value">{{ userTrainingResults.notStarted }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ltr col-12 md:col-6">
+                    <div class="chart-container">
+                        <p-chart
+                            type="pie"
+                            width="300"
+                            height="300"
+                            [data]="trainingPiehartData"
+                            [options]="trainingPieChartOptions"></p-chart>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="grid">
+                <div class="col-12 text-center">
+                    <h4>{{'user.user-details.trainingSection.trainingLessonsDetails' |translate}} <i class="pi pi-question-circle" style="font-size: 1rem"></i></h4>
+                </div>
+                <div class="col-12" *ngIf="showCampaignLessonsDetails">
+                    <div class="grid">
+                        <div class="col-12 md:col-4">
+                            <div class="col-12 p-fluid">
+                                <p-dropdown
+                                    [options]="allTrainingCampaignsWithoutAllOption"
+                                    (onChange)="changeTrainingCampaignLessonDetails($event)"
+                                    optionLabel="name"
+                                    optionValue="id"
+                                    [placeholder]="'user.user-details.trainingSection.selectaCampaign' |translate" />
+                            </div>
+                            <hr />
+                            <div class="detail-row mb-2 mt-2">
+                                <strong>{{'user.user-details.trainingSection.campaignName' |translate}}</strong>
+                                <span>{{ trainingCampaignSelected.name }}</span>
+                            </div>
+                            <hr />
+                            <div class="detail-row mb-2 mt-2">
+                                <strong>{{'user.user-details.trainingSection.campaignStartDate' |translate}}</strong>
+                                <span>{{ trainingCampaignSelected.startDate | date : 'MM/dd/yyyy' }}</span>
+                            </div>
+                            <hr />
+                            <div class="detail-row mb-2 mt-2">
+                                <strong>{{'user.user-details.trainingSection.campaignEndDate' |translate}}</strong>
+                                <span>{{ trainingCampaignSelected.endDate | date : 'MM/dd/yyyy' }}</span>
+                            </div>
+                        </div>
+                        <div class="col-12 md:col-8">
+                            <div class="col-12 flex justify-content-center rainingDetails">
+                                <div class="col-2">
+                                    <span class="inProgress-dot"></span>
+                                    <span>{{'user.user-details.trainingSection.inProgress' |translate}}</span>
+                                </div>
+                                <div class="col-2">
+                                    <span class="notStarted-dot"></span>
+                                    <span>{{'user.user-details.trainingSection.notStarted' |translate}}</span>
+                                </div>
+                                <div class="col-2">
+                                    <span class="completed-dot"></span>
+                                    <span>{{'user.user-details.trainingSection.completed' |translate}}</span>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="chart-container">
+                                    <p-chart
+                                        type="bar"
+                                        [data]="trainingCampaignLessonsChartData"
+                                        [options]="trainingCampaignLessonsChartOptions"></p-chart>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-12 flex justify-content-end">
+                    <div class="mx-3">
+                        <p-button
+                            [label]="'shared.actions.csv' | translate"
+                            icon="pi pi-file-excel"
+                            (onClick)="downloadTrainingUserDashboardReportAsCSV()"></p-button>
+                    </div>
+                    <div>
+                        <p-button
+                            [label]="'shared.actions.pdf' | translate"
+                            icon="pi pi-file-pdf"
+                            (onClick)="downloadTrainingUserDashboardReportAsPDF()"></p-button>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <p-scrollPanel [style]="{ height: '90vh' }">
+                        <div class="iAware-loading-table-container" style="position: relative">
+                            <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                            <p-table
+                                [value]="campaignsUserDashboardTemp"
+                                rowGroupMode="subheader"
+                                groupRowsBy="campaignName"
+                                sortField="campaignName"
+                                sortMode="single"
+                                [tableStyle]="{ 'min-width': '60rem' }"
+                                [paginator]="true"
+                                [rows]="10"
+                                [showCurrentPageReport]="true"
+                                responsiveLayout="scroll"
+                                [rowsPerPageOptions]="[10, 25, 50]">
+                                <ng-template pTemplate="header">
+                                    <tr>
+                                        <th>{{'user.user-details.trainingSection.campaignName' |translate}}</th>
+                                        <th></th>
+                                        <th></th>
+                                        <th colspan="3" class="ml-6 pl-3">{{'user.user-details.trainingSection.campaignProgress' |translate}}</th>
+                                    </tr>
+                                </ng-template>
+                                <ng-template pTemplate="groupheader" let-campaign>
+                                    <tr pRowGroupHeader>
+                                        <td colspan="5" class="group-header">
+                                            <div class="grid justify-content-between">
+                                                <div class="col-8">
+                                                    <strong class="font-bold mb-2" style="display: block">{{
+                                                        campaign.campaignName
+                                                    }}</strong>
+                                                    <span class="text-sm"
+                                                        >{{ campaign.campaignStartDate | date }} -
+                                                        {{ campaign.campaignEndDate | date }}</span
+                                                    >
+                                                </div>
+                                                <div class="col-4">
+                                                    <p class="text-center">
+                                                        {{
+                                                            'user.user-details.trainingSection.compelationPercentage'
+                                                                | translate : { number: campaign.campaignProgressPercentage }
+                                                        }}
+                                                    </p>
+                                                    <p-progressBar
+                                                        [value]="campaign.campaignProgressPercentage"
+                                                        [showValue]="false"></p-progressBar>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th class="th-table">{{'user.user-details.trainingSection.lessonName' |translate}}</th>
+                                        <th class="th-table">{{'user.user-details.trainingSection.lessonJoiningDate' |translate}}</th>
+                                        <th class="th-table text-center" style="text-align: center !important;">{{'user.user-details.trainingSection.contentStatus' |translate}}</th>
+                                        <th class="th-table text-center" style="text-align: center !important;">{{'user.user-details.trainingSection.status' |translate}}</th>
+                                        <th class="th-table text-center" style="text-align: center !important;">{{'user.user-details.trainingSection.score' |translate}}</th>
+                                    </tr>
+                                </ng-template>
+                                <ng-template pTemplate="groupfooter" let-campaign>
+                                    <tr>
+                                        <td colspan="5" class="group-footer text-right font-bold pr-6 pb-7">
+                                            {{
+                                                'user.user-details.trainingSection.totalLessons'
+                                                    | translate : { number: calculateTotalNumberOfLessons(campaign.campaignName) }
+                                            }}
+                                        </td>
+                                    </tr>
+                                </ng-template>
+                                <ng-template pTemplate="body" let-lesson>
+                                    <tr>
+                                        <td class="pl-6">{{ lesson.contentName }}</td>
+                                        <td>{{ lesson.joiningDate | date : 'MMM d, yyyy' }}</td>
+                                        <td class="text-center">
+                                            <i
+                                                *ngIf="lesson.status === 'Completed'"
+                                                class="pi pi-check"
+                                                style="color: green; font-size: large; font-weight: 900"></i>
+                                            <i
+                                                *ngIf="lesson.status === 'InProgress'"
+                                                class="pi pi-stopwatch"
+                                                style="color: rgb(232, 186, 2); font-size: large; font-weight: 900"></i>
+                                            <i
+                                                *ngIf="lesson.status === 'NotStarted'"
+                                                class="pi pi-times"
+                                                style="color: red; font-size: large; font-weight: 900"></i>
+                                        </td>
+                                        <td class="text-center">
+                                            <span
+                                                [ngClass]="{
+                                                    'status-completed': lesson.status === 'Completed',
+                                                    'status-in-progress': lesson.status === 'InProgress',
+                                                    'status-not-started': lesson.status === 'NotStarted'
+                                                }">
+                                                {{ lesson.status }}
+                                            </span>
+                                        </td>
+                                        <td class="text-center" style="color: var(--primary-color); font-size: larger; font-weight: 800">
+                                            {{
+                                                'user.user-details.trainingSection.lessonScore'
+                                                    | translate : { number: lesson.score ?? 0 }
+                                            }}
+                                        </td>
+                                    </tr>
+                                </ng-template>
+                                <ng-template pTemplate="emptymessage">
+                                    <tr class="text-center">
+                                        <td colspan="5">
+                                            <div style="width: 100%; padding: 10px; text-align: center">
+                                                {{ 'training-campaigns.current-campaign.noCampaignsAvailable' | translate }}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </ng-template>
+                            </p-table>
+                        </div>
+                    </p-scrollPanel>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="grid">
+                <div class="col-12 text-center">
+                    <h4>{{'user.user-details.trainingSection.statusofRunningCampaigns' |translate}} <i class="pi pi-question-circle" style="font-size: 1rem"></i></h4>
+                </div>
+                <div class="col-12 flex justify-content-center rainingDetails">
+                    <div class="col-2">
+                        <span class="completed-dot"></span>
+                        <span>{{'user.user-details.trainingSection.completedd' |translate}}</span>
+                    </div>
+                    <div class="col-2">
+                        <span class="inProgress-dot"></span>
+                        <span>{{'user.user-details.trainingSection.inProgresss' |translate}}</span>
+                    </div>
+                    <div class="col-2">
+                        <span class="notStarted-dot"></span>
+                        <span>{{'user.user-details.trainingSection.notStartedd' |translate}}</span>
+                    </div>
+                </div>
+                <div class="ltr col-12">
+                    <div class="chart-container">
+                        <p-chart type="bar" [data]="trainingChartData" [options]="trainingChartOptions"></p-chart>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-card>
+
+<br />
+
+<!-- phishing section -->
+<p-card [header]="'user.user-details.phishingSection.header' |translate" styleClass="userDashboard-Phishing">
+    <div class="ltr grid mb-4">
+        <div class="col-12 md:col-6 riskHistoryChart-container" *ngIf="userRiskHistroy">
+            <h4 class="text-left">{{'user.user-details.phishingSection.riskHistory' |translate}}</h4>
+            <div class="ltr">
+                <p-chart type="line" [data]="lineData" [options]="lineOptions"></p-chart>
+            </div>
+        </div>
+        <div class="ltr col-12 md:col-6 flex justify-content-center align-items-center">
+            <app-gauge-chart
+                [needleChartTitle]="'user.user-details.phishingSection.riskScore' |translate"
+                [chartWidth]="350"
+                [needleValue]="getTheNeedleValue()"></app-gauge-chart>
+        </div>
+    </div>
+
+    <div class="grid">
+        <div class="col-12 md:col-6 flex justify-content-start">
+            <div class="col-6 text-center mt-4">
+                <div class="col-12 p-fluid">
+                    <p-dropdown
+                        class="w-full"
+                        [options]="allPhishingCampaigns"
+                        (onChange)="changePhishingPieChartData($event)"
+                        optionLabel="name"
+                        optionValue="id"
+                        [placeholder]="'user.user-details.trainingSection.selectaCampaign' |translate" />
+                </div>
+                <div class="col-12">
+                    <strong style="font-size: xx-large" class="userResultPercenatge" >{{ userPhishingResults.percentage }}%</strong>
+                    <p>{{'user.user-details.phishingSection.vulnerabilityRate' |translate}}</p>
+                </div>
+                <div *ngIf="showPhishingCampaignDetailsBtn">
+                    <p-button
+                        [label]="'user.user-details.phishingSection.showCampaignDetails' |translate"
+                        icon="pi pi-eye"
+                        (onClick)="showPhishingCampaignDetails = !showPhishingCampaignDetails"></p-button>
+                </div>
+            </div>
+
+            <div class="col-6 flex flex-column justify-content-center">
+                <div class="flex gap-1 mb-3">
+                    <span class="label">{{'user.user-details.phishingSection.emailsDelivered' |translate}}</span>
+                    <span class="value">{{ userPhishingResults.emailsDelivered }}</span>
+                </div>
+                <div class="flex gap-1 mb-3">
+                    <span class="label">{{'user.user-details.phishingSection.emailsFailures' |translate}}</span>
+                    <span class="value">{{ userPhishingResults.failures }}</span>
+                </div>
+                <div class="flex gap-1 mb-3">
+                    <span class="label">{{'user.user-details.phishingSection.emailsReported' |translate}}</span>
+                    <span class="value">{{ userPhishingResults.emailsReported }}</span>
+                </div>
+                <div class="flex gap-1 mb-3">
+                    <span class="label">{{'user.user-details.phishingSection.emailsNoActions' |translate}}</span>
+                    <span class="value">{{ userPhishingResults.noActions }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="ltr col-12 md:col-6">
+            <div class="chart-container">
+                <p-chart
+                    type="pie"
+                    [data]="phishingChartData"
+                    width="300"
+                    height="300"
+                    [options]="phishingChartOptions"></p-chart>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid" *ngIf="showPhishingCampaignDetails">
+        <div class="col-12 text-center">
+            <h4>{{'user.user-details.phishingSection.campaignDetails' |translate}} <i class="pi pi-question-circle" style="font-size: 1rem"></i></h4>
+        </div>
+        <div class="col-12 md:col-6 flex justify-content-start">
+            <div class="col-6 text-center mt-4">
+                <div class="col-12 p-fluid">
+                    <p-dropdown
+                        class="w-full"
+                        [options]="allPhishingCampaignsWithoutAllOption"
+                        (onChange)="changePhishingCampaignPieChartData($event)"
+                        optionLabel="name"
+                        optionValue="id"
+                        [placeholder]="'user.user-details.trainingSection.selectaCampaign' |translate"/>
+                </div>
+                <!-- <div class="col-12 text-left">
+                    <p>Clicked: {{ userPhishingCampaignDetails.clickedPercentage }}</p>
+                    <p>Data Entered: {{ userPhishingCampaignDetails.enteredDataPercentage }}</p>
+                </div> -->
+
+                <div class="col-12 text-left">
+                    <div class="flex gap-1 mb-3">
+                        <span class="label">{{'user.user-details.phishingSection.clickedd' |translate}} </span>
+                        <span class="value">{{ userPhishingCampaignDetails.clickedPercentage }}</span>
+                    </div>
+                    <div class="flex gap-1 mb-3">
+                        <span class="label">{{'user.user-details.phishingSection.dataEnteredd' |translate}} </span>
+                        <span class="value">{{ userPhishingCampaignDetails.enteredDataPercentage }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ltr col-12 md:col-6">
+            <div class="chart-container">
+                <p-chart
+                    type="pie"
+                    [data]="phishingCampaignDetailChartData"
+                    width="300"
+                    height="300"
+                    [options]="phishingCampaignDetailChartOptions"></p-chart>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid">
+        <div class="col-12 md:col-10">
+            <!-- <h5>
+                Personal Phishing Threat Percentage: {{ userPhishingResults.percentage }}%
+                <span class="small-text">(based on {{ userPhishingResults.emailsDelivered }} emails delivered)</span>
+            </h5> -->
+
+            <div class="flex gap-1 mb-3 align-items-center">
+                <h5 class="m-0">{{'user.user-details.phishingSection.personalThreatPercentage' |translate}} </h5>
+                <h5 class="m-0">{{ userPhishingResults.percentage }}%</h5>
+                <span class="medium-text">{{'user.user-details.phishingSection.basedonemailsDelivered' |translate:{emailsDelivered:userPhishingResults.emailsDelivered} }}</span>
+            </div>
+        </div>
+        <div class="col-12 col-12 flex justify-content-end">
+            <div class="mx-3">
+                <p-button
+                    [label]="'shared.actions.csv' | translate"
+                    icon="pi pi-file-excel"
+                    (onClick)="downloadPhishingUserDashboardReportAsCSV()"></p-button>
+            </div>
+            <div>
+                <p-button
+                    [label]="'shared.actions.pdf' | translate"
+                    icon="pi pi-file-pdf"
+                    (onClick)="downloadPhishingUserDashboardReportAsPDF()"></p-button>
+            </div>
+        </div>
+        <div class="col-12">
+            <p-scrollPanel [style]="{ height: '90vh' }">
+                <div class="iAware-loading-table-container" style="position: relative">
+                    <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                    <p-table
+                        [value]="userPhishingCampaignsTemplatesTemp"
+                        rowGroupMode="subheader"
+                        groupRowsBy="campaignName"
+                        sortField="campaignName"
+                        sortMode="single"
+                        [tableStyle]="{ 'min-width': '60rem' }"
+                        [paginator]="true"
+                        [rows]="10"
+                        [showCurrentPageReport]="true"
+                        responsiveLayout="scroll"
+                        [rowsPerPageOptions]="[10, 25, 50]">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th>{{'user.user-details.phishingSection.campaignName' |translate }}</th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th colspan="2" class="text-center">{{'user.user-details.phishingSection.campaignDates' |translate }}</th>
+                                <th></th>
+                            </tr>
+                        </ng-template>
+
+                        <ng-template pTemplate="groupheader" let-campaign>
+                            <tr pRowGroupHeader>
+                                <td colspan="7" class="group-header">
+                                    <div class="grid justify-content-between">
+                                        <div class="col-8">
+                                            <strong class="font-bold mb-2" style="display: block">{{
+                                                campaign.campaignName
+                                            }}</strong>
+                                        </div>
+                                        <div class="col-4">
+                                            <span class="text-sm"
+                                                >{{ campaign.campaignStartDate | date }} -
+                                                {{ campaign.campaignEndDate | date }}</span
+                                            >
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="th-table">{{'user.user-details.phishingSection.templateName' |translate }}</th>
+                                <th class="th-table text-center" style="text-align: center !important;">{{'user.user-details.phishingSection.delivered' |translate }}</th>
+                                <th class="th-table text-center" style="text-align: center !important;">{{'user.user-details.phishingSection.Opened' |translate }}</th>
+                                <th class="th-table text-center" style="text-align: center !important;">{{'user.user-details.phishingSection.clickedd' |translate }}</th>
+                                <th class="th-table text-center" style="text-align: center !important;">{{'user.user-details.phishingSection.qRCodeScanned' |translate }}</th>
+                                <th class="th-table text-center" style="text-align: center !important;">{{'user.user-details.phishingSection.dataEnteredd' |translate }}</th>
+                                <th class="th-table text-center" style="text-align: center !important;">{{'user.user-details.phishingSection.reported' |translate }}</th>
+                            </tr>
+                        </ng-template>
+
+                        <ng-template pTemplate="body" let-user>
+                            <tr>
+                                <td>{{ user.phishingEmailTemplateName }}</td>
+                                <td class="text-center">
+                                    <i
+                                        class="pi pi-check"
+                                        style="font-size: larger; color: green; font-weight: 900"
+                                        *ngIf="user.isDelivered"></i>
+                                </td>
+                                <td class="text-center">
+                                    <i
+                                        class="pi pi-check"
+                                        style="font-size: larger; color: green; font-weight: 900"
+                                        *ngIf="user.isOpened"></i>
+                                </td>
+                                <td class="text-center">
+                                    <i
+                                        class="pi pi-check"
+                                        style="font-size: larger; color: green; font-weight: 900"
+                                        *ngIf="user.isLinkClicked"></i>
+                                </td>
+                                <td class="text-center">
+                                    <i
+                                        class="pi pi-check"
+                                        style="font-size: larger; color: green; font-weight: 900"
+                                        *ngIf="user.isQRCodeScanned"></i>
+                                </td>
+                                <td class="text-center">
+                                    <i
+                                        class="pi pi-check"
+                                        style="font-size: larger; color: red; font-weight: 900"
+                                        *ngIf="user.isDataEntered"></i>
+                                </td>
+                                <td class="text-center">
+                                    <i
+                                        class="pi pi-check"
+                                        style="font-size: larger; color: green; font-weight: 900"
+                                        *ngIf="user.isReported"></i>
+                                </td>
+                            </tr>
+                        </ng-template>
+
+                        <ng-template pTemplate="groupfooter" let-campaign>
+                            <tr>
+                                <td colspan="7" class="group-footer text-right font-bold pr-6 pb-7">
+                                    {{'user.user-details.phishingSection.totalTemplates' |translate:{number:calculateTotalNumberOfTemplates(campaign.campaignName)} }}
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </p-scrollPanel>
+        </div>
+    </div>
+</p-card>

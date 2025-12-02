@@ -1,0 +1,64 @@
+/* General styling for the input field */
+.startDate {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    width: 100%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+/* On focus styling */
+.startDate:focus {
+    outline: 0 none;
+    outline-offset: 0;
+    box-shadow: 0 0 0 0.2rem rgba(136, 60, 174, 0.5);
+    border-color: #883cae;
+}
+
+/* Styling the calendar icon */
+.startDate::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+
+/* Placeholder styling */
+.startDate::placeholder {
+    color: #aaa;
+    font-style: italic;
+}
+
+/* Adjust for different screen sizes */
+@media (max-width: 600px) {
+    .startDate {
+        width: 100%;
+        font-size: 16px;
+    }
+}
+
+
+.invalid-date-message {
+    color: red;
+    margin-top: 5px;
+    font-size: 0.9em;
+}
+
+.type{
+    padding-top: 0px !important;
+}
+
+::ng-deep .c .p-card-body{
+    padding-top: 0px !important;
+}
+
+::ng-deep .cc .p-card-body{
+    padding-bottom: 5px !important;
+}
+
+::ng-deep .p-selectbutton .p-button{
+    overflow: hidden;
+    margin-right: 10px !important;
+} 

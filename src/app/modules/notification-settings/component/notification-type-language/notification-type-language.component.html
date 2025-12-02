@@ -1,0 +1,173 @@
+<div class="grid">
+    <div class="col-12">
+        <div class="card">
+            <p-toast></p-toast>
+
+            <div class="iAware-loading-table-container" style="position: relative;">
+                <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                <p-table #dt [value]="notificationTypeLanguages" responsiveLayout="scroll" [rows]="10"
+                    [paginator]="true" [rowsPerPageOptions]="[10,20,30]" styleClass="p-datatable-striped"
+                    [globalFilterFields]="['name','description'  ]">
+                    <ng-template pTemplate="caption">
+                        <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                            <h5 class="m-0">{{'notification-settings.notification-type-language.title' | translate}}
+                            </h5>
+                            <div class="my-1">
+                                <button pButton pRipple label="{{'shared.actions.add' | translate}}" icon="pi pi-plus"
+                                    class="p-button-success mr-2" (click)="CreateNotificationType()"></button>
+                                <span class=" mt-2 md:mt-0 p-input-icon-left">
+                                    <i class="pi pi-search"></i>
+                                    <input pInputText type="text" (input)="onGlobalFilter(dt, $event)"
+                                        placeholder="{{'shared.actions.search' | translate}}"
+                                        class="w-full sm:w-auto" />
+                                </span>
+                            </div>
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th pSortableColumn="languageName">
+                                {{'notification-settings.notification-type-language.title' | translate}}
+                                <p-sortIcon field="languageName"></p-sortIcon>
+                                <p-columnFilter type="text" field="languageName" display="menu"></p-columnFilter>
+                            </th>
+                            <th pSortableColumn="title">{{'notification-settings.notification-type-language.name' |
+                                translate}}
+                                <p-sortIcon field="title"> </p-sortIcon>
+                                <p-columnFilter type="text" field="title" display="menu"></p-columnFilter>
+                            </th>
+                            <th>{{'notification-settings.notification-type-language.notificationMessage' | translate}}
+                            </th>
+                            <th>{{'notification-settings.notification-type-language.status' | translate}}</th>
+                            <th style="text-align: center;"> {{'shared.actions.action' | translate}}</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-type>
+                        <tr>
+                            <td> {{type.languageName }} </td>
+                            <td> {{type.title}} </td>
+                            <td>
+                                <a style="cursor: pointer;">
+                                    <i class="pi pi-file-o" (click)="openContent(type, 'NotificationMessage')"></i>
+                                </a>
+                            </td>
+                            <td>
+                                <p-inputSwitch [ngModel]="type.isActive" (onChange)="switchActivation(type)"
+                                    [disabled]="isDefaultLanguage(type)" />
+                            </td>
+                            <!-- <td>
+                            <button *ngIf="menuItems.length > 0" pButton pRipple type="button" icon="pi pi-ellipsis-v"
+                              class="p-button-rounded p-button-text p-button-plain ml-3"
+                              (click)="menu.toggle($event); assigneCurrentSelect(type)"></button>
+                            <p-menu #menu [model]="menuItems" [appendTo]="dt" [popup]="true"></p-menu>
+                        </td> -->
+                            <td style="text-align: center;">
+                                <button pButton pRipple icon="pi pi-pencil"
+                                    class="p-button-rounded p-button-success mr-2"
+                                    (click)="editNotificationTypeLanguage(type)"></button>
+
+                                <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger"
+                                    (click)="deleteNotificationTypeLanguage(type)" [disabled]="isDefaultLanguage(type)">
+
+                                </button>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p-dialog [(visible)]="notificationTypeLanguageDialog" [style]="{width: '800px', heigth:'900px'}"
+    header="{{'notification-settings.notification-type-language.editHeader' | translate}}" [modal]="true"
+    class="p-fluid">
+    <ng-template pTemplate="content">
+        <div class="card">
+            <form [formGroup]="notificationTypeLanguageForm" (ngSubmit)="saveEditNotificationTypeLanguage()">
+                <div class="field">
+                    <label for="languageId"
+                        class="font-medium text-900">{{'notification-settings.notification-type-language.language' |
+                        translate}}</label>
+                    <span class="p-float-label">
+                        <p-dropdown formControlName="languageId" [options]="activeLanguage" optionLabel="name"
+                            optionValue="id"
+                            placeholder="{{'notification-settings.notification-type-language.languagePlaceholder' | translate}}">
+                        </p-dropdown>
+                    </span>
+                </div>
+                <div class="field">
+                    <label for="title"
+                        class="font-medium text-900">{{'notification-settings.notification-type-language.name' |
+                        translate}}</label>
+                    <input type="text" pInputText id="title" formControlName="title" required
+                        [ngClass]="{'ng-invalid ng-dirty' : submitted && !notificationTypeLanguageForm.controls['title'].valid}" />
+                    <small *ngIf="submitted && !notificationTypeLanguageForm.controls['title'].valid"
+                        class="ng-dirty ng-invalid text-red-500">{{'notification-settings.notification-type-language.nameValidation'
+                        | translate}}</small>
+                </div>
+                <div class="field">
+                    <label class="font-medium text-900"
+                        for="notificationMessage">{{'notification-settings.notification-type-language.notificationMessage'
+                        | translate}}</label>
+                    <textarea id="notificationMessage" name="notificationMessage" formControlName="notificationMessage"
+                        pInputTextarea required
+                        [ngClass]="{'ng-invalid ng-dirty': submitted && !notificationTypeLanguageForm.controls['notificationMessage'].valid}"
+                        rows="3" cols="50"></textarea>
+                    <small *ngIf="submitted && !notificationTypeLanguageForm.controls['notificationMessage'].valid"
+                        class="ng-dirty ng-invalid text-red-500">{{'notification-settings.notification-type-language.notificationValidation'
+                        | translate}}</small>
+                </div>
+            </form>
+        </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{'shared.actions.cancel' | translate}}" icon="pi pi-times" class="p-button-text"
+            (click)="declineEditNotificationTypeLanguage()"></button>
+        <button pButton pRipple label="{{'shared.actions.save' | translate}}" icon="pi pi-check" class="p-button-text"
+            (click)="saveEditNotificationTypeLanguage()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="deletionNotificationTypeLanguageDialog" header="{{'shared.headers.delete' | translate}}"
+    [modal]="true" [style]="{width:'450px'}">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="notificationTypeLanguage">{{'shared.messages.delete' | translate}}
+            <b>{{notificationTypeLanguage.title}}</b></span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text" label="{{'shared.actions.cancel' | translate}}"
+            (click)="declineDeletion()"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{'shared.actions.save' | translate}}"
+            (click)="confirmDeletion()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="switchActivationNotificationTypeLanguageDialog" header="{{'shared.headers.active' | translate}}"
+    [modal]="true" [style]="{width:'450px'}">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        @if (notificationTypeLanguage && notificationTypeLanguage.isActive) {
+        <span>{{ 'shared.messages.deactive' | translate }} <b>{{notificationTypeLanguage.title}}</b></span>
+        }@else {
+        <span>{{ 'shared.messages.active' | translate }} <b>{{notificationTypeLanguage.title}}</b></span>
+        }
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text" label="{{'shared.actions.cancel' | translate}}"
+            (click)="declineActivation()"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{'shared.actions.save' | translate}}"
+            (click)="confirmtActivation()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="openNotificationMessageDialog" [modal]="true" [style]="{width:'450px'}">
+    <div class="flex align-items-center justify-content-center">
+        <span [innerHTML]="notificationTypeLanguage.notificationMessage"></span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text" label="{{'shared.actions.cancel' | translate}}"
+            (click)="hideCategoryPageContentHtmlDialog()"></button>
+    </ng-template>
+</p-dialog>

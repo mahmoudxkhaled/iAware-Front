@@ -1,0 +1,228 @@
+.pi-eye:hover {
+    cursor: pointer;
+}
+
+.campaign-stats {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+}
+
+.stat {
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.stat-label {
+    font-size: 14px;
+    color: #888;
+}
+
+.active-tab {
+    background-color: #df0bdf !important;
+    /* Light blue for active tab */
+    font-weight: bold !important;
+}
+
+.inactive-tab {
+    background-color: #ffffff !important;
+    /* White for inactive tabs */
+}
+
+.report-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.header-item {
+    flex: 1 1 100px;
+    max-width: 120px;
+    text-align: center;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 8px;
+    transition: transform 0.3s, box-shadow 0.3s;
+    background-color: #f9f9f9;
+}
+
+.item-selected {
+    flex: 1 1 100px;
+    max-width: 120px;
+    text-align: center;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 8px;
+    transition: transform 0.3s, box-shadow 0.3s;
+    background-color: #9b9999;
+    position: relative;
+    /* Position relative for the arrow */
+}
+
+.item-selected::after {
+    content: '';
+    position: absolute;
+    bottom: -19px;
+    /* Adjust as needed */
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 10px;
+    border-style: solid;
+    border-color: #9b9999 transparent transparent transparent;
+    /* Arrow color */
+}
+
+
+.header-item:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    outline: 0 none;
+    outline-offset: 0;
+    box-shadow: 0 0 0 0.2rem rgba(136, 60, 174, 0.5);
+    border-color: #883cae;
+    cursor: pointer;
+}
+
+.header-number {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ec3903;
+}
+
+.header-text {
+    font-size: 14px;
+    margin-top: 5px;
+    color: #333;
+}
+
+.header-percentage {
+    font-size: 18px;
+    margin-top: 5px;
+    color: #4caf50;
+}
+
+@media screen and (max-width: 768px) {
+    .header-item {
+        max-width: 90px;
+    }
+
+    .header-number {
+        font-size: 20px;
+    }
+
+    .header-text {
+        font-size: 12px;
+    }
+
+    .header-percentage {
+        font-size: 16px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .header-item {
+        max-width: 75px;
+    }
+
+    .header-number {
+        font-size: 18px;
+    }
+
+    .header-text {
+        font-size: 10px;
+    }
+
+    .header-percentage {
+        font-size: 14px;
+    }
+}
+
+::ng-deep .c .p-card-body {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+}
+
+
+::ng-deep .cc .p-card-body {
+    padding-top: 10px !important;
+    padding-bottom: 0px !important;
+}
+
+::ng-deep .cc .p-card .p-card-title {
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    margin-bottom: 0px !important;
+}
+
+.notStarted-dot,
+.completed-dot,
+.inProgress-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+.notStarted-dot {
+    background-color: #6c757d;
+}
+
+.completed-dot {
+    background-color: #28a745;
+}
+
+.inProgress-dot {
+    background-color: #ffc107;
+}
+
+.trainingDetails {
+    padding: 0px !important;
+}
+
+.status-completed {
+    background-color: #28a745;
+    color: white;
+    padding: 4px 6px;
+    border-radius: 12px;
+    font-size: smaller;
+    font-weight: 700;
+}
+
+.status-in-progress {
+    background-color: #ffc107;
+    color: white;
+    padding: 4px 6px;
+    border-radius: 12px;
+    font-size: smaller;
+    font-weight: 700;
+}
+
+.status-not-started {
+    background-color: red;
+    color: white;
+    padding: 4px 6px;
+    border-radius: 12px;
+    font-size: smaller;
+    font-weight: 700;
+}
+
+.th-table {
+    text-align: left;  /* RTL alignment */
+    padding: 1rem;  /* Restore padding */
+    font-weight: 600;
+    transition: box-shadow 0.15s;
+}
+
+/* Ensure both header and data cells have consistent alignment */
+th, td {
+    text-align: inherit;  /* Inherit the alignment from the parent container */
+}
+
+::ng-deep .p-button-label, ::ng-deep .pi-eye::before {
+    color: white !important;
+}

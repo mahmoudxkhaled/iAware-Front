@@ -1,0 +1,210 @@
+<div class="field col-12 ">
+    <p-tabView [style]="{ width: '100%' }">
+        <ng-container *ngFor="let language of defaultLanguage">
+            <p-tabPanel [header]="language.name">
+                <p-toast></p-toast>
+                <h5> {{ 'wallpaper-wizard.wallpaper-list-wizard.library-quote-wizard.title' | translate}}</h5>
+
+                <div class="iAware-loading-table-container" style="position: relative;">
+                    <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                    <p-table #dt [value]="filteredQuotesByLanguage[language.id]" responsiveLayout=" scroll" [rows]="10"
+                        [paginator]="true" [rowsPerPageOptions]="[10,20,30]" styleClass="p-datatable-striped"
+                        [globalFilterFields]="['quoteText']">
+
+                        <ng-template pTemplate="caption">
+                            <div class="flex flex-wrap justify-content-between">
+                                <p-button label="{{'shared.actions.back' | translate}}" (onClick)="prevPage()"
+                                    icon="pi pi-arrow-left"></p-button>
+                                <button *ngIf="hasPermission(actions.add)" pButton pRipple
+                                    label="{{ 'wallpaper-wizard.wallpaper-list-wizard.library-quote-wizard.actions.add' | translate}}"
+                                    icon="pi pi-plus" class="p-button mr-2" (click)="addNewQuote(language)"></button>
+
+                                <div>
+                                    <span class="p-input-icon-left">
+                                        <i class="pi pi-search"></i>
+                                        <input pInputText type="text" (input)="onGlobalFilter(dt, $event)"
+                                            placeholder="{{'shared.actions.search' | translate}}"
+                                            class="w-full sm:w-auto" />
+                                    </span>
+                                    <p-button class="mx-2" label="{{'shared.actions.next' | translate}}"
+                                        (onClick)="nextPage()" icon="pi pi-arrow-right" iconPos="right"
+                                        [disabled]="!selectedQuote"></p-button>
+                                </div>
+                            </div>
+                        </ng-template>
+
+
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <!-- <th style="width: 4rem"><p-tableHeaderCheckbox /></th> -->
+                                <th style="width: 4rem"></th>
+                                <th>{{ 'wallpaper-wizard.wallpaper-list-wizard.library-quote-wizard.fields.language' |
+                                    translate}}</th>
+                                <th pSortableColumn="quoteText" style="width:50%">{{
+                                    'wallpaper-wizard.wallpaper-list-wizard.library-quote-wizard.fields.quoteText' |
+                                    translate}} <p-sortIcon field="quoteText"></p-sortIcon>
+                                    <p-columnFilter type="text" field="quoteText" display="menu"></p-columnFilter>
+                                </th>
+                                <!-- <th style="text-align: center;">{{ 'wallpaper-wizard.wallpaper-list-wizard.library-quote-wizard.fields.status' | translate}}</th> -->
+                                <th style="text-align: center;">{{'shared.actions.action' | translate}}</th>
+                            </tr>
+                        </ng-template>
+
+                        <ng-template pTemplate="body" let-libraryQuote>
+                            <tr>
+                                <td>
+                                    <p-checkbox [id]="libraryQuote?.id" [binary]="true"
+                                        [ngModel]="isQuoteSelected(libraryQuote)"
+                                        (onChange)="toggleSelection(libraryQuote)">
+                                    </p-checkbox>
+                                </td>
+
+
+                                <td> {{libraryQuote.languageName}}</td>
+
+                                <td (click)="toggleSelection(libraryQuote)" [innerHTML]="libraryQuote.quoteText"
+                                    style="cursor: pointer;"></td>
+                                <!-- <td style="text-align: center;">
+                                <p-inputSwitch *ngIf="hasPermission(actions.active)" [ngModel]="libraryQuote.isActive"
+                                    (onChange)="switchQuoteActivation(libraryQuote)" />
+                            </td> -->
+
+                                <td style="text-align: center;">
+                                    <button *ngIf="hasPermission(actions.edit)" pButton pRipple icon="pi pi-pencil"
+                                        class="p-button-rounded p-button-success mr-2"
+                                        (click)="editLibraryQuote(libraryQuote,language)"></button>
+                                    <button *ngIf="hasPermission(actions.delete)" pButton pRipple icon="pi pi-trash"
+                                        class="p-button-rounded p-button-danger"
+                                        (click)="deleteLibraryQuote(libraryQuote)"></button>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+
+            </p-tabPanel>
+        </ng-container>
+    </p-tabView>
+</div>
+
+<p-dialog [(visible)]="editQuoteDialog"
+    header="{{ 'wallpaper-wizard.wallpaper-list-wizard.library-quote-wizard.editDialog.header' | translate}}"
+    [modal]="true" [style]="{width:'50%', height:'60%'}" class="p-fluid">
+    <ng-template pTemplate="content">
+        <div class="field ">
+            <label for="languageId" class="font-medium text-900">{{
+                'wallpaper-wizard.wallpaper-list-wizard.library-quote-wizard.editDialog.language' | translate}}</label>
+            <p-dropdown [(ngModel)]="selectedLanguageId" [options]="selectedLanguageAdd" optionLabel="name"
+                placeholder="{{ 'wallpaper-wizard.wallpaper-list-wizard.library-quote-wizard.editDialog.languagePlaceholder' | translate}}"
+                optionValue="id">
+            </p-dropdown>
+        </div>
+        <div class="field ">
+            <label for="quoteText" class="font-medium text-900">{{
+                'wallpaper-wizard.wallpaper-list-wizard.library-quote-wizard.editDialog.quoteText' | translate}}</label>
+                <app-iAware-rich-text [id]="'quoteText'" [(ngModel)]="libraryQuote.quoteText"></app-iAware-rich-text>
+            <!-- <div class="NgxEditor__Wrapper" style="height:300px">
+                <ngx-editor-menu [editor]="editor"></ngx-editor-menu>
+                <ngx-editor [editor]="editor" [(ngModel)]="libraryQuote.quoteText" [disabled]="false"
+                    placeholder="{{ 'wallpaper-wizard.wallpaper-list-wizard.library-quote-wizard.editDialog.quotePlaceholder' | translate}}"></ngx-editor>
+            </div> -->
+        </div>
+        <div class="col-12">
+            <small *ngIf="submitted && isQuoteTextEmpty(libraryQuote.quoteText)"
+                class="ng-dirty ng-invalid text-red-500">
+                {{ 'wallpaper-wizard.wallpaper-list-wizard.library-quote-wizard.editDialog.quoteValidation' |
+                translate}}
+            </small>
+        </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+            class="p-button-text" (click)="hideEditQuoteDialog()"></button>
+        <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check" class="p-button-text"
+            (click)="saveEditQuote()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="addQuoteDialog"
+    header="{{ 'wallpaper-wizard.wallpaper-list-wizard.library-quote-wizard.addDialog.header' | translate}}"
+    [modal]="true" [style]="{width:'450px'}" class="p-fluid">
+    <ng-template pTemplate="content">
+        <div class="field ">
+            <label for="languageId" class="font-medium text-900">{{
+                'wallpaper-wizard.wallpaper-list-wizard.library-quote-wizard.addDialog.language' | translate}}</label>
+            <p-dropdown [(ngModel)]="selectedLanguageId" [options]="selectedLanguageAdd" optionLabel="name"
+                placeholder="{{ 'wallpaper-wizard.wallpaper-list-wizard.library-quote-wizard.addDialog.languagePlaceholder' | translate}}"
+                optionValue="id">
+            </p-dropdown>
+        </div>
+        <div class="field ">
+            <label for="quoteText" class="font-medium text-900">{{
+                'wallpaper-wizard.wallpaper-list-wizard.library-quote-wizard.addDialog.quoteText' | translate}}</label>
+                <app-iAware-rich-text [id]="'quoteText'" [(ngModel)]="quoteText"></app-iAware-rich-text>
+            <!-- <div class="NgxEditor__Wrapper" style="height:300px">
+                <ngx-editor-menu [editor]="editor"></ngx-editor-menu>
+                <ngx-editor [editor]="editor" [(ngModel)]="quoteText" [disabled]="false"
+                    placeholder="{{ 'wallpaper-wizard.wallpaper-list-wizard.library-quote-wizard.addDialog.quotePlaceholder' | translate}}"></ngx-editor>
+            </div> -->
+        </div>
+        <div class="col-12">
+            <small *ngIf="submitted && isQuoteTextEmpty(quoteText)" class="ng-dirty ng-invalid text-red-500">
+                {{ 'wallpaper-wizard.wallpaper-list-wizard.library-quote-wizard.addDialog.quoteValidation' | translate}}
+            </small>
+        </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+            class="p-button-text" (click)="hideNewQuoteDialog()"></button>
+        <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check" class="p-button-text"
+            (click)="saveNewQuote()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="deletionQuoteDialog" header="{{ 'shared.headers.delete' | translate }}" [modal]="true"
+    [style]="{width:'450px'}">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="libraryQuote">{{ 'shared.messages.delete' | translate }}</span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="declineQuoteDeletion()"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{ 'shared.actions.save' | translate }}"
+            (click)="confirmQuoteDeletion()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="switchQuoteActivationDialog" header="{{ 'shared.headers.active' | translate }}" [modal]="true"
+    [style]="{width:'450px'}">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        @if (libraryQuote && libraryQuote && libraryQuote.isActive) {
+        <span> {{ 'shared.messages.deactive' | translate }} </span>
+        }@else {
+        <span>{{ 'shared.messages.active' | translate }} </span>
+        }
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="declineQuoteActivation()"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{ 'shared.actions.save' | translate }}"
+            (click)="confirmtQuoteActivation()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="chooseTitleDialog" header="Write a name for wallpaper" [modal]="true" [style]="{width:'450px'}">
+
+    <div class="field">
+        <label for="characterName" class="font-medium text-900">Name</label>
+        <input type="text" pInputText id="characterName" fo required [ngModel]="WallpaperTitle" />
+        <!-- <small *ngIf="submitted && !addLibraryCharacterForm.controls['characterName'].valid"
+            class="ng-dirty ng-invalid text-red-500">Name is required.</small> -->
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="declineCreateWallpaper()"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{ 'shared.actions.save' | translate }}"
+            (click)="confirmCreateWallpaper()"></button>
+    </ng-template>
+</p-dialog>

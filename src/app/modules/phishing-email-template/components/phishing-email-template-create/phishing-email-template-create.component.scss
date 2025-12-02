@@ -1,0 +1,84 @@
+.bbbutton {
+    border: none;
+    display: flex;
+    padding: 0.75rem 1.5rem;
+    background-color: #883cae;
+    color: #ffffff;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 700;
+    text-align: center;
+    text-transform: uppercase;
+    vertical-align: middle;
+    align-items: center;
+    border-radius: 0.5rem;
+    user-select: none;
+    gap: 0.75rem;
+    box-shadow: 0 4px 6px -1px #488aec31, 0 2px 4px -1px #488aec17;
+    transition: all 0.6s ease;
+}
+
+.bbbutton:hover {
+    box-shadow: 0 10px 15px -3px #488aec4f, 0 4px 6px -2px #488aec17;
+}
+
+.bbbutton:focus,
+button:active {
+    opacity: 0.85;
+    box-shadow: none;
+}
+
+.bbbutton svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.p-tabview .p-tabview-nav-content .p-tabview-nav li {
+    color: #883cae !important;
+    background-color: red;
+}
+
+.avatar {
+    vertical-align: middle;
+    width: 150px;
+    height: 150px;
+    border: 1px solid black;
+}
+
+:host ::ng-deep .p-dataview-emptymessage {
+    display: none !important;
+    ;
+}
+
+::ng-deep .animated-button {
+    position: relative;
+    padding: 15px 40px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #ffffff;
+    background: linear-gradient(90deg, #800080, #4b0082);
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    overflow: hidden;
+    background-size: 200% 200%;
+    animation: gradientWave 4s ease-in-out infinite !important;
+}
+
+@keyframes gradientWave {
+    0% {
+        background-position: 100% 50%;
+    }
+    25% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    75% {
+        background-position: 0% 50%;
+    }
+    100% {
+        background-position: 100% 50%;
+    }
+}

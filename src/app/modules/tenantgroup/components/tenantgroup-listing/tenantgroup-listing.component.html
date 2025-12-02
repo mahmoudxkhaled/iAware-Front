@@ -1,0 +1,171 @@
+<div class="card">
+    <p-toast></p-toast>
+    <div class="iAware-loading-table-container" style="position: relative;">
+        <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+        <p-table #dt [value]="groups" [paginator]="true" [rows]="pagination.size" [showCurrentPageReport]="true" [lazy]="true"
+            [totalRecords]="totalRecords" (onLazyLoad)="onLazyLoad($event)" responsiveLayout="scroll"
+            [rowsPerPageOptions]="[10, 25, 50]" [globalFilterFields]="['name']">
+            <ng-template pTemplate="caption">
+                <div class="flex flex-wrap gap-2 align-items-center justify-content-between">
+                    <span class="p-input-icon-left w-full sm:w-20rem flex-order-1 sm:flex-order-0">
+                        <i class="pi pi-search"></i>
+                        <input pInputText type="text" (input)="onGlobalFilter(dt, $event)"
+                            placeholder="{{ 'shared.search.group' | translate }}" class="w-full" />
+                    </span>
+                    <p-button *ngIf="hasPermission(actions.add)" (click)="navigateToCreate()" icon="pi pi-user-plus"
+                        label="{{ 'tenantgroup.tenantgroup-listing.actions.add' | translate }}"></p-button>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="header">
+                <tr>
+                    <th pSortableColumn="name" class="white-space-nowrap" style="width: 25%">
+                        {{ 'tenantgroup.tenantgroup-listing.fields.groupName' | translate }}<p-sortIcon
+                            field="name"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="status" class="white-space-nowrap" style="width: 25%">
+                        {{ 'tenantgroup.tenantgroup-listing.fields.status' | translate }}<p-sortIcon
+                            field="status"></p-sortIcon>
+                    </th>
+                    <th style="width: 25% " class="text-center">{{ 'shared.actions.action' | translate }}</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-group>
+                <tr>
+                    <td>{{ group.name }}</td>
+                    <td>
+                        <p-inputSwitch *ngIf="hasPermission(actions.active)" [formControl]="toggleControls[group.id]"
+                            (onChange)="openActivationDialog(group)"></p-inputSwitch>
+                    <td>
+                        <div class="flex align-items-center justify-content-around">
+                            <div>
+                                <button *ngIf="hasPermission(actions.edit)" pButton pRipple icon="pi pi-pencil"
+                                    class="p-button-rounded p-button-success mr-2"
+                                    (click)="openEditDialog(group)"></button>
+                            </div>
+                            <div>
+                                <button *ngIf="hasPermission(actions.delete)" pButton pRipple icon="pi pi-trash"
+                                    class="p-button-rounded p-button-danger" (click)="openDeleteDialog(group)"></button>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+
+<p-dialog [(visible)]="editeDialog" [style]="{ width: '50%', height:'70%' }"
+    header="{{ 'tenantgroup.tenantgroup-listing.dialogs.editDialog.header' | translate }}" [modal]="true"
+    class="p-fluid">
+    <ng-template pTemplate="content">
+        <form [formGroup]="groupEditForm" (ngSubmit)="edit()">
+            <div class="grid">
+                <div class="col-12">
+                    <div class="grid formgrid p-fluid">
+                        <div class="field mb-4 col-12 md:col-6">
+                            <label for="membersToEdit" class="font-medium text-900">{{
+                                'tenantgroup.tenantgroup-listing.dialogs.editDialog.fields.groupMembers' | translate
+                                }}</label>
+                            <span>
+                                <div class="mb-3">
+                                    <p-multiSelect [options]="users" formControlName="membersToEdit" optionLabel="name"
+                                        optionValue="id"
+                                        placeholder="{{ 'tenantgroup.tenantgroup-listing.dialogs.editDialog.fields.selectMemebers' | translate }}"
+                                        [filter]="true">
+                                    </p-multiSelect>
+                                </div>
+                            </span>
+                        </div>
+                        <div class="field mb-4 col-12 md:col-6">
+                            <label for="name" class="font-medium text-900">{{
+                                'tenantgroup.tenantgroup-listing.dialogs.editDialog.fields.groupName' | translate
+                                }}</label>
+                            <input id="name" type="text" pInputText formControlName="nameGroupToEdit">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+            class="p-button-text" (click)="hideDialog()"></button>
+        <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check" class="p-button-text"
+            [disabled]="!groupEditForm.valid" (click)="edit()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="addDialog" [style]="{width: '50%', height:'70%'}"
+    header="{{ 'tenantgroup.tenantgroup-listing.dialogs.addDialog.header' | translate }}" [modal]="true"
+    class="p-fluid">
+    <ng-template pTemplate="content">
+        <form [formGroup]="groupAddForm" (ngSubmit)="onSubmit()">
+            <div class="grid">
+                <div class="col-12">
+                    <div class="grid formgrid p-fluid">
+                        <div class="field mb-4 col-12 md:col-6">
+                            <label for="membersToAdd" class="font-medium text-900">{{
+                                'tenantgroup.tenantgroup-listing.dialogs.addDialog.fields.groupMembers' | translate
+                                }}</label>
+                            <span>
+                                <div class="mb-3">
+                                    <p-multiSelect [options]="users" formControlName="membersToAdd" optionLabel="name"
+                                        optionValue="id"
+                                        placeholder="{{ 'tenantgroup.tenantgroup-listing.dialogs.addDialog.fields.selectMemebers' | translate }}"
+                                        [filter]="true">
+                                    </p-multiSelect>
+                                </div>
+                            </span>
+                        </div>
+                        <div class="field mb-4 col-12 md:col-6">
+                            <label for="name" class="font-medium text-900">{{
+                                'tenantgroup.tenantgroup-listing.dialogs.addDialog.fields.groupName' | translate
+                                }}</label>
+                            <input id="name" type="text" pInputText formControlName="nameGroupToAdd">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+            class="p-button-text" (click)="addDialog = false"></button>
+        <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check" class="p-button-text"
+            [disabled]="!groupAddForm.valid" (click)="onSubmit()"></button>
+    </ng-template>
+</p-dialog>
+
+
+<p-dialog [(visible)]="deleteDialog" header="{{ 'shared.headers.delete' | translate }}" [modal]="true"
+    [style]="{ width: '450px' }">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="currentSelected">{{ 'shared.messages.delete' | translate }}
+            <b> {{ currentSelected.name }} </b>?</span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="deleteDialog = false"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text"
+            label="{{ 'shared.actions.delete' | translate }}" (click)="delete()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="activationDialog" header="{{ 'shared.headers.active' | translate }}" [modal]="true"
+    [style]="{width:'450px'}" (onHide)="onCancelActivationDialog()">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        @if (currentSelected.isActive) {
+        <span>{{ 'shared.messages.deactive' | translate }} <b>{{currentSelected.name}}</b></span>
+        }@else {
+        <span>{{ 'shared.messages.active' | translate }} <b>{{currentSelected.name}}</b></span>
+        }
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="activationDialog = false"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{ 'shared.actions.save' | translate }}"
+            (click)="currentSelected.isActive ? activation(false) : activation(true)"></button>
+    </ng-template>
+</p-dialog>

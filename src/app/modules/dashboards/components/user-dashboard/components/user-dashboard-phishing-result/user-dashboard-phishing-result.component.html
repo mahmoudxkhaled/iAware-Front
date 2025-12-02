@@ -1,0 +1,54 @@
+<p-card>
+    <div class="mb-4">
+        <div class="phishing-header">
+            <h2>{{'dashboards.user-dashboard.phishingResults.header' | translate }}</h2>
+            <p>{{'dashboards.user-dashboard.phishingResults.description' | translate }}</p>
+        </div>
+    </div>
+    <div class="mb-4">
+        <div class="phishing-item">
+            <div class="phishing-icon col-2">
+                <i class="fas fa-check-circle text-7xl p-1 text-green-500"></i>
+            </div>
+            <div class="phishing-content col-10 pl-0 pr-0">
+                <h2>{{'dashboards.user-dashboard.phishingResults.reportedEmails' | translate }}</h2>
+                <p>
+                    {{'dashboards.user-dashboard.phishingResults.emailsflaggedasphishingthreats' |translate }}
+                </p>
+                <div class="progress-container">
+                    <div class="progress-bar success" [style.width.%]="emailsReportedPercentage"></div>
+                </div>
+                <div class="stats flex justify-content-between p-1">
+                    <span class="success-rate">{{'dashboards.user-dashboard.phishingResults.emailsReported' |
+                        translate:{emailsReported:emailsReported, emailsDelivered:emailsDelivered} }}</span>
+                    <span>
+                        {{'dashboards.user-dashboard.phishingResults.emailsReportedPercentage' |
+                        translate:{emailsReportedPercentage:emailsReportedPercentage} }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <div class="phishing-item">
+            <div class="phishing-icon col-2">
+                <i class="fas fa-times-circle text-7xl p-1 text-red-500"></i>
+            </div>
+            <div class="phishing-content col-10 pl-0 pr-0">
+                <h2>{{'dashboards.user-dashboard.phishingResults.failures' | translate }}</h2>
+                <p>
+                    {{'dashboards.user-dashboard.phishingResults.emailsnotrecognizedasphishingattempts' |translate }}
+                </p>
+                <div class="progress-container">
+                    <div class="progress-bar failuer" [style.width.%]="emailsFailuresPercentage"></div>
+                </div>
+                <div class="stats flex justify-content-between p-1">
+                    <span class="success-rate">{{'dashboards.user-dashboard.phishingResults.emailsFailures' |
+                        translate:{emailsFailures:emailsFailures, emailsDelivered:emailsDelivered} }}</span>
+                    <span>
+                        {{'dashboards.user-dashboard.phishingResults.emailsFailuresPercentage' |
+                        translate:{emailsFailuresPercentage:emailsFailuresPercentage} }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-card>

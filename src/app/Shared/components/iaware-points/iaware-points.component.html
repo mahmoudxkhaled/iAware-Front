@@ -1,0 +1,51 @@
+@if (showInCard) {
+    <p-card [header]="'dashboards.organization.pointsTitle' | translate">
+        <ul class="list-none p-0 m-0 h-full">
+            <li class="points-card positive-points p-3 mb-2 flex align-items-center justify-content-between cursor-pointer border-round">
+                <div class="flex align-items-center">
+                    <i class="pi pi-arrow-up-right text-2xl mr-3 icon"></i>
+                    <span class="ext-lg font-medium">{{ 'dashboards.organization.positivePoints' | translate }}</span>
+                </div>
+                <span class="text-lg font-bold">{{ points.positivePoints }}</span>
+            </li>
+            <li class="points-card negative-points p-3 mb-2 flex align-items-center justify-content-between cursor-pointer border-round">
+                <div class="flex align-items-center">
+                    <i class="pi pi-arrow-down-left text-2xl mr-3 icon"></i>
+                    <span class="ext-lg font-medium">{{ 'dashboards.organization.negativePoints' | translate }}</span>
+                </div>
+                <span class="text-lg font-bold">{{ points.negativePoints }}</span>
+            </li>
+            <li class="points-card total-points p-3 mb-1 flex align-items-center justify-content-between cursor-pointer border-round">
+                <div class="flex align-items-center">
+                    <i class="pi pi-star text-2xl mr-3 icon"></i>
+                    <span class="ext-lg font-medium">{{ 'dashboards.organization.totalPoints' | translate }}</span>
+                </div>
+                <span class="text-lg font-bold">{{ points.totalSumPoints }}</span>
+            </li>
+        </ul>
+    </p-card>
+}@else{
+    <ul class="list-none p-0 m-0 h-full">
+        <li class="points-card positive-points p-3 mb-2 flex align-items-center justify-content-between cursor-pointer border-round">
+            <div class="flex align-items-center">
+                <i class="pi pi-arrow-up-right text-2xl mr-3 icon"></i>
+                <span class="ext-lg font-medium">{{ 'dashboards.organization.positivePoints' | translate }}</span>
+            </div>
+            <span class="text-lg font-bold">{{ points.positivePoints }}</span>
+        </li>
+        <li class="points-card negative-points p-3 mb-2 flex align-items-center justify-content-between cursor-pointer border-round">
+            <div class="flex align-items-center">
+                <i class="pi pi-arrow-down-left text-2xl mr-3 icon"></i>
+                <span class="ext-lg font-medium">{{ 'dashboards.organization.negativePoints' | translate }}</span>
+            </div>
+            <span class="text-lg font-bold">{{ points.negativePoints }}</span>
+        </li>
+        <li class="points-card total-points p-3 mb-1 flex align-items-center justify-content-between cursor-pointer border-round">
+            <div class="flex align-items-center">
+                <i class="pi pi-star text-2xl mr-3 icon"></i>
+                <span class="ext-lg font-medium">{{ 'dashboards.organization.totalPoints' | translate }}</span>
+            </div>
+            <span class="text-lg font-bold">{{ points.totalSumPoints }}</span>
+        </li>
+    </ul>
+}

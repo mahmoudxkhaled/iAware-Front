@@ -1,0 +1,158 @@
+<div class="stepsdemo-content">
+	<p-card styleClass="c">
+		<ng-template pTemplate="title">
+			<div class="grid">
+				<div class="col-12 pb-0">
+					<app-iAware-info description="{{'campaign-management.campaign-create.phishing-email-templates.message' | translate}}"
+                    icon="fa fa-solid fa-circle-info text-3xl"
+                    severity="info"></app-iAware-info>
+				</div>
+			</div>
+		</ng-template>
+		<ng-template pTemplate="content">
+			<p-card [style]="{ border: '2px solid rgb(136 60 174 / 26%)', borderRadius:'8px', margin:'1rem' }">
+
+				<p-tabView class="w-full h-full" styleClass="tabview-custom">
+					<p-tabPanel *ngIf="isIAwareTeamUser" [header]="'campaign-management.campaign-create.phishing-email-templates.defaultTemplateHeader' | translate">
+						<div class="iAware-loading-table-container" style="position: relative;">
+							<app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+							<p-dataView #dv [value]="defaultPhishingTemplates" 
+								[paginator]="true" 
+								[rows]="9"
+								layout="grid"
+								[lazy]="true"
+								[totalRecords]="defaultTotalRecords"
+								(onLazyLoad)="onLazyLoadDefaultTemplates($event)"
+								[rowsPerPageOptions]="[9, 20, 50]" >
+								<ng-template let-templates pTemplate="gridItem">
+									<div class="grid grid-nogutter">
+										<div class="col-12 md:col-4" *ngFor="let template of templates">
+											<div class="p-3 m-3">
+												<div class="surface-card shadow-3 border-round overflow-hidden hover:shadow-5 transition-all relative">
+													<div class="p-3">
+														<p-checkbox [id]="template?.id"
+														[(ngModel)]="checkboxStates[template?.id]" [binary]="true"
+														(onChange)="addToselected($event, template)">
+														</p-checkbox>
+													</div>
+													<div class="p-3" (click)="toggleSelection(template)" style="cursor: pointer;">
+														<div class="object-cover">
+															<img [src]="template.phishingEmailImageUrl"
+																[alt]="template.emailName" class="w-full rounded" />
+														</div>
+														 <div class="text-center mt-2 mb-2">
+															<div class="text-2xl font-bold">{{ template.emailName }}</div>
+															<p>{{ template.phishingEmailDescription }}</p>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</ng-template>
+							</p-dataView>
+						</div>
+					</p-tabPanel>
+
+					<p-tabPanel *ngIf="!isIAwareTeamUser"
+						[header]="('campaign-management.campaign-create.phishing-email-templates.defaultTemplateHeader' | translate)">
+						<div class="iAware-loading-table-container" style="position: relative;">
+							<app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+							<p-dataView #dv 
+								[value]="defaultPhishingTemplates" 
+							    [paginator]="true" 
+								[rows]="9"
+								layout="grid" 
+								[lazy]="true" 
+								[totalRecords]="defaultTotalRecords" 
+								(onLazyLoad)="onLazyLoadDefaultTemplates($event)" 
+								[rowsPerPageOptions]="[9, 20, 50]" >
+								<ng-template let-templates pTemplate="gridItem">
+									<div class="grid grid-nogutter">
+										<div class="col-12 md:col-4" *ngFor="let template of templates">
+											<div class="p-3 m-3">
+												<div class="surface-card shadow-3 border-round overflow-hidden hover:shadow-5 transition-all relative">
+													<div class="p-3">
+														<p-checkbox [id]="template?.id"
+														[(ngModel)]="checkboxStates[template?.id]" [binary]="true"
+														(onChange)="addToselected($event, template)">
+														</p-checkbox>
+													</div>
+													<div class="p-3" (click)="toggleSelection(template)" style="cursor: pointer;">
+														<div class="object-cover">
+															<img [src]="template.phishingEmailImageUrl"
+																[alt]="template.emailName" class="w-full rounded" />
+														</div>
+														 <div class="text-center mt-2 mb-2">
+															<div class="text-2xl font-bold">{{ template.emailName }}</div>
+															<p>{{ template.phishingEmailDescription }}</p>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</ng-template>
+							</p-dataView>
+						</div>
+					</p-tabPanel>
+
+					<p-tabPanel *ngIf="!isIAwareTeamUser"
+						[header]="'campaign-management.campaign-create.phishing-email-templates.tenantTemplatesHeader' | translate">
+						<div class="iAware-loading-table-container" style="position: relative;">
+							<app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+							<p-dataView #dv 
+								[value]="tenantPhishingTemplates" 
+								[paginator]="true" 
+								[rows]="9"
+								layout="grid"
+								[lazy]="true"
+								[totalRecords]="tenantTotalRecords"
+								(onLazyLoad)="onLazyLoadTenantTemplates($event)"
+								[rowsPerPageOptions]="[9, 20, 50]" >
+								<ng-template let-templates pTemplate="gridItem">
+									<div class="grid grid-nogutter">
+										<div class="col-12 md:col-4" *ngFor="let template of templates">
+											<div class="p-3 m-3">
+												<div class="surface-card shadow-3 border-round overflow-hidden hover:shadow-5 transition-all relative">
+													<div class="p-3">
+														<p-checkbox [id]="template?.id"
+														[(ngModel)]="checkboxStates[template?.id]" [binary]="true"
+														(onChange)="addToselected($event, template)">
+														</p-checkbox>
+													</div>
+													<div class="p-3" (click)="toggleSelection(template)" style="cursor: pointer;">
+														<div class="object-cover">
+															<img [src]="template.phishingEmailImageUrl"
+																[alt]="template.emailName" class="w-full rounded" />
+														</div>
+														 <div class="text-center mt-2 mb-2">
+															<div class="text-2xl font-bold">{{ template.emailName }}</div>
+															<p>{{ template.phishingEmailDescription }}</p>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</ng-template>
+							</p-dataView>
+						</div>
+					</p-tabPanel>
+
+				</p-tabView>
+
+			</p-card>
+		</ng-template>
+		<ng-template pTemplate="footer">
+			<div class="grid grid-nogutter justify-content-between">
+				<p-button
+					label="{{ 'campaign-management.campaign-create.phishing-email-templates.actions.back' | translate }}"
+					(onClick)="prevPage()" icon="pi pi-angle-left"></p-button>
+				<p-button
+					label="{{ 'campaign-management.campaign-create.phishing-email-templates.actions.next' | translate }}"
+					(onClick)="nextPage()" icon="pi pi-angle-right" iconPos="right"></p-button>
+			</div>
+		</ng-template>
+	</p-card>
+</div>

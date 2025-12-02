@@ -1,0 +1,103 @@
+<p-card header="{{'dashboards.phishing.header' | translate }}">
+    <div class="col-12">
+        <app-phishing-campaigns-dashboard></app-phishing-campaigns-dashboard>
+    </div>
+    <div class="col-12 benchmark-button benchmark-button-miniscreen animation-duration-1000 animation-ease-in-out" pAnimateOnScroll enterClass="fadein" leaveClass="fadeoutleft">
+        <p-button
+            label="{{ 'dashboards.phishing.showIndustry' | translate }}"
+            icon="pi pi-eye"
+            (onClick)="toggleIndustryBenchmark()"
+            *ngIf="!showIndustryBenchmark"></p-button>
+        <p-button
+            label="{{ 'dashboards.phishing.hideIndustry' | translate }}"
+            icon="pi pi-eye-slash"
+            (onClick)="toggleIndustryBenchmark()"
+            *ngIf="showIndustryBenchmark"></p-button>
+    </div>
+    <div class="container">
+        <div class="chart-section animation-duration-1000 animation-ease-in-out" pAnimateOnScroll enterClass="fadein" leaveClass="fadeoutleft" [ngClass]="{ expanded: !showIndustryBenchmark, shrinked: showIndustryBenchmark }">
+            <p-card>
+                <h3 style="text-align: center">
+                    {{ 'dashboards.phishing.phishingSecurity' | translate:{ months: selectedMonth } }}
+                    <span style="font-size: 1.3rem; font-weight: 400">
+                        <p-dropdown
+                            [options]="months"
+                            optionLabel="name"
+                            optionValue="id"
+                            [ngModel]="selectedMonth"
+                            (onChange)="onMonthsDropdownChange($event)"
+                        ></p-dropdown>
+                        {{ 'dashboards.phishing.months' | translate }}
+                    </span>
+                </h3>                
+                <p-chart type="line" [data]="data" [options]="options" [responsive]="true"></p-chart>
+
+                <div class="table-container" style="margin-top: 20px">
+                    <div class="iAware-loading-table-container" style="position: relative">
+                        <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+
+                        <table class="styled-table">
+                            <thead>
+                                <tr>
+                                    <th style="visibility: hidden; border: none"></th>
+                                    <th *ngFor="let label of data?.labels">{{ label }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let dataset of data?.datasets">
+                                    <td class="flex">
+                                        <span
+                                            [style.background-color]="dataset.backgroundColor"
+                                            class="color-dot"></span>
+                                        <span
+                                            style="
+                                                position: relative;
+                                                display: inline-block;
+                                                vertical-align: middle;
+                                                margin-right: 5px;
+                                            ">
+                                            {{ dataset.label }}
+                                            <div
+                                                [style.background-color]="dataset.backgroundColor"
+                                                class="short-line"></div>
+                                        </span>
+                                    </td>
+                                    <td *ngFor="let value of dataset.data">{{ value }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </p-card>
+        </div>
+
+        <div class="industry-benchmark" [ngClass]="{ visible: showIndustryBenchmark, hidden: !showIndustryBenchmark }">
+            <p-card header="{{ 'dashboards.phishing.industryBenchmark' | translate }}">
+                <div class="benchmark-data">
+                    <div class="data-row">
+                        <span class="label">{{ 'dashboards.phishing.yourPhishingVulnerability' | translate }}</span>
+                        <span class="value">{{ tenantPhishingPercentage }}%</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="label">{{ 'dashboards.phishing.industryPhishingVulnerability' | translate }}</span>
+                        <span class="value">{{ selectedIndustryValue }}%</span>
+                    </div>
+                </div>               
+
+                <div class="grid">
+                    <div class="col-12">
+                        <div class="col-12">
+                            <p-dropdown
+                                [options]="industries"
+                                [style]="{ width: '100%' }"
+                                placeholder="{{ 'dashboards.phishing.industryPlaceholder' | translate }}"
+                                optionLabel="name"
+                                optionValue="value"
+                                (onChange)="onIndustryChange($event)"></p-dropdown>
+                        </div>
+                    </div>
+                </div>
+            </p-card>
+        </div>
+    </div>
+</p-card>

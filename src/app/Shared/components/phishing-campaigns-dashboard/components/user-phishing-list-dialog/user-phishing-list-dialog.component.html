@@ -1,0 +1,136 @@
+<p-dialog [header]="dialogHeader" [style]="{ width: '90%', height: '83%' }" (onHide)="handleHideAndClearSelections()"
+    [(visible)]="displayDialog" [modal]="true" [closable]="true">
+    <ng-template pTemplate="content">
+        <div class="grid">
+
+            <!-- Header Buttons -->
+            <div class="col-12 flex justify-content-end align-items-center">
+                <div class="action-buttons mx-3">
+                    <p-button label="{{ 'shared.actions.csv' | translate }}" icon="pi pi-file-excel"
+                        [disabled]="phishingCampaignsForSelectedUser.length === 0" class="p-button-success"
+                        (onClick)="downloadCSV()"></p-button>
+                </div>
+                <div class="action-buttons">
+                    <p-button label="{{ 'shared.actions.pdf' | translate }}" icon="pi pi-file-pdf"
+                        [disabled]="phishingCampaignsForSelectedUser.length === 0" class="p-button-danger"
+                        (onClick)="downloadPDF()"></p-button>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-12 overflow-auto">
+                <div class="grid">
+                    <!-- User List -->
+                    <div class="col-12 md:col-3 p-2 user-list">
+
+                        <button pButton pRipple label="Download All Users as PDF" icon="pi pi-file-pdf"
+                            (click)="downloadAllPDF()" class="mb-1 w-full md:w-50 p-button-outlined"></button>
+
+                        <button pButton pRipple label="Download All Users as CSV" icon="pi pi-file-excel"
+                            (click)="downloadAllCSV()" class="mb-5 w-full md:w-50 p-button-outlined"></button>
+                        <div class="overflow-auto">
+                            <p-scrollPanel [style]="{ height: '40vh' }">
+                                <ul class="flex flex-row md:flex-column gap-1 md:gap-2 list-none m-0 p-0 overflow-auto">
+                                    <li *ngFor="let user of filteredPhishingCampaignUsers; let i = index"
+                                        class="cursor-pointer select-none p-3 transition-duration-150 border-round flex align-items-center justify-content-center md:justify-content-start md:flex-1 flex-auto"
+                                        (click)="selectUser(user)"
+                                        [ngClass]="{'bg-primary': selectedUser === user, 'hover:surface-hover': selectedUser !== user}">
+                                        <img [alt]="user.userName"
+                                            [src]="user?.userImageUrl ?? '../../../../../assets/media/avatar.png'"
+                                            class="user-avatar md:mr-3 text-600 transition-duration-150 text-lg" />
+                                        <span class="text-900 font-medium hidden md:inline"
+                                            [ngClass]="{'text-primary-50': selectedUser === user}">
+                                            {{ user.userName }}
+                                            <br>
+                                            <span class="text-sm px-2hidden md:inline">
+                                                {{ user.userEmail }}
+                                            </span>
+                                        </span>
+                                        <hr>
+                                    </li>
+                                </ul>
+                            </p-scrollPanel>
+                        </div>
+                    </div>
+
+                    <!-- Campaign Table -->
+                    <div class="col-12 md:col-9 p-2">
+                        <div class="card">
+                            <p-scrollPanel [style]="{ height: '50vh' }">
+                                <p-table #dt dataKey="userName" [value]="phishingCampaignsForSelectedUser"
+                                    [tableStyle]="{ 'min-width': '60rem' }" [paginator]="true" [rows]="10"
+                                    [showCurrentPageReport]="true" responsiveLayout="scroll"
+                                    [rowsPerPageOptions]="[10, 50, 100, 150]">
+                                    <ng-template pTemplate="header">
+                                        <tr>
+                                            <!-- <th style="width: 40px">
+                                            <p-checkbox [binary]="true"
+                                                [(ngModel)]="isSelected"
+                                                (onChange)="addAllSelected($event)"></p-checkbox>
+                                        </th> -->
+                                            <th>{{ 'phishingCampaignsDashboard.campaign' | translate }}</th>
+                                            <th>{{ 'phishingCampaignsDashboard.template' | translate }}</th>
+                                            <th class="text-center">{{ 'phishingCampaignsDashboard.delivered' |
+                                                translate }}
+                                            </th>
+                                            <th class="text-center">{{ 'phishingCampaignsDashboard.opened' | translate
+                                                }}
+                                            </th>
+                                            <th class="text-center">{{ 'phishingCampaignsDashboard.qrCode' | translate
+                                                }}
+                                            </th>
+                                            <th class="text-center">{{ 'phishingCampaignsDashboard.clicked' | translate
+                                                }}
+                                            </th>
+                                            <th class="text-center">
+                                                {{ 'phishingCampaignsDashboard.dataEntered' | translate }}
+                                            </th>
+                                            <th class="text-center">{{ 'phishingCampaignsDashboard.reported' | translate
+                                                }}
+                                            </th>
+                                        </tr>
+                                    </ng-template>
+                                    <ng-template pTemplate="body" let-template>
+                                        <tr>
+                                            <!-- <td>
+                                            <p-checkbox [id]="template.userId"
+                                                [(ngModel)]="checkboxStates[template.userId]" [binary]="true"
+                                                (onChange)="addToselected($event, template)"></p-checkbox>
+                                        </td> -->
+                                            <td>{{ template.name }}</td>
+                                            <td>{{ template.templateName }}</td>
+                                            <td class="text-center">
+                                                <i *ngIf="template.isDelivered"
+                                                    class="text-4xl fa fa-check delivered-icon"></i>
+                                            </td>
+                                            <td class="text-center">
+                                                <i *ngIf="template.isOpened"
+                                                    class="text-4xl fa fa-check opened-icon"></i>
+                                            </td>
+                                            <td class="text-center">
+                                                <i *ngIf="template.isQRCodeScanned"
+                                                    class="text-4xl fa fa-check qr-code-icon"></i>
+                                            </td>
+                                            <td class="text-center">
+                                                <i *ngIf="template.isLinkClicked"
+                                                    class="text-4xl fa fa-check clicked-icon"></i>
+                                            </td>
+                                            <td class="text-center">
+                                                <i *ngIf="template.isDataEntered"
+                                                    class="text-4xl fa fa-check data-entered-icon"></i>
+                                            </td>
+                                            <td class="text-center">
+                                                <i *ngIf="template.isReported"
+                                                    class="text-4xl fa fa-check reported-icon"></i>
+                                            </td>
+                                        </tr>
+                                    </ng-template>
+                                </p-table>
+                            </p-scrollPanel>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+</p-dialog>

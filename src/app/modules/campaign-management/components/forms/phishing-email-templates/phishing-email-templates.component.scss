@@ -1,0 +1,15 @@
+::ng-deep .c .p-card-body{
+    padding-top: 5px !important;
+}
+
+.object-cover {
+    transition: transform 0.3s ease-in-out;
+}
+
+.object-cover:hover {
+    transform: scale(1.05);
+}
+
+:host ::ng-deep .p-dataview-emptymessage{
+    display: none !important;;
+}

@@ -1,0 +1,136 @@
+.campaign-dashboard-button{
+    padding-top: 0;
+    padding-bottom: 5;
+} 
+
+@media (min-width: 768px) {
+    .campaign-dashboard-button-miniscreen {
+        text-align: end;
+        width: 100%;
+    }
+}
+
+.campaign-table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.campaign-header {
+    display: flex;
+    background-color: #f3f4f6;
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.header-icon, .header-name, .header-progress {
+    flex: 1;
+    text-align: center;
+}
+
+.campaign-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border: 1px solid #e0e0e0; 
+    border-radius: 4px;
+    margin: 5px 0;
+    transition: background-color 0.3s ease;
+}
+
+.campaign-row:hover {
+    background-color: #acc2c4;
+    color: var(--primary-color);
+    cursor: pointer;
+}
+
+.campaign-name {
+    text-decoration: none;
+    font-size: larger;
+    font-weight: 500;
+    color: var(--primary-color);
+}
+
+.progress-bar {
+    flex: 1;
+    margin-left: 10px;
+}
+
+/* Campaign Buttons */
+.campaign-dashboard-button {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+/* Campaign Name Styling */
+.campaign-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
+/* Progress Bar Styling */
+.custom-progress-bar .p-progressbar-value {
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    transition: width 0.5s ease;
+}
+
+/* Campaign Table Styling */
+.campaign-table p-scrollPanel {
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.campaign-table ::ng-deep .p-scrollpanel-bar {
+    background: var(--primary-color);
+    height: 8px;
+    border-radius: 4px;
+}
+
+/* Campaign Row Styling */
+.campaign-row {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    align-items: center;
+    transition: background-color 0.3s;
+}
+
+.campaign-row-hover:hover {
+    background-color: var(--surface-hover);
+    cursor: pointer;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+    .campaign-dashboard-button {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .campaign-row {
+        display: block;
+    }
+}
+
+/* Scroll Animations */
+.fadeinup {
+    animation: fadeInUp 1s ease-in-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

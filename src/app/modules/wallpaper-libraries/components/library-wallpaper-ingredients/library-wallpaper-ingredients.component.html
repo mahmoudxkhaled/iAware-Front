@@ -1,0 +1,50 @@
+<div class="card">
+    <p-toast></p-toast>
+    <p-tabView class="w-full h-full" styleClass="tabview-custom">
+        <p-tabPanel>
+            <ng-template pTemplate="header">
+                <div class="flex align-items-center gap-2">
+                    <p-avatar image="https://images.tech.co/wp-content/uploads/2015/08/libraries-640x361.jpg"
+                        shape="circle" />
+                    <span class="font-bold white-space-nowrap m-0"> Wallpapers Library </span>
+                </div>
+            </ng-template>
+            <app-library-wallpaper></app-library-wallpaper>
+        </p-tabPanel>
+        <p-tabPanel>
+            <ng-template pTemplate="header">
+                <div class="flex align-items-center gap-2">
+                    <p-avatar image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTra0sAZmOGsqyAEZHWPWL5-WAMnUayWjekyQ&s"
+                        shape="circle" />
+                    <span class="font-bold white-space-nowrap m-0"> Backgrounds Library </span>
+                </div>
+            </ng-template>
+            <app-library-background></app-library-background>
+        </p-tabPanel>
+        <p-tabPanel>
+            <ng-template pTemplate="header">
+                <div class="flex align-items-center gap-2">
+                    <p-avatar
+                        image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHDW2LHfkbbsCn2fVbzgdc0KoH90AMWTN1Xw&s"
+                        shape="circle" />
+                    <span class="font-bold white-space-nowrap m-0">
+                        Characters Library </span>
+                </div>
+            </ng-template>
+            <div class="card">
+                <app-library-language-character></app-library-language-character>
+            </div>
+        </p-tabPanel>
+        <p-tabPanel>
+            <ng-template pTemplate="header">
+                <div class="flex align-items-center gap-2">
+                    <p-avatar  image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTiCOJrciDybsnMYoiFmhhLLalfG3jOX3DeOiW7dmg7zYgU1eqH79U2ngA8blmR1NL4Sic&usqp=CAU" shape="circle" />
+                    <span class="font-bold white-space-nowrap m-0"> Quotes Library </span>
+                </div>
+            </ng-template>
+            <div class="card">
+                <app-library-language-quote></app-library-language-quote>
+            </div>
+        </p-tabPanel>
+    </p-tabView>
+</div>

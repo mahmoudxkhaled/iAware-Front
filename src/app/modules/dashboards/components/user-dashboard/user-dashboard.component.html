@@ -1,0 +1,147 @@
+<div class="grid">
+    <div class="col-12" *ngIf="showMydashboard">
+        <div class="grid">
+            <div class="col-12 md:col-6 animation-duration-1000 animation-ease-in-out" pAnimateOnScroll
+                enterClass="fadein" leaveClass="fadeoutleft">
+                <app-user-dashboard-personal-risk-score [userPoints]="userPoints"
+                    [userRisk]="userRisk"></app-user-dashboard-personal-risk-score>
+            </div>
+
+            <div class="col-12 md:col-6 animation-duration-1000 animation-ease-in-out" pAnimateOnScroll
+                enterClass="fadein" leaveClass="fadeoutleft">
+                <app-user-dashboard-training-progress [progress]="userTrainingResults.assignmentsPercentage"
+                    [totalAssignments]="userTrainingResults.totalAssignments"
+                    [completedAssignments]="userTrainingResults.completedAssignments"></app-user-dashboard-training-progress>
+            </div>
+
+            <div class="col-12 md:col-6 animation-duration-1000 animation-ease-in-out" pAnimateOnScroll
+                enterClass="fadein" leaveClass="fadeoutleft">
+                <app-badge-ransk-scetion [usersBadgesEarnedNumber]="usersBadgesEarnedNumber"
+                    [userTeanatUnitRankedNumber]="userTeanatUnitRankedNumber"></app-badge-ransk-scetion>
+            </div>
+
+            <div class="col-12 md:col-6 animation-duration-1000 animation-ease-in-out" pAnimateOnScroll
+                enterClass="fadein" leaveClass="fadeoutleft">
+                <div *ngIf="userPhishingResults">
+                    <app-user-dashboard-phishing-result [emailsDelivered]="userPhishingResults.emailsDelivered"
+                        [emailsFailures]="userPhishingResults.emailsFailures"
+                        [emailsReported]="userPhishingResults.emailsReported"
+                        [emailsReportedPercentage]="userPhishingResults.emailsReportedPercentage"
+                        [emailsFailuresPercentage]="userPhishingResults.emailsFailuresPercentage"></app-user-dashboard-phishing-result>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="col-12" *ngIf="!showMydashboard">
+        <div class="grid">
+            <div class="col-12">
+                <p-card header="{{'dashboards.user-dashboard.teamSelection.header' | translate }}">
+                    <div class="grid">
+                        <div class="col-12">
+                            <p>{{'dashboards.user-dashboard.teamSelection.description' | translate }}</p>
+                        </div>
+                        <div class="col-12">
+                            <p-dropdown [style]="{width:'100%', padding:'7px'}" inputId="tenantUnitId"
+                                [options]="tenantUnits" optionLabel="unitName" optionValue="id"
+                                [(ngModel)]="tenantUnitIdSelected" [filter]="true"
+                                placeholder="{{'dashboards.user-dashboard.teamSelection.dropdownPlaceholder' | translate }}">
+                            </p-dropdown>
+                        </div>
+                        <div class="col-12 mt-2 text-right">
+                            <p-button label="{{'dashboards.user-dashboard.buttons.viewTeam' | translate }}"
+                                [outlined]="false" class="p-3" (onClick)="showTeamSelectedDetails()"></p-button>
+                        </div>
+                    </div>
+                </p-card>
+            </div>
+            <div class="col-12 md:col-6">
+                <p-card [style]="{height:'100%'}"
+                    header="{{'dashboards.user-dashboard.teamTrainingProgress.header' | translate }}">
+                    <div class="grid">
+                        <div class="col-12 mt-3 md:mt-5">
+                            <div class="col-12 flex pt-1">
+                                <div class="team-assignmentsPercentage mr-3">
+                                    {{teamTrainingResults.assignmentsPercentage}}% </div>
+                                <div class="mt-1">{{'dashboards.user-dashboard.teamTrainingProgress.description' |
+                                    translate }} </div>
+                            </div>
+                            <div class="col-12">
+                                <p-progressBar [value]="teamTrainingResults.assignmentsPercentage">
+                                    <ng-template pTemplate="content" let-value>
+                                        <span>{{value}}/100</span>
+                                    </ng-template>
+                                </p-progressBar>
+                            </div>
+                            <div class="col-12">
+                                {{'dashboards.user-dashboard.teamTrainingProgress.completedAssignments' |
+                                translate:{completedAssignments:teamTrainingResults.completedAssignments,
+                                totalAssignments:teamTrainingResults.totalAssignments} }}
+                            </div>
+                        </div>
+                    </div>
+                </p-card>
+            </div>
+            <div class="col-12 md:col-6">
+                <p-card [style]="{height:'100%'}"
+                    header="{{'dashboards.user-dashboard.teamPhishingResults.header' | translate}}">
+                    <div class="grid" *ngIf="teamPhishingResults; else noPhishingResults">
+                        <div class="col-12 flex justify-content-between  mt-3 md:mt-5 pb-0">
+                            <div class="col-6">
+                                <p>{{'dashboards.user-dashboard.teamPhishingResults.reportedEmails' | translate }} <i
+                                        class="pi pi-question-circle"></i></p>
+                            </div>
+                            <div class="col-6 text-right">
+                                {{'dashboards.user-dashboard.teamPhishingResults.reportedPercentage' |
+                                translate:{emailsReported:teamPhishingResults.emailsReported,
+                                emailsDelivered:teamPhishingResults.emailsDelivered} }}
+                            </div>
+                        </div>
+                        <div class="col-12 pb-0">
+                            <p-progressBar [value]="teamPhishingResults.emailsReportedPercentage">
+                                <ng-template pTemplate="content" let-value>
+                                    <span>{{value}}/100</span>
+                                </ng-template>
+                            </p-progressBar>
+                        </div>
+                        <div class="col-12 flex justify-content-between pb-0">
+                            <div class="col-6">
+                                <p>{{'dashboards.user-dashboard.teamPhishingResults.failures' | translate}} <i
+                                        class="pi pi-question-circle"></i></p>
+                            </div>
+                            <div class="col-6 text-right">
+                                {{teamPhishingResults.emailsFailures}} / {{teamPhishingResults.emailsDelivered}}
+                            </div>
+                        </div>
+                        <div class="col-12 md:mb-3">
+                            <p-progressBar [value]="teamPhishingResults.emailsFailuresPercentage">
+                                <ng-template pTemplate="content" let-value>
+                                    <span>{{value}}/100</span>
+                                </ng-template>
+                            </p-progressBar>
+                        </div>
+                    </div>
+                    <ng-template #noPhishingResults>
+                        <div class="col-12">
+                            <p>{{'dashboards.user-dashboard.teamPhishingResults.noData' | translate}}</p>
+                        </div>
+                    </ng-template>
+                </p-card>
+            </div>
+            <div class="col-12">
+                <p-card [style]="{height:'100%'}"
+                    header="{{'dashboards.user-dashboard.teamRiskScore.header' | translate}}">
+                    <div *ngIf="teamPhishingResults.teamUserRiskScore">
+                        <app-gauge-chart
+                            needleChartTitle="{{'dashboards.user-dashboard.teamRiskScore.title' | translate}}"
+                            [chartWidth]="400" [needleValue]="teamPhishingResults.teamUserRiskScore"></app-gauge-chart>
+                    </div>
+                </p-card>
+            </div>
+            <div class="col-12">
+                <p-card [style]="{height:'100%'}" styleClass="userDashboard-Phishing-result"
+                    header="{{'dashboards.user-dashboard.teamDetails.header' | translate}}"></p-card>
+            </div>
+        </div>
+    </div>
+</div>

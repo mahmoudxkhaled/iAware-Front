@@ -1,0 +1,25 @@
+.avatar {
+    vertical-align: middle;
+    width: 150px;
+    height: 150px;
+    border: 1px solid black;
+}
+
+input[type='file'] {
+    display: none;
+}
+
+// component-specific SCSS file
+:host ::ng-deep .p-dataview .p-dataview-header {
+    color: #8080802b !important ;
+    border: none !important;
+    border-bottom: 1px solid !important;
+    border-width: 1px 0 0 0;
+    padding: 1rem 1rem;
+    font-weight: 600;
+    padding-bottom: 26px;
+}
+
+:host ::ng-deep .p-dataview-emptymessage{
+    display: none !important;;
+}

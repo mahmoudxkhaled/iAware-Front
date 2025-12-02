@@ -1,0 +1,57 @@
+<p-card header="Phish Alert Button">
+    <!-- Cards for summary data -->
+    <div class="grid card-grid">
+        <div class="card-body col-12 md:col-4 lg:col-2">
+            <p-card styleClass="card-summary">
+                <div class="card-content">
+                    <span>{{ installed }}</span>
+                    <p>Installed</p>
+                </div>
+            </p-card>
+        </div>
+
+        <div class="card-body col-12 md:col-4 lg:col-2">
+            <p-card styleClass="card-summary">
+                <div class="card-content">
+                    <span>{{ uninstalled }}</span>
+                    <p>Uninstalled</p>
+                </div>
+            </p-card>
+        </div>
+
+        <div class="card-body col-12 md:col-4 lg:col-2">
+            <p-card styleClass="card-summary">
+                <div class="card-content">
+                    <span>{{ totalReported }}</span>
+                    <p>Total Reported</p>
+                </div>
+            </p-card>
+        </div>
+
+        <div class="card-body col-12 md:col-4 lg:col-2">
+            <p-card styleClass="card-summary">
+                <div class="card-content">
+                    <span>{{ simulatedEmails }}</span>
+                    <p>Simulated Emails</p>
+                </div>
+            </p-card>
+        </div>
+
+        <div class="card-body col-12 md:col-4 lg:col-2">
+            <p-card styleClass="card-summary">
+                <div class="card-content">
+                    <span>{{ nonSimulatedEmails }}</span>
+                    <p style="font-size: small;">Non-simulated Emails</p>
+                </div>
+            </p-card>
+        </div>
+    </div>
+
+    <!-- Chart below the summary cards -->
+    <div class="grid">
+        <div class="col-12">
+            <h3 style="text-align: center;">Phishing Alert Report Comparison<span style="font-size: 1.3rem;font-weight: 400;"> - Last 30 days</span></h3>
+            <p-chart type="bar" [data]="data" [options]="options"></p-chart>
+        </div>
+    </div>
+</p-card>

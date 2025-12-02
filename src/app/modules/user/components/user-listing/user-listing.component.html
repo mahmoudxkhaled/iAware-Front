@@ -1,0 +1,897 @@
+<div class="card">
+    <p-toast></p-toast>
+    <p-tabView [style]="{ width: '100%' }">
+        <p-tabPanel header="{{ 'user.user-listing.actions.activeUsers' | translate }}">
+            <div class="iAware-loading-table-container" style="position: relative">
+                <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                <p-table #dt id="t-p" [value]="users" [paginator]="true" [rows]="10" [showCurrentPageReport]="true"
+                    responsiveLayout="scroll" [rowsPerPageOptions]="[10, 25, 50, 100, 200]"
+                    [globalFilterFields]="['firstName', 'lastName', 'email']" [rowHover]="true"
+                    (onLazyLoad)="lazyLoadUsers($event)" [totalRecords]="totalRecords" [lazy]="true">
+                    <ng-template pTemplate="caption">
+                        <div class="flex flex-wrap gap-2 align-items-center justify-content-between">
+                            <span class="p-input-icon-left w-full sm:w-20rem flex-order-1 sm:flex-order-0">
+                                <i class="pi pi-search"></i>
+                                <input pInputText type="text" (input)="onGlobalFilter(dt, $event)"
+                                    placeholder="{{ 'shared.search.activeUser' | translate }}" class="w-full" />
+                            </span>
+                            <p-button *ngIf="hasPermission(actions.add)" (click)="navigateToCreateUsers()"
+                                class="p-button-outlined w-full sm:w-auto flex-order-0 sm:flex-order-1"
+                                icon="pi pi-user-plus"
+                                label="{{ 'user.user-listing.actions.addUser' | translate }}"></p-button>
+                            <!-- <p-button *ngIf="hasPermission(actions.exportExcel)" [disabled]="users == null"
+                                (onClick)="exportExcel()"
+                                label="{{ 'user.user-listing.actions.exportUsers' | translate }}"
+                                icon="pi pi-file-export" class="w-auto"></p-button> -->
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th class="white-space-nowrap rtl-layout" style="width: 25%">
+                                {{ 'user.user-listing.usersTable.fields.firstName' | translate
+                                }}
+                            </th>
+                            <th class="white-space-nowrap" style="width: 25%">
+                                {{ 'user.user-listing.usersTable.fields.lastName' | translate }}
+                            </th>
+                            <th class="white-space-nowrap" style="width: 25%">
+                                {{ 'user.user-listing.usersTable.fields.email' | translate}}
+                            </th>
+                            <th class="white-space-nowrap" style="width: 25%">
+                                {{ 'user.user-listing.usersTable.fields.unit' | translate }}
+                            </th>
+                            <th class="white-space-nowrap" style="width: 25%">
+                                {{ 'user.user-listing.usersTable.fields.emailConfirmed' | translate }}
+                            </th>
+                            <th class="white-space-nowrap" style="width: 25%">
+                                {{ 'user.user-listing.usersTable.fields.status' | translate}}
+                            </th>
+                            <th style="width: 25%"></th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-user>
+                        <tr>
+                            <td>
+                                <a style="cursor: pointer" routerLink="userDetail/{{ user?.id }}">{{user.firstName}}</a>
+                            </td>
+                            <td>
+                                <a style="cursor: pointer" routerLink="userDetail/{{ user?.id }}">{{user.lastName}}</a>
+                            </td>
+                            <td>
+                                <a style="cursor: pointer" routerLink="userDetail/{{ user?.id }}">{{ user.email }}</a>
+                            </td>
+                            <td>{{ user.tenantUnitName }}</td>
+                            <td>
+                                <p-checkbox [ngModel]="user.isEmailConfirmed" [disabled]="true"
+                                    [binary]="true"></p-checkbox>
+                            </td>
+                            <td>
+                                <p-inputSwitch *ngIf="hasPermission(actions.active) && !user.isDefaultTenantUser"
+                                    [formControl]="userToggleControls[user.id]"
+                                    (onChange)="openActivationDialog(user)"></p-inputSwitch>
+
+                                    <p-inputSwitch *ngIf="hasPermission(actions.active) && user.isDefaultTenantUser" 
+                                    [ngModel]="user.isActive" [disabled]="true"></p-inputSwitch>
+                            </td>
+                            <td>
+                                @if(!user.isDefaultTenantUser){
+                                <button *ngIf="menuItems.length > 0" pButton pRipple type="button"
+                                    icon="pi pi-ellipsis-v" class="p-button-rounded p-button-text p-button-plain ml-3"
+                                    (click)="menu.toggle($event); assigneCurrentSelect(user)"></button>
+                                <p-menu #menu [model]="menuItems" [appendTo]="'body'" [popup]="true"></p-menu>
+                                }
+                            </td>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="emptymessage">
+                        <tr>
+                            <td colspan="7" class="text-center">
+                                <div class="empty-state">
+                                    <p class="empty-state-message">
+                                        {{ 'user.user-listing.actions.noActiveUsersavailable' | translate }}
+                                    </p>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </p-tabPanel>
+        <p-tabPanel header="{{ 'user.user-listing.actions.deletedUsers' | translate }}">
+            <div class="iAware-loading-table-container" style="position: relative">
+                <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                <p-table #dt id="t-p" [value]="deletedUsers" [paginator]="true" [rows]="10"
+                    [showCurrentPageReport]="true" responsiveLayout="scroll" [rowsPerPageOptions]="[10, 25, 50, 100, 200]"
+                    [globalFilterFields]="['firstName', 'lastName', 'email', 'isEmailConfirmed', 'status']"
+                    [rowHover]="true" (onLazyLoad)="lazyLoadDeletedUsers($event)" [totalRecords]="deletedUsersTotalRecords" [lazy]="true">
+                    <ng-template pTemplate="caption">
+                        <div class="flex flex-wrap gap-2 align-items-center justify-content-between">
+                            <span class="p-input-icon-left w-full sm:w-20rem flex-order-1 sm:flex-order-0">
+                                <i class="pi pi-search"></i>
+                                <input pInputText type="text" (input)="onGlobalFilter(dt, $event)"
+                                    placeholder="{{ 'shared.search.deletedUser' | translate }}" class="w-full" />
+                            </span>
+                            <p-button *ngIf="hasPermission(actions.exportExcel)" [disabled]="deletedUsers == null"
+                                (onClick)="exportDeletedExcel()"
+                                label="{{ 'user.user-listing.actions.exportUsers' | translate }}"
+                                icon="pi pi-file-export" class="w-auto"></p-button>
+                            <p-button [disabled]="deletedUsers == null" (onClick)="fetchDeletedUsers()"
+                                label="{{ 'user.user-listing.actions.refresh' | translate }}" icon="pi pi-sync"
+                                class="w-auto"></p-button>
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th pSortableColumn="firstName" class="white-space-nowrap rtl-layout" style="width: 25%">
+                                {{ 'user.user-listing.usersTable.fields.firstName' | translate
+                                }}<p-sortIcon field="firstName"></p-sortIcon>
+                            </th>
+                            <th pSortableColumn="lastName" class="white-space-nowrap" style="width: 25%">
+                                {{ 'user.user-listing.usersTable.fields.lastName' | translate }}
+                                <p-sortIcon field="lastName"></p-sortIcon>
+                            </th>
+                            <th pSortableColumn="email" class="white-space-nowrap" style="width: 25%">
+                                {{ 'user.user-listing.usersTable.fields.email' | translate
+                                }}<p-sortIcon field="email"></p-sortIcon>
+                            </th>
+                            <th style="width: 25%"></th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-user>
+                        <tr>
+                            <td>{{ user.firstName }}</td>
+                            <td>{{ user.lastName }}</td>
+                            <td>{{ user.email }}</td>
+                            <td class="text-right">
+                                <p-button icon="pi pi-replay" (onClick)="returnUserDeleted(user.id)"></p-button>
+                            </td>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="emptymessage">
+                        <tr>
+                            <td colspan="4" class="text-center">
+                                <div class="empty-state">
+                                    <p class="empty-state-message">
+                                        {{ 'user.user-listing.actions.noDeletedUsersavailable' | translate }}
+                                    </p>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </p-tabPanel>
+    </p-tabView>
+</div>
+
+<p-dialog [(visible)]="editeUserDialog" [style]="{ width: '50%', height: '60%' }"
+    header="{{ 'user.user-listing.dialogs.editeUserDialog.header' | translate }}" [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <form [formGroup]="userForm" (ngSubmit)="editeUser()">
+            <div class="grid">
+                <div class="col-12">
+                    <div class="grid formgrid p-fluid">
+                        <!-- <div class="field mb-4 col-12 md:col-6">
+                            <label class="font-medium text-900">{{ 'user.user-listing.dialogs.editeUserDialog.fields.roles' | translate }}</label>
+                            <span class="p-float-label">
+                                <p-multiSelect [options]="roles" formControlName="roleIds" optionLabel="name" optionValue="id" placeholder="{{ 'user.user-listing.dialogs.editeUserDialog.placeHolders.roles' | translate }}"></p-multiSelect>
+                                <div *ngIf="userForm.get('roleIds')?.invalid && (userForm.get('roleIds')?.dirty || userForm.get('roleIds')?.touched)"
+                                    class="p-error">
+                                    <div *ngIf="userForm.get('roleIds')?.errors?.['required']">{{ 'user.user-listing.dialogs.editeUserDialog.validations.roles' | translate }}</div>
+                                </div>
+                            </span>
+                        </div> -->
+
+                        <div class="field mb-4 col-12 md:col-6">
+                            <label for="groupsIds" class="font-medium text-900">{{
+                                'user.user-listing.dialogs.addUserDialog.fields.group' | translate
+                                }}</label>
+                            <span>
+                                <p-multiSelect inputId="groupsIds" [options]="groups" optionLabel="name"
+                                    optionValue="id" formControlName="groupsIds" [filter]="true" placeholder="{{
+                                        'user.user-listing.dialogs.editeUserDialog.placeHolders.group' | translate
+                                    }}">
+                                </p-multiSelect>
+                            </span>
+                        </div>
+
+                        <div class="field mb-4 col-12 md:col-6">
+                            <label for="groupsIds" class="font-medium text-900">{{ 'Department' | translate }}</label>
+                            <span>
+                                <p-dropdown inputId="tenantUnitId" [options]="tenantUnits" optionLabel="unitName"
+                                    optionValue="id" formControlName="tenantUnitId" [filter]="true"
+                                    placeholder="{{ 'Select a Department' | translate }}">
+                                </p-dropdown>
+                            </span>
+                        </div>
+
+                        <div class="field mb-4 col-12 md:col-6">
+                            <label for="firstName" class="font-medium text-900">{{
+                                'user.user-listing.dialogs.editeUserDialog.fields.firstName' | translate
+                                }}</label>
+                            <input id="firstName" type="text" pInputText formControlName="firstName" placeholder="{{
+                                    'user.user-listing.dialogs.editeUserDialog.placeHolders.firstName' | translate
+                                }}" />
+                            <div *ngIf="
+                                    userForm.get('firstName')?.invalid &&
+                                    (userForm.get('firstName')?.dirty || userForm.get('firstName')?.touched)
+                                " class="p-error">
+                                <div *ngIf="userForm.get('firstName')?.errors?.['required']">
+                                    {{ 'user.user-listing.dialogs.editeUserDialog.validations.firstName' | translate }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field mb-4 col-12 md:col-6">
+                            <label for="lastName" class="font-medium text-900">{{
+                                'user.user-listing.dialogs.editeUserDialog.fields.lastName' | translate
+                                }}</label>
+                            <input id="lastName" type="text" pInputText formControlName="lastName" placeholder="{{
+                                    'user.user-listing.dialogs.editeUserDialog.placeHolders.lastName' | translate
+                                }}" />
+                            <div *ngIf="
+                                    userForm.get('lastName')?.invalid &&
+                                    (userForm.get('lastName')?.dirty || userForm.get('lastName')?.touched)
+                                " class="p-error">
+                                <div *ngIf="userForm.get('lastName')?.errors?.['required']">
+                                    {{ 'user.user-listing.dialogs.editeUserDialog.validations.lastName' | translate }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field mb-4 col-12 md:col-6">
+                            <label for=" languageId" class="font-medium text-900">{{
+                                'user.user-listing.dialogs.editeUserDialog.fields.language' | translate
+                                }}</label>
+                            <span>
+                                <p-dropdown formControlName="languageId" [options]="languages" [filter]="true"
+                                    optionLabel="name" optionValue="id" placeholder="{{
+                                        'user.user-listing.dialogs.editeUserDialog.placeHolders.language' | translate
+                                    }}">
+                                </p-dropdown>
+                                <div *ngIf="
+                                        userForm.get('languageId')?.invalid &&
+                                        (userForm.get('languageId')?.dirty || userForm.get('languageId')?.touched)
+                                    " class="p-error">
+                                    <div *ngIf="userForm.get('languageId')?.errors?.['required']">
+                                        {{
+                                        'user.user-listing.dialogs.editeUserDialog.validations.language' | translate
+                                        }}
+                                    </div>
+                                </div>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+            class="p-button-text" (click)="hideDialog()"></button>
+        <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check" class="p-button-text"
+            (click)="editeUser()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="addUserDialog" [style]="{ width: '70%', height: '100%' }"
+    header="{{ 'user.user-listing.dialogs.addUserDialog.header' | translate }}" [modal]="true" class="p-fluid"
+    (onHide)="analysisData = null">
+    <ng-template pTemplate="content">
+        <p-tabView [style]="{ width: '100%' }">
+            <p-tabPanel header="{{ 'user.user-listing.dialogs.addUserDialog.taps.adUser' | translate }}">
+                <app-iAware-info
+                    description="{{ 'user.user-listing.dialogs.addUserDialog.messages.adUser' | translate }}"
+                    icon="fa fa-solid fa-circle-info text-3xl" severity="info"></app-iAware-info>
+
+                <form [formGroup]="userAddForm" (ngSubmit)="onSubmit()">
+                    <div class="grid">
+                        <div class="col-12">
+                            <div class="grid formgrid p-fluid">
+                                <div class="field mb-4 col-12 md:col-6">
+                                    <label for="firstName" class="font-medium text-900">{{
+                                        'user.user-listing.dialogs.addUserDialog.fields.firstName' | translate }}
+                                        <span style="color: red"
+                                            pTooltip="{{ 'shared.messages.required' | translate }}">{{ 'shared.labels.*'
+                                            | translate }}</span>
+                                    </label>
+                                    <input id="firstName" type="text" pInputText formControlName="firstName"
+                                        placeholder="{{
+                                            'user.user-listing.dialogs.editeUserDialog.placeHolders.firstName'
+                                                | translate
+                                        }}" />
+                                    <div *ngIf="
+                                            userAddForm.get('firstName')?.invalid &&
+                                            (userAddForm.get('firstName')?.dirty ||
+                                                userAddForm.get('firstName')?.touched)
+                                        " class="p-error">
+                                        {{
+                                        'user.user-listing.dialogs.addUserDialog.validations.firstName' | translate
+                                        }}
+                                    </div>
+                                </div>
+                                <div class="field mb-4 col-12 md:col-6">
+                                    <label for="lastName" class="font-medium text-900">{{
+                                        'user.user-listing.dialogs.addUserDialog.fields.lastName' | translate }}
+                                        <span style="color: red"
+                                            pTooltip="{{ 'shared.messages.required' | translate }}">{{ 'shared.labels.*'
+                                            | translate }}</span>
+                                    </label>
+                                    <input id="lastName" type="text" pInputText formControlName="lastName" placeholder="{{
+                                            'user.user-listing.dialogs.editeUserDialog.placeHolders.lastName'
+                                                | translate
+                                        }}" />
+                                    <div *ngIf="
+                                            userAddForm.get('lastName')?.invalid &&
+                                            (userAddForm.get('lastName')?.dirty || userAddForm.get('lastName')?.touched)
+                                        " class="p-error">
+                                        {{ 'user.user-listing.dialogs.addUserDialog.validations.lastName' | translate }}
+                                    </div>
+                                </div>
+                                <div class="field mb-4 col-12 md:col-6">
+                                    <label for="email" class="font-medium text-900">{{
+                                        'user.user-listing.dialogs.addUserDialog.fields.email' | translate }}
+                                        <span style="color: red"
+                                            pTooltip="{{ 'shared.messages.required' | translate }}">{{ 'shared.labels.*'
+                                            | translate }}</span>
+                                    </label>
+                                    <input id="email" type="text" pInputText formControlName="email" placeholder="{{
+                                            'user.user-listing.dialogs.addUserDialog.placeHolders.email' | translate
+                                        }}" />
+                                    <div *ngIf="
+                                            userAddForm.get('email')?.invalid &&
+                                            (userAddForm.get('email')?.dirty || userAddForm.get('email')?.touched)
+                                        " class="p-error">
+                                        <div *ngIf="userAddForm.get('email')?.errors?.['required']">
+                                            {{
+                                            'user.user-listing.dialogs.addUserDialog.validations.email' | translate
+                                            }}.
+                                        </div>
+                                        <div *ngIf="userAddForm.get('email')?.errors?.['email']">
+                                            {{
+                                            'user.user-listing.dialogs.addUserDialog.validations.emailAddress'
+                                            | translate
+                                            }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field mb-4 col-12 md:col-6">
+                                    <label for=" languageId" class="font-medium text-900">{{
+                                        'user.user-listing.dialogs.addUserDialog.fields.language' | translate }}
+                                        <span style="color: red"
+                                            pTooltip="{{ 'shared.messages.required' | translate }}">{{ 'shared.labels.*'
+                                            | translate }}</span>
+                                    </label>
+                                    <span>
+                                        <p-dropdown formControlName="languageId" [options]="languages" [filter]="true"
+                                            optionLabel="name" optionValue="id" placeholder="{{
+                                                'user.user-listing.dialogs.editeUserDialog.placeHolders.language'
+                                                    | translate
+                                            }}">
+                                        </p-dropdown>
+                                        <div *ngIf="
+                                                userAddForm.get('languageId')?.invalid &&
+                                                (userAddForm.get('languageId')?.dirty ||
+                                                    userAddForm.get('languageId')?.touched)
+                                            " class="p-error">
+                                            <div *ngIf="userAddForm.get('languageId')?.errors?.['required']">
+                                                {{
+                                                'user.user-listing.dialogs.addUserDialog.validations.language'
+                                                | translate
+                                                }}
+                                            </div>
+                                        </div>
+                                    </span>
+                                </div>
+                                <div class="field mb-4 col-12 md:col-6">
+                                    <label for="groupsIds" class="font-medium text-900">{{
+                                        'user.user-listing.dialogs.addUserDialog.fields.dept' | translate
+                                        }}</label>
+                                    <span>
+                                        <p-dropdown inputId="tenantUnitId" [options]="tenantUnits"
+                                            optionLabel="unitName" optionValue="id" formControlName="tenantUnitId"
+                                            [filter]="true" placeholder="{{
+                                                'user.user-listing.dialogs.addUserDialog.placeHolders.dept' | translate
+                                            }}">
+                                        </p-dropdown>
+                                    </span>
+                                </div>
+                                <div class="field mb-4 col-12 md:col-6">
+                                    <label for="groupsIds" class="font-medium text-900">{{
+                                        'user.user-listing.dialogs.addUserDialog.fields.group' | translate
+                                        }}</label>
+                                    <span>
+                                        <p-multiSelect inputId="groupsIds" [options]="groups" optionLabel="name"
+                                            formControlName="groupsIds" [filter]="true" placeholder="{{
+                                                'user.user-listing.dialogs.editeUserDialog.placeHolders.group'
+                                                    | translate
+                                            }}">
+                                        </p-multiSelect>
+                                    </span>
+                                </div>
+                                <div class="field field-checkbox mt-4 col-12 md:col-6">
+                                    <p-checkbox formControlName="isActive" [binary]="true" label="{{
+                                            'user.user-listing.dialogs.addUserDialog.fields.isActive' | translate
+                                        }}" />
+                                </div>
+                                <div class="mt-4 mb-2 m-auto col-12">
+                                    <p-button type="submit" label="{{ 'shared.actions.save' | translate }}"
+                                        class="p-button-text" [disabled]="!userAddForm.valid"></p-button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </p-tabPanel>
+
+            <p-tabPanel header="{{ 'user.user-listing.dialogs.addUserDialog.taps.excelUsers' | translate }}">
+                <app-iAware-info
+                    description="{{ 'user.user-listing.dialogs.addUserDialog.messages.excelUsers' | translate }}"
+                    icon="fa fa-solid fa-circle-info text-3xl" severity="info"></app-iAware-info>
+
+                <div class="grid">
+                    <div class="col-12 flex md:justify-content-between">
+                        <div class="col-12 md:col-6 lg:col-3">
+                            <p-button *ngIf="hasPermission(actions.exportExcelSample)"
+                                (onClick)="dowenloadExcelSample()"
+                                label="{{ 'user.user-listing.actions.exportExcelSample' | translate }}"
+                                icon="pi pi-file-excel"></p-button>
+                        </div>
+                        <div class="col-12 md:col-6 lg:col-3">
+                            <div class="flex align-items-center justify-content-center" style="display: none">
+                                <p-button *ngIf="hasPermission(actions.importExcel)"
+                                    label="{{ 'user.user-listing.actions.importUsers' | translate }}"
+                                    icon="pi pi-file-import" (click)="onUploadFileClick()"></p-button>
+                                <input type="file" id="excelFile" style="display: none"
+                                    (change)="onUploadComplete($event)" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="_excelAnalysis mt-5 mb-2">
+                    <div *ngIf="analysisData">
+                        <div class="grid">
+                            <!-- Title for Excel Data Overview -->
+                            <div class="col-12">
+                                <div class="card p-3 shadow-2 border-round text-center mb-4">
+                                    <h2 class="m-0 font-bold" style="color: #7a38a7">
+                                        {{
+                                        'user.user-listing.dialogs.importUsersToaster.excelDataOverview' | translate
+                                        }}
+                                    </h2>
+                                </div>
+                            </div>
+
+                            <!-- File Name -->
+                            <div class="col-12 md:col-6">
+                                <div class="card p-3 shadow-2 border-round excel-div">
+                                    <div class="flex align-items-center">
+                                        <i class="pi pi-file" style="font-size: 1.5rem; color: #007bff"></i>
+                                        <div class="ml-3">
+                                            <p class="m-0 font-bold">
+                                                {{
+                                                'user.user-listing.dialogs.importUsersToaster.fileName' | translate
+                                                }}
+                                            </p>
+                                            <p class="m-0 font-medium">{{ analysisData.fileName }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- File Size -->
+                            <div class="col-12 md:col-6">
+                                <div class="card p-3 shadow-2 border-round excel-div">
+                                    <div class="flex align-items-center">
+                                        <i class="pi pi-box" style="font-size: 1.5rem; color: #007bff"></i>
+                                        <div class="ml-3">
+                                            <p class="m-0 font-bold">
+                                                {{
+                                                'user.user-listing.dialogs.importUsersToaster.fileSize' | translate
+                                                }}
+                                            </p>
+                                            <p class="m-0 font-medium">{{ 'Size: ' + analysisData.fileSize }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Total Records -->
+                            <div class="col-12 md:col-6">
+                                <div class="card p-3 shadow-2 border-round excel-div">
+                                    <div class="flex align-items-center">
+                                        <i class="pi pi-database" style="font-size: 1.5rem; color: #28a745"></i>
+                                        <div class="ml-3">
+                                            <p class="m-0 font-bold">
+                                                {{
+                                                'user.user-listing.dialogs.importUsersToaster.totalRecords'
+                                                | translate
+                                                }}
+                                            </p>
+                                            <p class="m-0 font-medium">{{ analysisData.totalRecords }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Unique Records -->
+                            <div class="col-12 md:col-6">
+                                <div class="card p-3 shadow-2 border-round excel-div">
+                                    <div class="flex align-items-center">
+                                        <i class="pi pi-check-circle" style="font-size: 1.5rem; color: #28a745"></i>
+                                        <div class="ml-3">
+                                            <p class="m-0 font-bold">
+                                                {{
+                                                'user.user-listing.dialogs.importUsersToaster.uniqueRecords'
+                                                | translate
+                                                }}
+                                            </p>
+                                            <p class="m-0 font-medium">{{ analysisData.uniqueRecordsNumber }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Duplicated Records -->
+                            <div class="col-12 md:col-6">
+                                <div class="card p-3 shadow-2 border-round excel-div"
+                                    (click)="toggleDuplicatedRecords()" style="cursor: pointer">
+                                    <div class="flex align-items-center">
+                                        <i class="pi pi-exclamation-triangle"
+                                            style="font-size: 1.5rem; color: #ffc107"></i>
+                                        <div class="ml-3">
+                                            <p class="m-0 font-bold">
+                                                {{
+                                                'user.user-listing.dialogs.importUsersToaster.duplicatedRecords'
+                                                | translate
+                                                }}
+                                            </p>
+                                            <p class="m-0 font-medium">{{ analysisData.duplicatedRecords }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Invalid Records -->
+                            <div class="col-12 md:col-6">
+                                <div class="card p-3 shadow-2 border-round excel-div" (click)="toggleInvalidRecords()"
+                                    style="cursor: pointer">
+                                    <div class="flex align-items-center">
+                                        <i class="pi pi-times-circle" style="font-size: 1.5rem; color: #dc3545"></i>
+                                        <div class="ml-3">
+                                            <p class="m-0 font-bold">
+                                                {{
+                                                'user.user-listing.dialogs.importUsersToaster.invalidRecords'
+                                                | translate
+                                                }}
+                                            </p>
+                                            <p class="m-0 font-medium">{{ analysisData.invalidRecords }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Invalid Records Section -->
+                            <div *ngIf="showInvalidRecords" class="col-12 mt-3">
+                                <div class="card p-4 shadow-2 border-round">
+                                    <h3 class="text-danger">
+                                        <i class="pi pi-times-circle" style="font-size: 1.5rem; color: #dc3545"></i>
+                                        {{ 'user.user-listing.dialogs.importUsersToaster.invalidRecords' | translate }}
+                                    </h3>
+                                    <p class="text-muted">
+                                        {{ analysisData.invalidRecordsList?.length }}
+                                        {{ 'Invalid Records Found' | translate }}
+                                    </p>
+
+                                    <div class="grid">
+                                        <div class="col-12">
+                                            <div class="iAware-loading-table-container" style="position: relative">
+                                                <app-table-loading-spinner
+                                                    *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                                                <p-table #dt [value]="analysisData.invalidRecordsList!"
+                                                    [paginator]="true" [rows]="10" [showCurrentPageReport]="true"
+                                                    responsiveLayout="scroll" [rowsPerPageOptions]="[10, 25, 50]">
+                                                    <ng-template pTemplate="header">
+                                                        <tr>
+                                                            <th class="white-space-nowrap" style="width: 25%">Email</th>
+                                                            <th class="white-space-nowrap" style="width: 25%">
+                                                                Reason
+                                                            </th>
+                                                        </tr>
+                                                    </ng-template>
+                                                    <ng-template pTemplate="body" let-user>
+                                                        <tr>
+                                                            <td>{{ user.email }}</td>
+                                                            <td>{{ user?.reason?.join(', ') }}</td>
+                                                        </tr>
+                                                    </ng-template>
+                                                </p-table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Duplicated Records Section -->
+                            <div *ngIf="showDuplicatedRecords" class="col-12 mt-3">
+                                <div class="card p-4 shadow-2 border-round">
+                                    <h3 class="text-warning">
+                                        <i class="pi pi-exclamation-triangle"
+                                            style="font-size: 1.5rem; color: #ffc107"></i>
+                                        {{
+                                        'user.user-listing.dialogs.importUsersToaster.duplicatedRecords' | translate
+                                        }}
+                                    </h3>
+                                    <p class="text-muted">
+                                        {{ analysisData.duplicatedRecordsList?.length }}
+                                        {{ 'Duplicated Records Found' | translate }}
+                                    </p>
+
+                                    <div class="grid">
+                                        <div class="col-12">
+                                            <div class="iAware-loading-table-container" style="position: relative">
+                                                <app-table-loading-spinner
+                                                    *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                                                <p-table #dt [value]="analysisData.duplicatedRecordsList!"
+                                                    [paginator]="true" [rows]="10" [showCurrentPageReport]="true"
+                                                    responsiveLayout="scroll" [rowsPerPageOptions]="[10, 25, 50]">
+                                                    <ng-template pTemplate="header">
+                                                        <tr>
+                                                            <th class="white-space-nowrap" style="width: 25%">Email</th>
+                                                            <th class="white-space-nowrap" style="width: 25%">
+                                                                First Name
+                                                            </th>
+                                                            <th class="white-space-nowrap" style="width: 25%">
+                                                                Last Name
+                                                            </th>
+                                                        </tr>
+                                                    </ng-template>
+                                                    <ng-template pTemplate="body" let-user>
+                                                        <tr>
+                                                            <td>{{ user.email }}</td>
+                                                            <td>{{ user.firstName }}</td>
+                                                            <td>{{ user.lastName }}</td>
+                                                        </tr>
+                                                    </ng-template>
+                                                </p-table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Group Info -->
+                            <div class="col-12 mt-3">
+                                <h4>{{ 'user.user-listing.dialogs.importUsersToaster.ous' | translate }}:</h4>
+                                <div class="grid">
+                                    <div *ngFor="let ou of analysisData.ouAnalysis" class="col-12 md:col-6 lg:col-4">
+                                        <div class="card p-3 shadow-2 border-round">
+                                            <div class="flex align-items-center">
+                                                <i class="pi pi-users" style="font-size: 1.5rem; color: #007bff"></i>
+                                                <div class="ml-3">
+                                                    <p class="m-0 font-bold">{{ ou.department }}</p>
+                                                    <p class="m-0 font-medium">
+                                                        {{
+                                                        'user.user-listing.dialogs.importUsersToaster.numOfUsers'
+                                                        | translate
+                                                        }}: {{ ou.userCount }}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12 mt-5">
+                                <p-button
+                                    label="{{ 'user.user-listing.dialogs.importUsersToaster.confirm' | translate }}"
+                                    (click)="confirmImportData()"></p-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </p-tabPanel>
+
+            <p-tabPanel header="{{ 'user.user-listing.dialogs.addUserDialog.taps.adSync' | translate }}">
+                <!-- <p-messages severity="info" [showTransitionOptions]="'500ms'" [hideTransitionOptions]="'500ms'"
+                    [enableService]="false" [closable]="true">
+                    <ng-template pTemplate>
+                        <div class="flex flex-column">
+                            <div class="ml-1">
+                                <i class="pi pi-sun" style="color: rgb(255, 196, 0); font-size: 1.5rem"></i>
+                                {{ 'user.user-listing.dialogs.addUserDialog.messages.adSync' | translate }}
+                            </div>
+                            <div class="text-center" *ngIf="isADBtnEnabled">
+                                <div style="color: #c69606" class="mt-4 mb-3">
+                                    <i class="pi pi-megaphone"></i>
+                                    We recommend syncing Active Directory Organizational Units (OUs) first.
+                                    <a style="font-weight: 500" routerLink="/tenantUnit"> Click here to proceed.</a>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-template>
+                </p-messages> -->
+
+                <app-iAware-info
+                    description="{{ 'user.user-listing.dialogs.addUserDialog.messages.adSync' | translate }}"
+                    icon="fa fa-solid fa-circle-info text-3xl" severity="info"></app-iAware-info>
+
+                <div class="mt-4 mb-4 flex justify-content-center">
+                    <div class="col-12 md:col-6 lg:col-3">
+                        <p-button *ngIf="hasPermission(actions.syncADUsers)" [disabled]="!isADBtnEnabled"
+                            (click)="syncADUsers()" label="{{ 'user.user-listing.actions.syncADUsers' | translate }}"
+                            icon="pi pi-sync"></p-button>
+                    </div>
+                </div>
+
+                <!-- <p-messages *ngIf="!isADBtnEnabled" severity="info" [showTransitionOptions]="'500ms'"
+                    [hideTransitionOptions]="'500ms'" [enableService]="false" [closable]="true">
+                    <ng-template pTemplate>
+                        <div class="flex flex-column">
+                            <div class="text-center">
+                                <div style="color: #c69606" class="mt-4 mb-3">
+                                    <i class="pi pi-megaphone"></i>
+                                    we recommend to Complete the Active Directory data First
+                                    <a style="font-weight: 500" [routerLink]="['/users/profile']"
+                                        [queryParams]="{ tapIndex: 3 }">click here</a>
+                                    to do that
+                                </div>
+                            </div>
+                        </div>
+                    </ng-template>
+                </p-messages> -->
+            </p-tabPanel>
+        </p-tabView>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{ 'shared.actions.close' | translate }}" icon="pi pi-times"
+            class="p-button-text" (click)="hideDialog()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="deleteUserDialog" header="{{ 'shared.headers.delete' | translate }}" [modal]="true"
+    [style]="{ width: '450px' }">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="currentUserSelected">{{ 'shared.messages.delete' | translate }}<b> {{ currentUserSelected.firstName
+                }} </b>?</span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="deleteUserDialog = false"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text"
+            label="{{ 'shared.actions.delete' | translate }}" (click)="confirmDelete()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="activationUserDialog" [dismissableMask]="true" (onHide)="onCancelActivationDialog()"
+    header="{{ 'shared.headers.active' | translate }}" [modal]="true" [style]="{ width: '450px' }">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        @if (currentUserSelected.isActive) {
+        <span>
+            {{ 'shared.messages.deactive' | translate }} <b>{{ currentUserSelected.firstName }}</b></span>
+        }@else {
+        <span>{{ 'shared.messages.active' | translate }} <b>{{ currentUserSelected.firstName }}</b></span>
+        }
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="activationUserDialog = false"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{ 'shared.actions.save' | translate }}"
+            (click)="currentUserSelected.isActive ? activation(false) : activation(true)"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="adUsersDialog" [header]="adHeaderText" [modal]="true" [style]="{ width: '50%', height: '60%' }">
+    <ng-template pTemplate="content">
+        <div class="card" *ngIf="files.length > 0">
+            <p-tree [value]="files" selectionMode="checkbox" [(selection)]="selectedADUsersToInsert"></p-tree>
+        </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="adUsersDialog = false"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{ 'shared.actions.save' | translate }}"
+            [disabled]="selectedADUsersToInsert.length === 0" (click)="InsertFinalADUsers()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="excelUsersTreeDialog" [header]="excelUsersFinalStep" [modal]="true"
+    [style]="{ width: '50%', height: '60%' }">
+    <ng-template pTemplate="content">
+        <p-messages *ngIf="!isADBtnEnabled" severity="info" [showTransitionOptions]="'500ms'"
+            [hideTransitionOptions]="'500ms'" [enableService]="false" [closable]="true">
+            <ng-template pTemplate>
+                <div class="text-center m-auto">
+                    <div class="mb-2">
+                        <i style="color: #c69606; font-size: 1.5rem" class="pi pi-megaphone"></i>
+                        in this step you can select finl excel users to add them based on OU.
+                    </div>
+                </div>
+            </ng-template>
+        </p-messages>
+        <div class="card" *ngIf="excelUsersTree.length > 0">
+            <p-tree [value]="excelUsersTree" selectionMode="checkbox"
+                [(selection)]="selectedExcelTreeToInsert"></p-tree>
+        </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="excelUsersTreeDialog = false"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{ 'shared.actions.save' | translate }}"
+            [disabled]="selectedExcelTreeToInsert.length === 0" (click)="InsertFinalExcelUsers()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="excelUsersDialog" [header]="excelHeaderText" [modal]="true"
+    [style]="{ width: '60%', height: '80%' }">
+    <ng-template pTemplate="content">
+        <div class="card" *ngIf="files.length > 0">
+            <div class="iAware-loading-table-container" style="position: relative">
+                <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                <p-table #dt [value]="excelusersReturnedToSelect" responsiveLayout="scroll" [rows]="10"
+                    [globalFilterFields]="['firstName', 'lastName', 'email']" [paginator]="true"
+                    [rowsPerPageOptions]="[10, 20, 30]" [(selection)]="finalExcelusersToInserts"
+                    selectionMode="multiple" [rowHover]="true" dataKey="email">
+                    <ng-template pTemplate="caption">
+                        <div class="flex flex-wrap align-items-center justify-content-between gap-3">
+                            <span class="p-input-icon-left">
+                                <i class="pi pi-search"></i>
+                                <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="{{
+                                        'user.user-listing.dialogs.excelUsersDialog.usersTable.fields.search'
+                                            | translate
+                                    }}" class="w-full sm:w-auto" />
+                            </span>
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th></th>
+                            <th pSortableColumn="firstName" class="white-space-nowrap rtl-layout">
+                                {{
+                                'user.user-listing.dialogs.excelUsersDialog.usersTable.fields.firstName' | translate
+                                }}
+                                <p-sortIcon field="firstName"></p-sortIcon>
+                            </th>
+                            <th pSortableColumn="lastName" class="white-space-nowrap">
+                                {{
+                                'user.user-listing.dialogs.excelUsersDialog.usersTable.fields.lastName' | translate
+                                }}
+                                <p-sortIcon field="lastName"></p-sortIcon>
+                            </th>
+                            <th pSortableColumn="email" class="white-space-nowrap">
+                                {{ 'user.user-listing.dialogs.excelUsersDialog.usersTable.fields.email' | translate
+                                }}<p-sortIcon field="email"></p-sortIcon>
+                            </th>
+                            <th class="white-space-nowrap">
+                                {{ 'user.user-listing.dialogs.excelUsersDialog.usersTable.fields.groups' | translate }}
+                            </th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-user>
+                        <tr>
+                            <td style="width: 3rem" class="pl-3">
+                                <p-tableCheckbox [value]="user" (click)="$event.stopPropagation()"
+                                    (touchend)="$event.stopPropagation()"></p-tableCheckbox>
+                            </td>
+                            <td>{{ user.firstName }}</td>
+                            <td>{{ user.lastName }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user?.groupsNames?.join(',') }}</td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="excelUsersDialog = false"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{ 'shared.actions.save' | translate }}"
+            [disabled]="finalExcelusersToInserts.length === 0" (click)="InsertFinalExcelUsers()"></button>
+    </ng-template>
+</p-dialog>

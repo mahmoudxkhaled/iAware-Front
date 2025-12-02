@@ -1,0 +1,198 @@
+<div class="card">
+    <div class="iAware-loading-table-container" style="position: relative;">
+        <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+        <p-table #dt [value]="domainEmails" [paginator]="true" [rows]="pagination.size" [showCurrentPageReport]="true"
+            responsiveLayout="scroll" [rowsPerPageOptions]="[10,25,50]" [totalRecords]="totalRecords" [lazy]="true"
+            (onLazyLoad)="onLazyLoad($event)">
+            <ng-template pTemplate="caption">
+                <div class="flex flex-wrap gap-2 align-items-center justify-content-between">
+                    <span class="p-input-icon-left w-full sm:w-20rem flex-order-1 sm:flex-order-0">
+                        <i class="pi pi-search"></i>
+                        <input pInputText type="text" (input)="onGlobalFilter(dt, $event)"
+                            placeholder="{{'shared.actions.search' | translate}}" class="w-full" />
+                    </span>
+                    <button (click)="openAddDialog()" pButton
+                        class="p-button-outlined w-full sm:w-auto flex-order-0 sm:flex-order-1" icon="pi pi-user-plus"
+                        label="{{'email-domains.email-domains-details.addHeader' | translate}}"></button>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="header">
+                <tr>
+                    <th class="white-space-nowrap" style="width:25%">{{
+                        'email-domains.email-domains-details.senderEmail' | translate}}</th>
+                    <th class="white-space-nowrap" style="width:25%">{{
+                        'email-domains.email-domains-details.phishingDomainName' | translate}}</th>
+                    <th class="white-space-nowrap" style="width:25%">{{
+                        'email-domains.email-domains-details.senderDisplayName' | translate}}</th>
+                    <th class="white-space-nowrap" style="width:25%">{{
+                        'email-domains.email-domains-details.outgoingServer' | translate}}</th>
+                    <th class="white-space-nowrap" style="width:25%">{{
+                        'email-domains.email-domains-details.enableSSL' | translate}}</th>
+                    <th style="width:25%"></th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-email>
+                <tr>
+                    <td>{{email.senderEmail}}</td>
+                    <td>{{email.phishingDomainName}}</td>
+                    <td>{{email.senderDisplayName}}</td>
+                    <td>{{email.outgoingServer}}</td>
+                    <td><p-checkbox [ngModel]="email.enableSSL" [disabled]="true" [binary]="true" inputId="binary" />
+                    </td>
+                    <td>
+                        <button *ngIf="menuItems.length > 0" pButton pRipple type="button" icon="pi pi-ellipsis-v"
+                            class="p-button-rounded p-button-text p-button-plain ml-3"
+                            (click)="menu.toggle($event); assigneCurrentSelect(email)"></button>
+                        <p-menu #menu [model]="menuItems" [appendTo]="'body'" [popup]="true"></p-menu>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+                <tr class="text-center">
+                    <td colspan="5">
+                        <div style="width: 100%; padding: 10px; text-align: center">
+                            {{ 'email-domains.email-domains-details.noEmails' | translate }}
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+
+<p-dialog [(visible)]="addDialog" [style]="{ width: '50%', height:'60%' }"
+    header="{{ 'email-domains.email-domains-details.addHeader' | translate}}" [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <form [formGroup]="addForm" (ngSubmit)="add()">
+            <div class="grid">
+                <div class="col-12">
+                    <div class="grid formgrid p-fluid">
+                        <div class="field mb-4 col-12 lg:col-6">
+                            <label for="senderUserName" class="font-medium text-900">{{
+                                'email-domains.email-domains-details.senderUserName' | translate}}</label>
+                            <input id="senderUserName" type="text" pInputText name="senderUserName"
+                                formControlName="senderUserName">
+                        </div>
+                        <div class="field mb-4 col-12 lg:col-6">
+                            <label for="senderDisplayName" class="font-medium text-900">{{
+                                'email-domains.email-domains-details.senderDisplayName' | translate}}</label>
+                            <input id="senderDisplayName" type="text" pInputText name="senderDisplayName"
+                                formControlName="senderDisplayName">
+                        </div>
+                        <div class="field mb-4 col-12 lg:col-6">
+                            <label for="senderEmail" class="font-medium text-900">{{
+                                'email-domains.email-domains-details.senderEmail' | translate}}</label>
+                            <input id="senderEmail" type="text" pInputText name="senderEmail"
+                                formControlName="senderEmail">
+                        </div>
+                        <div class="field mb-4 col-12 lg:col-6">
+                            <label for="senderEmailPassword" class="font-medium text-900">{{
+                                'email-domains.email-domains-details.senderEmailPassword' | translate}}</label>
+                            <input id="senderEmailPassword" type="text" pInputText name="senderEmailPassword"
+                                formControlName="senderEmailPassword">
+                        </div>
+                        <div class="field mb-4 col-12 lg:col-6">
+                            <label for="outgoingServer" class="font-medium text-900">{{
+                                'email-domains.email-domains-details.outgoingServer' | translate}}</label>
+                            <input id="outgoingServer" type="text" pInputText name="outgoingServer"
+                                formControlName="outgoingServer">
+                        </div>
+                        <div class="field mb-4 col-12 lg:col-6">
+                            <label for="outgoingServerPort" class="font-medium text-900">{{
+                                'email-domains.email-domains-details.outgoingServerPort' | translate}}</label>
+                            <p-inputNumber  [showButtons]="true"  buttonLayout="horizontal" inputId="integeronly" formControlName="outgoingServerPort" />
+                        </div>
+                        <div class="field mt-4 col-12 lg:col-6">
+                            <div style="gap: 0.5rem;" class="field new-padding flex align-items-center col-6">
+                                <p-inputSwitch formControlName="enableSSL"></p-inputSwitch>
+                                <label for="enableSSL" class="font-medium text-900">{{'email-domains.email-domains-details.enableSSL' | translate}}</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{'shared.actions.cancel' | translate}}" icon="pi pi-times" class="p-button-text"
+            (click)="hideAddDialog()"></button>
+        <button pButton pRipple label="{{'shared.actions.save' | translate}}" icon="pi pi-check" class="p-button-text"
+            (click)="add()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="editeDialog" [style]="{ width: '50%', height:'60%' }"
+    header="{{ 'email-domains.email-domains-details.editHeader' | translate}}" [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <div class="grid">
+            <div class="col-12">
+                <form [formGroup]="editForm">
+                    <div class="grid formgrid p-fluid">
+                        <div class="field mb-4 col-12 lg:col-6">
+                            <label for="senderUserName" class="font-medium text-900">{{
+                                'email-domains.email-domains-details.senderUserName' | translate}}</label>
+                            <input id="senderUserName" type="text" pInputText name="senderUserName"
+                                formControlName="senderUserName">
+                        </div>
+                        <div class="field mb-4 col-12 lg:col-6">
+                            <label for="senderDisplayName" class="font-medium text-900">{{
+                                'email-domains.email-domains-details.senderDisplayName' | translate}}</label>
+                            <input id="senderDisplayName" type="text" pInputText name="senderDisplayName"
+                                formControlName="senderDisplayName">
+                        </div>
+                        <div class="field mb-4 col-12 lg:col-6">
+                            <label for="senderEmail" class="font-medium text-900">{{
+                                'email-domains.email-domains-details.senderEmail' | translate}}</label>
+                            <input id="senderEmail" type="text" pInputText name="senderEmail"
+                                formControlName="senderEmail">
+                        </div>
+                        <div class="field mb-4 col-12 lg:col-6">
+                            <label for="senderEmailPassword" class="font-medium text-900">{{
+                                'email-domains.email-domains-details.senderEmailPassword' | translate}}</label>
+                            <input id="senderEmailPassword" type="text" pInputText name="senderEmailPassword"
+                                formControlName="senderEmailPassword">
+                        </div>
+                        <div class="field mb-4 col-12 lg:col-6">
+                            <label for="outgoingServer" class="font-medium text-900">{{
+                                'email-domains.email-domains-details.outgoingServer' | translate}}</label>
+                            <input id="outgoingServer" type="text" pInputText name="outgoingServer"
+                                formControlName="outgoingServer">
+                        </div>
+                        <div class="field mb-4 col-12 lg:col-6">
+                            <label for="outgoingServerPort" class="font-medium text-900">{{
+                                'email-domains.email-domains-details.outgoingServerPort' | translate}}</label>
+                            <p-inputNumber  [showButtons]="true"  buttonLayout="horizontal" inputId="integeronly" formControlName="outgoingServerPort" />
+                        </div>
+                        <div class="field mt-4 col-12 lg:col-6">
+                            <div style="gap: 0.5rem;" class="field new-padding flex align-items-center col-6">
+                                <p-inputSwitch formControlName="enableSSL"></p-inputSwitch>
+                                <label for="enableSSL" class="font-medium text-900">{{'email-domains.email-domains-details.enableSSL' | translate}}</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{'shared.actions.cancel' | translate}}" icon="pi pi-times" class="p-button-text"
+            (click)="hideEditDialog()"></button>
+        <button pButton pRipple label="{{'shared.actions.save' | translate}}" icon="pi pi-check" class="p-button-text"
+            (click)="edit()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="deleteDialog" header="{{'shared.headers.delete' | translate}}" [modal]="true"
+    [style]="{width:'450px'}">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="currentSelected">{{'shared.messages.delete' | translate}} <b> {{currentSelected.senderUserName}}
+            </b>?</span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text" label="{{'shared.actions.cancel' | translate}}"
+            (click)="deleteDialog = false"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{'shared.actions.delete' | translate}}"
+            (click)="delete()"></button>
+    </ng-template>
+</p-dialog>

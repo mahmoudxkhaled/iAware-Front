@@ -1,0 +1,28 @@
+.pi-eye:hover{
+    cursor: pointer;
+}
+
+.add-role-dialog .p-accordion .p-accordion-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 1rem;
+}
+
+.edit-role-dialog .p-accordion .p-accordion-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 1rem;
+}
+
+.add-role-dialog .p-accordion-tab,
+.edit-role-dialog .p-accordion-tab {
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+.add-role-dialog .p-accordion-tab:hover,
+.edit-role-dialog .p-accordion-tab:hover {
+    background-color: #f5f5f5;
+}

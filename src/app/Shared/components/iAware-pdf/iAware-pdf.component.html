@@ -1,0 +1,14 @@
+<div id="flipbook-container" style="direction: ltr;">
+    <div class="zoom-controls">
+        <button class="zoom-btn" (click)="zoomIn()" pTooltip="Zoom In">
+            <i class="fas fa-search-plus"></i>
+        </button>
+        <button class="zoom-btn" (click)="zoomOut()" pTooltip="Zoom Out">
+            <i class="fas fa-search-minus"></i>
+        </button>
+        <button *ngIf="currentZoom !== 1" class="zoom-btn" (click)="resetZoom()" pTooltip="Reset Zoom">
+            <i class="fas fa-sync-alt"></i>
+        </button>
+    </div>
+    <div style="transform-origin: center; border-radius: 10px" id="flipbook" class="flipbook"></div>
+</div>

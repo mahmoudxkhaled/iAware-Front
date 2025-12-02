@@ -1,0 +1,481 @@
+<div class="card">
+    <div class="iAware-loading-table-container" style="position: relative">
+        <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+        <p-table
+            #dt
+            [value]="trainingCategoryLanguages"
+            dataKey="name"
+            [scrollable]="false"
+            [paginator]="true"
+            [rows]="9"
+            [rowsPerPageOptions]="[10, 25, 50]"
+            styleClass="p-datatable-striped"
+            [globalFilterFields]="['name']">
+            <ng-template pTemplate="caption">
+                <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                    <button
+                        pButton
+                        pRipple
+                        label="Add New Category"
+                        icon="pi pi-plus"
+                        class="p-button-success mr-2"
+                        (click)="openAddTrainingCategoryLanguageDialog()"></button>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>Language</th>
+                    <th pSortableColumn="name">
+                        Name <p-sortIcon field="name"></p-sortIcon
+                        ><p-columnFilter type="text" field="name" display="menu"></p-columnFilter>
+                    </th>
+                    <th pSortableColumn="description">Description <p-sortIcon field="description"></p-sortIcon></th>
+                    <th style="text-align: center">Image</th>
+                    <!-- <th style="text-align: center">Banner</th> -->
+
+                    <th colspan="2" style="text-align: center">Actions</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-cat let-expanded="expanded">
+                <tr>
+                    <td style="min-width: 12rem">{{ cat.languageName }}</td>
+                    <td style="min-width: 12rem">{{ cat.name }}</td>
+                    <td style="min-width: 7rem">{{ cat.description }}</td>
+                    <td style="text-align: center">
+                        <p-image
+                            [src]="cat.trainingCategoryImageUrl"
+                            alt="Image"
+                            width="100"
+                            height="100"
+                            [preview]="true" />
+                    </td>
+
+                    <!-- <td style="text-align: center">
+                        <p-image
+                            [src]="cat.trainingCategoryBannerImageUrl"
+                            alt="Image"
+                            width="200"
+                            height="100"
+                            [preview]="true" />
+                    </td> -->
+
+                    <td style="text-align: center">
+                        <button
+                            pButton
+                            pRipple
+                            icon="pi pi-pencil"
+                            class="p-button-rounded p-button-success mr-2"
+                            (click)="editTrainingLessonCategoryLanguage(cat)"></button>
+                    </td>
+                    <td style="text-align: center">
+                        <button
+                            pButton
+                            pRipple
+                            icon="pi pi-trash"
+                            class="p-button-rounded p-button-danger"
+                            (click)="deleteTrainingLessonCategoryLanguage(cat)"></button>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+
+<p-dialog
+    [(visible)]="addTrainingCategoryLanguageDialog"
+    [style]="{ width: '70%', height: '85%' }"
+    header="{{ 'Add Training Category Language' | translate }}"
+    [modal]="true"
+    class="p-fluid">
+    <ng-template pTemplate="content">
+        <div class="card">
+            <form [formGroup]="addTrainingCategoryLanguageForm" (ngSubmit)="addTrainingCategoryLanguage()">
+                <div class="grid">
+                    <div class="col-12">
+                        <div class="grid formgrid p-fluid">
+                            <div class="field col-12 md:col-6">
+                                <label for="languageId" class="font-medium text-900">{{
+                                    'phishing-category.phishing-category-language-list.language' | translate
+                                }}</label>
+                                <span class="p-float-label">
+                                    <p-dropdown
+                                        formControlName="languageId"
+                                        [options]="activeLanguage"
+                                        optionLabel="name"
+                                        optionValue="id"
+                                        placeholder="{{
+                                            'phishing-category.phishing-category-language-list.languagePlaceholder'
+                                                | translate
+                                        }}">
+                                    </p-dropdown>
+                                </span>
+                            </div>
+                            <div class="field col-12 md:col-6">
+                                <label for="name" class="font-medium text-900">{{
+                                    'phishing-category.phishing-category-language-list.name' | translate
+                                }}</label>
+                                <input
+                                    type="text"
+                                    pInputText
+                                    id="name"
+                                    formControlName="name"
+                                    required
+                                    [ngClass]="{
+                                        'ng-invalid ng-dirty':
+                                            submitted && !addTrainingCategoryLanguageForm.controls['name'].valid
+                                    }" />
+                                <small
+                                    *ngIf="submitted && !addTrainingCategoryLanguageForm.controls['name'].valid"
+                                    class="ng-dirty ng-invalid text-red-500"
+                                    >{{
+                                        'phishing-category.phishing-category-language-list.validations.name' | translate
+                                    }}</small
+                                >
+                            </div>
+                            <div class="field col-12">
+                                <label class="font-medium text-900" for="description">{{
+                                    'phishing-category.phishing-category-language-list.description' | translate
+                                }}</label>
+                                <textarea
+                                    id="description"
+                                    name="description"
+                                    formControlName="description"
+                                    pInputTextarea
+                                    required
+                                    [ngClass]="{
+                                        'ng-invalid ng-dirty':
+                                            submitted && !addTrainingCategoryLanguageForm.controls['description'].valid
+                                    }"
+                                    rows="3"
+                                    cols="50"></textarea>
+                                <small
+                                    *ngIf="submitted && !addTrainingCategoryLanguageForm.controls['description'].valid"
+                                    class="ng-dirty ng-invalid text-red-500"
+                                    >{{
+                                        'phishing-category.phishing-category-language-list.validations.description'
+                                            | translate
+                                    }}</small
+                                >
+                            </div>
+
+                            <div class="field col-12">
+                                <div class="flex justify-content-center flex-wrap">
+                                    <div class="md:col-6">
+                                        <p-panel header="Category Image" class="mb-3">
+                                            <div class="flex align-items-center justify-content-center">
+                                                <img
+                                                    [src]="imageUrl1"
+                                                    alt="Avatar"
+                                                    class="avatar"
+                                                    style="width: 100%; max-width: 150px; border-radius: 8px; border: 1px solid #ccc"
+                                                    (click)="onUploadCategoryImageClick()" />
+                                            </div>
+
+                                                                       <!-- Recommended Dimensions -->
+                            <small class="text-center block m-2">{{ 'shared.messages.recommendedDimensions' | translate}} <strong>{{ 'shared.messages.800x449' | translate}}</strong> {{ 'shared.messages.pixels' | translate}}</small>
+
+                                            <div
+                                                class="flex align-items-center justify-content-center mt-2"
+                                                style="display: none">
+                                                <p-button
+                                                    label="Upload"
+                                                    icon="pi pi-upload"
+                                                    (click)="onUploadCategoryImageClick()"></p-button>
+                                                <input
+                                                    type="file"
+                                                    id="myBackgroundImage"
+                                                    style="display: none"
+                                                    (change)="onCategoryImageSelected($event)" />
+                                            </div>
+                                        </p-panel>
+                                    </div>
+
+                                    <!-- <div class="md:col-6 flex flex-column">
+                                        <div class="flex align-items-center justify-content-center">
+                                            <img
+                                                [src]="imageUrl2"
+                                                alt="Avatar"
+                                                class="avatar1"
+                                                style="cursor: pointer"
+                                                (click)="onUploadCategoryBannerImageClick()" />
+                                        </div>
+                                        <label class="flex justify-content-center">Banner Image 1200 x 200</label>
+
+                                        <div
+                                            class="flex align-items-center justify-content-center mt-2"
+                                            style="display: none">
+                                            <p-button
+                                                label="Upload"
+                                                icon="pi pi-upload"
+                                                (click)="onUploadCategoryBannerImageClick()"></p-button>
+                                            <input
+                                                type="file"
+                                                id="myBackgroundBannerImage"
+                                                style="display: none"
+                                                (change)="onCategoryBannerImageSelected($event)" />
+                                        </div>
+                                    </div> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button
+            pButton
+            pRipple
+            label="{{ 'shared.actions.cancel' | translate }}"
+            icon="pi pi-times"
+            class="p-button-text"
+            (click)="addTrainingCategoryLanguageDialog = false"></button>
+        <button
+            pButton
+            pRipple
+            label="{{ 'shared.actions.save' | translate }}"
+            icon="pi pi-check"
+            class="p-button-text"
+            (click)="addTrainingCategoryLanguage()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog
+    [(visible)]="editTrainingCategoryLanguageDialog"
+    [style]="{ width: '70%', height: '85%' }"
+    header="{{ 'Edit Training Category Language' | translate }}"
+    [modal]="true"
+    class="p-fluid">
+    <ng-template pTemplate="content">
+        <div class="card">
+            <form [formGroup]="editTrainingCategoryLanguageForm" (ngSubmit)="saveEdittrainingCategoryLanguage()">
+                <div class="grid">
+                    <div class="col-12">
+                        <div class="grid formgrid p-fluid">
+                            <div class="field col-12 md:col-6">
+                                <label for="languageId" class="font-medium text-900">{{
+                                    'phishing-category.phishing-category-language-list.language' | translate
+                                }}</label>
+                                <span class="p-float-label">
+                                    <p-dropdown
+                                        formControlName="languageId"
+                                        [options]="activeLanguage"
+                                        optionLabel="name"
+                                        optionValue="id"
+                                        placeholder="{{
+                                            'phishing-category.phishing-category-language-list.languagePlaceholder'
+                                                | translate
+                                        }}">
+                                    </p-dropdown>
+                                </span>
+                            </div>
+                            <div class="field col-12 md:col-6">
+                                <label for="name" class="font-medium text-900">{{
+                                    'phishing-category.phishing-category-language-list.name' | translate
+                                }}</label>
+                                <input
+                                    type="text"
+                                    pInputText
+                                    id="name"
+                                    formControlName="name"
+                                    required
+                                    [ngClass]="{
+                                        'ng-invalid ng-dirty':
+                                            submitted && !editTrainingCategoryLanguageForm.controls['name'].valid
+                                    }" />
+                                <small
+                                    *ngIf="submitted && !editTrainingCategoryLanguageForm.controls['name'].valid"
+                                    class="ng-dirty ng-invalid text-red-500"
+                                    >{{
+                                        'phishing-category.phishing-category-language-list.validations.name' | translate
+                                    }}</small
+                                >
+                            </div>
+                            <div class="field col-12">
+                                <label class="font-medium text-900" for="description">{{
+                                    'phishing-category.phishing-category-language-list.description' | translate
+                                }}</label>
+                                <textarea
+                                    id="description"
+                                    name="description"
+                                    formControlName="description"
+                                    pInputTextarea
+                                    required
+                                    [ngClass]="{
+                                        'ng-invalid ng-dirty':
+                                            submitted && !editTrainingCategoryLanguageForm.controls['description'].valid
+                                    }"
+                                    rows="3"
+                                    cols="50"></textarea>
+                                <small
+                                    *ngIf="submitted && !editTrainingCategoryLanguageForm.controls['description'].valid"
+                                    class="ng-dirty ng-invalid text-red-500"
+                                    >{{
+                                        'phishing-category.phishing-category-language-list.validations.description'
+                                            | translate
+                                    }}</small
+                                >
+                            </div>
+                            <div class="field col-12">
+                                <div class="flex justify-content-center flex-wrap">
+                                    <div class="md:col-6 flex flex-column">
+                                        <p-panel header="Category Image" class="mb-3">
+                                            <div class="flex align-items-center justify-content-center">
+                                                <img
+                                                    [src]="imageUrl1"
+                                                    alt="Avatar"
+                                                    class="avatar"
+                                                    style="width: 100%; max-width: 150px; border-radius: 8px; border: 1px solid #ccc"
+                                                    (click)="onUploadCategoryImageClick()" />
+                                            </div>
+
+                                                                      <!-- Recommended Dimensions -->
+                            <small class="text-center block m-2">{{ 'shared.messages.recommendedDimensions' | translate}} <strong>{{ 'shared.messages.800x449' | translate}}</strong> {{ 'shared.messages.pixels' | translate}}</small>
+                                            <div
+                                                class="flex align-items-center justify-content-center mt-2"
+                                                style="display: none">
+                                                <p-button
+                                                    label="Upload"
+                                                    icon="pi pi-upload"
+                                                    (click)="onUploadCategoryImageClick()"></p-button>
+                                                <input
+                                                    type="file"
+                                                    id="myBackgroundImage"
+                                                    style="display: none"
+                                                    (change)="onCategoryImageSelected($event)" />
+                                            </div>
+                                        </p-panel>
+                                    </div>
+
+                                    <!-- <div class="md:col-6 flex flex-column">
+                                        <div class="flex align-items-center justify-content-center">
+                                            <img
+                                                [src]="imageUrl2"
+                                                alt="Avatar"
+                                                class="avatar1"
+                                                style="cursor: pointer"
+                                                (click)="onUploadCategoryBannerImageClick()" />
+                                        </div>
+                                        <label class="flex justify-content-center">Banner Image 1200 x 200</label>
+
+                                        <div
+                                            class="flex align-items-center justify-content-center mt-2"
+                                            style="display: none">
+                                            <p-button
+                                                label="Upload"
+                                                icon="pi pi-upload"
+                                                (click)="onUploadCategoryBannerImageClick()"></p-button>
+                                            <input
+                                                type="file"
+                                                id="myBackgroundBannerImage"
+                                                style="display: none"
+                                                (change)="onCategoryBannerImageSelected($event)" />
+                                        </div>
+                                    </div> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button
+            pButton
+            pRipple
+            label="{{ 'shared.actions.cancel' | translate }}"
+            icon="pi pi-times"
+            class="p-button-text"
+            (click)="declineEdittrainingCategoryLanguage()"></button>
+        <button
+            pButton
+            pRipple
+            label="{{ 'shared.actions.save' | translate }}"
+            icon="pi pi-check"
+            class="p-button-text"
+            (click)="saveEdittrainingCategoryLanguage()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog
+    [(visible)]="deletionTrainingCategoryLanguageDialog"
+    header="{{ 'shared.headers.delete' | translate }}"
+    [modal]="true"
+    [style]="{ width: '450px' }">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="trainingCategoryLanguage"
+            >{{ 'shared.messages.delete' | translate }}
+            <b>{{ trainingCategoryLanguage.name }}</b>
+            ?</span
+        >
+    </div>
+    <ng-template pTemplate="footer">
+        <button
+            pButton
+            pRipple
+            icon="pi pi-times"
+            class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}"
+            (click)="declineDeletion()"></button>
+        <button
+            pButton
+            pRipple
+            icon="pi pi-check"
+            class="p-button-text"
+            label="{{ 'shared.actions.save' | translate }}"
+            (click)="confirmDeletion()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog
+    [(visible)]="switchActivationTrainingCategoryLanguageDialog"
+    header="{{ 'shared.headers.active' | translate }}"
+    [modal]="true"
+    [style]="{ width: '450px' }">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        @if (trainingCategoryLanguage && trainingCategoryLanguage.isActive) {
+        <span
+            >{{ 'shared.messages.deactive' | translate }} <b>{{ trainingCategoryLanguage.name }}</b></span
+        >
+        }@else {
+        <span
+            >{{ 'shared.messages.active' | translate }} <b>{{ trainingCategoryLanguage.name }}</b></span
+        >
+        }
+    </div>
+    <ng-template pTemplate="footer">
+        <button
+            pButton
+            pRipple
+            icon="pi pi-times"
+            class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}"
+            (click)="declineActivation()"></button>
+        <button
+            pButton
+            pRipple
+            icon="pi pi-check"
+            class="p-button-text"
+            label="{{ 'shared.actions.save' | translate }}"
+            (click)="confirmtActivation()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="openCategoryPageContentHtmlDialog" [modal]="true" [style]="{ width: '450px' }">
+    <div class="flex align-items-center justify-content-center">
+        <span *ngIf="trainingCategoryLanguage" [innerHTML]="trainingCategoryLanguage.description"></span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button
+            pButton
+            pRipple
+            icon="pi pi-times"
+            class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}"
+            (click)="hideCategoryPageContentHtmlDialog()"></button>
+    </ng-template>
+</p-dialog>

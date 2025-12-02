@@ -1,0 +1,231 @@
+<div class="card">
+    <p-toast></p-toast>
+    <h5>News Category Article List</h5>
+    <p-dataView #dv [value]="newsCategoryArticles" [paginator]="true" [rows]="10" layout="grid">
+        <ng-template pTemplate="header">
+            <div class="flex flex-column md:flex-row md:justify-content-between gap-2">
+
+                <p-button label="Back" icon="pi pi-arrow-left" [routerLink]="'/marketing/news'"></p-button>
+
+                <button pButton pRipple label="Add New Article" icon="pi pi-plus" class="p-button mr-2"
+                    (click)="addNewsCategoryArticle()"></button>
+            </div>
+        </ng-template>
+        <ng-template let-cats pTemplate="gridItem">
+            <div class="iAware-loading-table-container" style="position: relative">
+                <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                <div class="grid grid-nogutter">
+                    <div class="col-12 md:col-4" *ngFor="let cat of cats">
+                        <div class="p-3">
+                            <div
+                                class="surface-card shadow-3 border-round overflow-hidden hover:shadow-5 transition-all relative">
+                                <!-- Container for Image and Menu -->
+                                <div style="cursor: pointer;">
+                                    <img (click)="editNewsCategoryArticle(cat)"
+                                        [src]="cat.imageUrl??'assets/images/trainingCategoryBannerImageUrl.jpg'"
+                                        [alt]="cat.articleTitle" class="square-image" />
+                                </div>
+                                <!-- Three Dots Button -->
+                                <button pButton pRipple type="button" icon="pi pi-ellipsis-v"
+                                    class="p-button-rounded p-button-text p-button-plain absolute top-0 right-0 m-2 bg-gray-200 shadow-lg border border-gray-300"
+                                    (click)="iAwareMenu.toggle($event); assigneCurrentSelect(cat)">
+                                </button>
+
+                                <!-- Menus -->
+
+                                <p-menu #iAwareMenu [model]="menuItems" [appendTo]="'body'" [popup]="true"></p-menu>
+
+                                <!-- Category Name -->
+                                <div class="text-center mt-3">
+                                    <h4 class="font-semibold text-xl">{{ cat.articleTitle }}</h4>
+                                </div>
+
+                                <!-- Category Details -->
+                                <div class="text-center mt-2 mb-3">
+                                    <p class="text-md text-gray-700">
+                                        <span style="font-weight: bold;">Writer Name:</span> {{
+                                        cat.writerName }}
+                                    </p>
+                                    <p class="text-md text-gray-700">
+                                        <span style="font-weight: bold;">Publishing Date:</span> {{ cat.publishingDate |
+                                        date:'mediumDate' }}
+                                    </p>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+    </p-dataView>
+</div>
+
+
+
+<p-dialog [(visible)]="addNewsCategoryArticleDialog" [style]="{ width: '100%', height: '100%' }"
+    header="Add New Article" [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <form [formGroup]="addNewsCategoryArticleForm" (ngSubmit)="saveAddNewsCategoryArticle()">
+            <div class="col-12">
+                <div class="grid formgrid p-fluid">
+                    <div class="md:col-6">
+
+                        <div class="field col-12 md:col-12">
+                            <label for="articleTitle" class="font-medium text-900">Article Title</label>
+                            <input type="text" pInputText id="articleTitle" formControlName="articleTitle"
+                                placeholder="Article Title" required [ngClass]="{
+                                    'ng-invalid ng-dirty': submitted && !addNewsCategoryArticleForm.controls['articleTitle'].valid
+                                }" />
+                            <small *ngIf="submitted && !addNewsCategoryArticleForm.controls['articleTitle'].valid"
+                                class="ng-dirty ng-invalid text-red-500">Title is required</small>
+                        </div>
+
+                        <div class="field col-12 md:col-12">
+                            <label for="writerName" class="font-medium text-900">Writer Name</label>
+                            <input type="text" pInputText id="writerName" formControlName="writerName"
+                                placeholder="Writer Name" required [ngClass]="{
+                                    'ng-invalid ng-dirty': submitted && !addNewsCategoryArticleForm.controls['writerName'].valid
+                                }" />
+                            <small *ngIf="submitted && !addNewsCategoryArticleForm.controls['writerName'].valid"
+                                class="ng-dirty ng-invalid text-red-500">Writer Name is required</small>
+                        </div>
+
+                        <div class="field col-12 md:col-12">
+                            <label for="writerName" class="font-medium text-900">Description</label>
+                            <textarea pInputTextarea id="writerName" formControlName="description"
+                                placeholder="Write Description for news list" required rows="5" [ngClass]="{
+                                    'ng-invalid ng-dirty': submitted && !addNewsCategoryArticleForm.controls['description'].valid
+                                }"></textarea>
+                            <small *ngIf="submitted && !addNewsCategoryArticleForm.controls['description'].valid"
+                                class="ng-dirty ng-invalid text-red-500">Description is required</small>
+                        </div>
+
+                        <!-- Tag Input -->
+                        <div class="col-12 field">
+                            <label for="name" class="font-medium text-900">{{
+                                'wallpaper-wizard.wallpaper-list-wizard.addDialog.fields.tag'
+                                | translate }}</label>
+                            <p-multiSelect placeholder="Select Tags" [options]="tags" optionLabel="tagName"
+                                optionValue="id" formControlName="tags"></p-multiSelect>
+                        </div>
+
+                        <div class="field col-12 md:col-6">
+                            <label for="publishingDate" class="font-medium text-900">Publishing Date</label>
+                            <input type="date" id="publishingDate" formControlName="publishingDate"
+                                class="p-inputtext p-component" />
+                            <small *ngIf="submitted && !addNewsCategoryArticleForm.controls['publishingDate'].valid"
+                                class="ng-dirty ng-invalid text-red-500">
+                                Publishing Date Time is required
+                            </small>
+                        </div>
+
+
+                        <div class="field col-12 md:col-6">
+                            <label for="languageId" class="font-medium text-900">Select Language</label>
+                            <p-dropdown [readonly]="true" formControlName="languageId" [options]="defaultLanguage"
+                                optionLabel="name" placeholder="Select Language" optionValue="id">
+                            </p-dropdown>
+                        </div>
+
+
+                    </div>
+
+                    <div class="col-12 md:col-6 mt-2">
+                        <p-panel header="Article Image" class="mb-3">
+
+                            <div class="flex flex-column align-items-center justify-content-center ">
+                                <div class="image-upload-container" (click)="triggerImageUpload()">
+                                    <img [src]="imageUrl" alt="Avatar" class="avatar" style="width: 300px; height: 225px; max-width: 300px; border-radius: 8px;
+                                           object-fit: fill; border: 1px solid #ccc; cursor: pointer;" />
+
+                                    <!-- Overlay text (hidden by default, shown on hover) -->
+                                    <div class="upload-hover-text">
+                                        {{ 'shared.actions.upload' | translate }}
+                                    </div>
+                                </div>
+                                <small class="text-center block m-2">{{ 'shared.messages.recommendedDimensions'
+                                    |
+                                    translate}} <strong>800px x 500px</strong> {{
+                                    'shared.messages.pixels' | translate}}</small>
+                            </div>
+
+                            <!-- Hidden File Input -->
+                            <input type="file" id="myCategoryImage" style="display: none"
+                                (change)="handleImageSelection($event)" />
+
+
+                        </p-panel>
+                    </div>
+
+                    <div class="field col-12 md:col-12">
+                        <label for="articleText" class="font-medium text-900">Article Content</label>
+
+                        <app-iAware-rich-text [id]="'articleText'" placeholder="Write article content"
+                            formControlName="articleText"></app-iAware-rich-text>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+            class="p-button-text" (click)="declineAddNewsCategoryArticleDialog()"></button>
+        <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check" class="p-button-text"
+            (click)="saveAddNewsCategoryArticle()"></button>
+    </ng-template>
+</p-dialog>
+
+
+
+
+
+<p-dialog [(visible)]="editNewsCategoryArticleDialog" *ngIf="selectedArticle" [header]="selectedArticle.articleTitle"
+    [modal]="true" (onHide)="loadArticlesByCategory()" [closable]="false" [style]="{width:'98%', height:'100vh'}"
+    [closable]="true">
+    <app-article-edit [article]="selectedArticle"></app-article-edit>
+</p-dialog>
+
+
+
+<p-dialog [(visible)]="switchActivationNewsCategoryArticleDialog" header="{{ 'shared.headers.active' | translate }}"
+    [modal]="true" [style]="{ width: '500px' }">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        @if (newsCategoryArticle && newsCategoryArticle.isActive) {
+        <span *ngIf="newsCategoryArticle">{{ 'shared.messages.deactive' | translate }} <b>{{
+                newsCategoryArticle.articleTitle }}</b></span>
+        }@else {
+        <span *ngIf="newsCategoryArticle">{{ 'shared.messages.active' | translate }} <b>{{
+                newsCategoryArticle.articleTitle}}</b></span>
+        }
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="declineActivation()"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{ 'shared.actions.save' | translate }}"
+            (click)="confirmtActivation()"></button>
+    </ng-template>
+</p-dialog>
+
+
+
+<p-dialog [(visible)]="deletionNewsCategoryArticleDialog" header="{{ 'shared.headers.delete' | translate }}"
+    [modal]="true" [style]="{ width: 'auto', maxWidth: '90%' }" [closable]="true">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="newsCategoryArticle">{{ 'shared.messages.delete' | translate }}
+            <b class="flex flex-wrap justify-content-center">{{ newsCategoryArticle.articleTitle }}</b>
+        </span>
+    </div>
+    <ng-template pTemplate="footer">
+        <div style="display: flex; justify-content: center; align-items: center; width: 100%;">
+            <button pButton pRipple icon="pi pi-times" class="p-button-text"
+                label="{{ 'shared.actions.cancel' | translate }}" (click)="declineDeletion()"></button>
+            <button pButton pRipple icon="pi pi-check" class="p-button-text"
+                label="{{ 'shared.actions.save' | translate }}" (click)="confirmDeletion()"></button>
+        </div>
+    </ng-template>
+
+</p-dialog>

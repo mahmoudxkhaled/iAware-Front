@@ -1,0 +1,289 @@
+<p-tabView class="w-full h-full" styleClass="tabview-custom">
+    <div class="mb-1">
+        <!-- <app-tag-filter (filterApplied)="onTagFilterChanged($event)"  [componentName]="'Phishing Email Templates'"></app-tag-filter> -->
+    </div>
+
+    <p-tabPanel *ngIf="isIAwareTeamUser !== null && isIAwareTeamUser"
+        [header]="'phishing-email-template.defaultPhishingTemplates' | translate">
+        <div class="card">
+            <p-toast></p-toast>
+            <h5>{{ 'phishing-email-template.listTitle' | translate }}</h5>
+            <p-dataView #dv [value]="filteredDefaultPhishingTemplates" [paginator]="true" [rows]="9" layout="grid"
+                [lazy]="true" [totalRecords]="defaultTotalRecords" (onLazyLoad)="onLazyLoadDefaultTemplates($event)"
+                [rowsPerPageOptions]="[9, 20, 50]" [emptyMessage]="'phishing-email-template.noTemplates' | translate">
+                <ng-template pTemplate="header">
+                    <div class="flex flex-column md:flex-row md:justify-content-end gap-2">
+                        <button pButton pRipple label="{{ 'phishing-email-template.add' | translate }}"
+                            icon="pi pi-plus" class="p-button mr-2" (click)="createPhishingTemplate()"></button>
+                    </div>
+                </ng-template>
+                <ng-template let-templates pTemplate="gridItem">
+                    <div class="iAware-loading-table-container" style="position: relative">
+                        <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                        <div class="grid grid-nogutter">
+
+                            <div class="col-12 md:col-4 phishing-see-more  " *ngFor="let template of templates">
+                                <div class="p-3 m-3">
+                                    <div
+                                        class="surface-card shadow-3 border-round overflow-hidden hover:shadow-5 transition-all relative">
+                                        <div class="object-cover  phishing-card-image-container">
+
+                                            <img [src]="template.phishingEmailImageUrl ?? defaultImageUrl"
+                                                [alt]="template.emailName" class="w-full"
+                                                routerLink="/phishing-templates/{{ template.id }}/defaultPhishingTemplates" />
+
+                                        </div>
+                                        <button *ngIf="!isIAwareTeamUser" pButton pRipple type="button"
+                                            icon="pi pi-ellipsis-v"
+                                            class="p-button-rounded p-button-text p-button-plain absolute top-0 right-0 m-2 surface-500 bg-gray-200 shadow-lg border border-gray-300"
+                                            (click)="adminMenu.toggle($event); assigneCurrentSelect(template)">
+                                        </button>
+
+                                        <button *ngIf="isIAwareTeamUser" pButton pRipple type="button"
+                                            icon="pi pi-ellipsis-v"
+                                            class="p-button-rounded p-button-text p-button-plain absolute top-0 right-0 m-2 surface-500 bg-gray-200 shadow-lg border border-gray-300"
+                                            (click)="iAwareMenu.toggle($event); assigneCurrentSelect(template)">
+                                        </button>
+
+                                        <p-menu #adminMenu [model]="normalMenuItems" [appendTo]="'body'"
+                                            [popup]="true"></p-menu>
+                                        <p-menu #iAwareMenu [model]="ownerMenuItems" [appendTo]="'body'"
+                                            [popup]="true"></p-menu>
+
+                                        <div class="text-center mt-2 mb-2">
+                                            <a class="text-2xl font-bold text-primary hover:underline"
+                                                routerLink="/phishing-templates/{{ template.id }}/defaultPhishingTemplates">
+                                                {{ template.emailName }}
+                                            </a>
+                                            <span class="text-lg font-medium text-secondary block">
+                                                {{ template.phishingEmailTemplateLanguageCount }} Languages
+                                            </span>
+                                            <p class="text-sm text-gray-600 mt-1">
+                                                {{ template.phishingEmailDescription }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+            </p-dataView>
+        </div>
+    </p-tabPanel>
+
+    <p-tabPanel *ngIf="isIAwareTeamUser !== null &&!isIAwareTeamUser"
+        [header]="'phishing-email-template.defaultPhishingTemplates' | translate">
+        <div class="card">
+            <p-toast></p-toast>
+            <h5>{{ 'phishing-email-template.listTitle' | translate }}</h5>
+            <p-dataView #dv [value]="filteredDefaultPhishingTemplates" [paginator]="true" [rows]="9" layout="grid"
+                [lazy]="true" [totalRecords]="defaultTotalRecords" (onLazyLoad)="onLazyLoadDefaultTemplates($event)"
+                [rowsPerPageOptions]="[9, 20, 50]" [emptyMessage]="'phishing-email-template.noTemplates' | translate">
+                <ng-template let-templates pTemplate="gridItem">
+                    <div class="iAware-loading-table-container" style="position: relative">
+                        <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                        <div class="grid grid-nogutter">
+
+                            <div class="col-12 md:col-4 phishing-see-more  " *ngFor="let template of templates">
+                                <div class="p-3">
+                                    <div
+                                        class="surface-card shadow-3 border-round overflow-hidden hover:shadow-5 transition-all">
+                                        <div class="relative object-cover  phishing-card-image-container">
+                                            <img [src]="template.phishingEmailImageUrl ?? defaultImageUrl"
+                                                [alt]="template.emailName" class="w-full"
+                                                routerLink="/phishing-templates/{{ template.id }}/defaultPhishingTemplates" />
+
+                                            <div *ngIf="template.isLocked" class="lock-overlay">
+                                                <div class="lock-background"></div>
+                                                <img src="/assets/media/Locker.png" alt="Locked" class="lock-icon" />
+
+                                                <div class="upgrade-overlay">
+                                                    <div class="upgrade-content">
+                                                        <p class="upgrade-title text-lg font-bold">
+                                                            {{ 'phishing-email-template.upgradeYourPlan' | translate }}
+                                                        </p>
+                                                        <p class="upgrade-description">
+                                                            {{ 'phishing-email-template.upgradeMessage' | translate }}
+                                                        </p>
+                                                        <a [routerLink]="['/users/profile']"
+                                                            [queryParams]="{ tapIndex: 2 }" class="upgrade-button">{{
+                                                            'phishing-email-template.upgradeBtn' | translate }}</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="text-center p-3">
+                                            <a class="text-2xl font-bold" *ngIf="!template.isLocked"
+                                                routerLink="/phishing-templates/{{ template.id }}/defaultPhishingTemplates">{{
+                                                template.emailName
+                                                }}</a>
+                                            <a class="text-2xl font-bold" *ngIf="template.isLocked">{{
+                                                template.emailName
+                                                }}</a>
+                                            <span class="text-1xl font-bold" style="display: block">{{
+                                                template.phishingEmailTemplateLanguageCount }} Languages</span>
+                                            <p>{{ template.phishingEmailDescription }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+            </p-dataView>
+        </div>
+    </p-tabPanel>
+
+    <p-tabPanel *ngIf="isIAwareTeamUser !== null &&!isIAwareTeamUser"
+        [header]="'phishing-email-template.companyPhishingTemplates' | translate">
+        <div class="card">
+            <p-toast></p-toast>
+            <h5>{{ 'phishing-email-template.listTitle' | translate }}</h5>
+            <p-dataView #dv [value]="filteredTenantPhishingTemplates" layout="grid" [paginator]="true" [rows]="9"
+                [lazy]="true" [totalRecords]="tenantTotalRecords" (onLazyLoad)="onLazyLoadTenantTemplates($event)"
+                [rowsPerPageOptions]="[9, 20, 50]" [emptyMessage]="'phishing-email-template.noTemplates' | translate">
+                <ng-template pTemplate="header">
+                    <div class="flex flex-column md:flex-row md:justify-content-end gap-2">
+                        <button pButton pRipple label="{{ 'shared.actions.add' | translate }}" icon="pi pi-plus"
+                            class="p-button mr-2" (click)="createPhishingTemplate()"></button>
+                    </div>
+                </ng-template>
+                <ng-template let-templates pTemplate="gridItem">
+                    <div class="iAware-loading-table-container" style="position: relative">
+                        <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                        <div class="grid grid-nogutter">
+                            <div class="col-12 md:col-4 phishing-see-more " *ngFor="let template of templates">
+                                <div class="p-3 m-3">
+                                    <div
+                                        class="surface-card shadow-3 border-round overflow-hidden hover:shadow-5 transition-all relative">
+                                        <div class="object-cover  phishing-card-image-container">
+
+                                            <img [src]="template.phishingEmailImageUrl ?? defaultImageUrl"
+                                                [alt]="template.emailName" class="w-full"
+                                                routerLink="/phishing-templates/{{ template.id }}/companyPhishingTemplates" />
+
+                                        </div>
+
+                                        <button *ngIf="!isIAwareTeamUser" pButton pRipple type="button"
+                                            icon="pi pi-ellipsis-v"
+                                            class="p-button-rounded p-button-text p-button-plain absolute top-0 right-0 m-2 bg-gray-200 shadow-lg border border-gray-300"
+                                            (click)="
+                                            adminMenu.toggle($event); assigneCurrentSelect(template) "></button>
+
+                                        <button *ngIf="isIAwareTeamUser" pButton pRipple type="button"
+                                            icon="pi pi-ellipsis-v"
+                                            class="p-button-rounded p-button-text p-button-plain absolute top-0 right-0 m-2 bg-gray-200 shadow-lg border border-gray-300"
+                                            (click)="
+                                            iAwareMenu.toggle($event); assigneCurrentSelect(template) "></button>
+
+                                        <p-menu #adminMenu [model]="normalMenuItems" [appendTo]="'body'"
+                                            [popup]="true"></p-menu>
+
+                                        <p-menu #iAwareMenu [model]="ownerMenuItems" [appendTo]="'body'"
+                                            [popup]="true"></p-menu>
+
+                                        <div class="text-center mt-2 mb-2">
+                                            <a class="text-2xl font-bold text-primary hover:underline"
+                                                routerLink="/phishing-templates/{{ template.id }}/companyPhishingTemplates">
+                                                {{ template.emailName }}
+                                            </a>
+                                            <span class="text-lg font-medium text-secondary block">
+                                                {{ template.phishingEmailTemplateLanguageCount }} Languages
+                                            </span>
+                                            <p class="text-sm text-gray-600 mt-1">
+                                                {{ template.phishingEmailDescription }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+            </p-dataView>
+        </div>
+    </p-tabPanel>
+
+    <div *ngIf="isIAwareTeamUser === null" class="col-12 flex flex-column justify-content-center align-items-center"
+    style="height: 100vh;">
+    <p-progressSpinner></p-progressSpinner>
+    <br>
+    <p class="ml-3">{{ 'shared.loading' | translate }}</p>
+</div>
+
+</p-tabView>
+
+
+<p-dialog [(visible)]="editDialog" [style]="{ width: '50%', height: '70%' }"
+    header="{{ 'phishing-email-template.editHeader' | translate }}" [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <form [formGroup]="templateEditForm" (ngSubmit)="edit()">
+            <div class="grid">
+                <div class="col-12">
+                    <div class="grid formgrid p-fluid">
+                        <div class="field mb-4 col-12">
+                            <label for="name" class="font-medium text-900">{{
+                                'wallpaper-wizard.wallpaper-list-wizard.addDialog.fields.tag'
+                                | translate }}</label>
+                            <p-multiSelect
+                                [placeholder]="'wallpaper-wizard.wallpaper-list-wizard.addDialog.fields.tagsPlaceholder' | translate"
+                                [options]="allTags" optionLabel="tagName" optionValue="id"
+                                formControlName="tages"></p-multiSelect>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+            class="p-button-text" (click)="hideDialog()"></button>
+        <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check" class="p-button-text"
+            (click)="edit()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="activationDialog" header="{{ 'shared.headers.active' | translate }}" [modal]="true"
+    [style]="{ width: '450px' }">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        @if (currentSelected.isActive) {
+        <span>{{ 'shared.messages.deactive' | translate }} <b>{{ currentSelected.emailName }}</b></span>
+        }@else {
+        <span>{{ 'shared.messages.active' | translate }} <b>{{ currentSelected.emailName }}</b></span>
+        }
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="activationDialog = false"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{ 'shared.actions.save' | translate }}"
+            (click)="currentSelected.isActive ? activation(false) : activation(true)"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="deleteDialog" header="{{ 'shared.headers.delete' | translate }}" [modal]="true"
+    [style]="{ width: '450px' }">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="currentSelected">{{ 'shared.messages.delete' | translate }} <b> {{ currentSelected.emailName }}
+            </b>?</span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="deleteDialog = false"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text"
+            label="{{ 'shared.actions.delete' | translate }}" (click)="delete()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="previewDialog" header="{{ currentSelected.emailName }}" [modal]="true"
+    [style]="{ width: '450px' }">
+    <div class="flex align-items-center justify-content-center" [innerHTML]="getSafeHtml()"></div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="previewDialog = false"></button>
+    </ng-template>
+</p-dialog>

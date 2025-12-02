@@ -1,0 +1,65 @@
+<p-button class="mb-3" label="{{'shared.actions.back' | translate}}" (onClick)="prevPage()"
+    icon="pi pi-arrow-left"></p-button>
+<div class="p-fluid card-container">
+
+    <div class="form-group">
+        <label class="font-medium text-900">{{ 'wallpaper-wizard.wallpaper-list-wizard.wall-preview.wallpaper' |
+            translate}}</label>
+        <input type="text" pInputText id="characterName" required [(ngModel)]="WallpaperTitle" />
+        <small class="mt-1 text-red-500" [ngStyle]="{ 'display': !WallpaperTitle ? 'block' : 'none' }">
+            {{ 'wallpaper-wizard.wallpaper-list-wizard.wall-preview.wallpaperValidation' | translate}}
+        </small>
+    </div>
+
+    <!-- Tag Input -->
+    <div class="form-group">
+        <label for="name" class="font-medium text-900">{{ 'wallpaper-wizard.wallpaper-list-wizard.addDialog.fields.tag' | translate }}</label>
+        <p-multiSelect
+            [placeholder]="'wallpaper-wizard.wallpaper-list-wizard.addDialog.fields.tagsPlaceholder' | translate"
+            [options]="tages" optionLabel="tagName" optionValue="id" [(ngModel)]="selectedTages"></p-multiSelect>
+
+    </div>
+
+
+    <div class="image-previews">
+        <div *ngIf="selectedCharacter" class="grid-item character">
+            <div class="character-preview mx-4">
+                <label class="font-medium text-900 flex justify-content-center">{{
+                    'wallpaper-wizard.wallpaper-list-wizard.wall-preview.selectedCharacter' | translate}}</label>
+                <img [src]="selectedCharacter.characterImageUrl" class="shadow-2 my-3 mx-0"
+                    style="width: 150px; height: 150px; cursor: pointer;" />
+            </div>
+        </div>
+        <div *ngIf="selectedBackground" class="grid-item background">
+            <div class="background-preview mx-4">
+                <label class="font-medium text-900 flex justify-content-center">{{
+                    'wallpaper-wizard.wallpaper-list-wizard.wall-preview.selectedBackground' | translate}}</label>
+                <img [src]="selectedBackground.backgroundImageUrl" class="shadow-2 my-3 mx-0"
+                    style="width: 150px; height: 150px; cursor: pointer;" />
+            </div>
+        </div>
+    </div>
+
+    <label class="flex justify-content-center font-medium text-900 mb-2">{{
+        'wallpaper-wizard.wallpaper-list-wizard.wall-preview.selectedQuote' | translate}}</label>
+    <div class="quote-container">
+        <div class="quote-text">
+            <strong [innerHTML]="selectedQuote?.quoteText" class="text-l"></strong>
+        </div>
+    </div>
+
+    <div class="header mt-4">
+        <div class="button-container shadow-4" (click)="createWallpaper()" style="cursor: pointer;">
+            <p class="p-button font-bold fs-1 fw-bold cursor-pointer" severity="help">
+                {{ 'wallpaper-wizard.wallpaper-list-wizard.wall-preview.createWallpaper' | translate}}
+                <i class="pi pi-check px-2 fs-1 fw-bold" style="font-size: 18px;"></i>
+            </p>
+
+        </div>
+    </div>
+
+    <ng-container *ngIf="isLoading$ | async">
+        <p-progressBar mode="indeterminate" [style]="{ height: '6px' }" />
+    </ng-container>
+
+</div>

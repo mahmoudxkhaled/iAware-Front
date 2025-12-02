@@ -1,0 +1,31 @@
+::ng-deep .userDashboard-Phishing-result .p-card-title::before,
+::ng-deep .userDashboard-Training-Progress .p-card-title::before,
+::ng-deep .userDashboard-Personal-Risk-Score .p-card-title::before {
+    font-family: 'primeicons';
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    display: inline-block;
+    -webkit-font-smoothing: antialiased;
+}
+
+::ng-deep .p-card{
+    height: 100%;
+}
+
+::ng-deep .userDashboard-Training-Progress .p-card-title::before {
+    content: '\ea02';
+    color: var(--primary-color);
+}
+
+::ng-deep .userDashboard-Phishing-result .p-card-title::before {
+    content: '\e979';
+    color: var(--primary-color);
+}
+
+::ng-deep .userDashboard-Personal-Risk-Score .p-card-title::before {
+    content: '\e922';
+    color: var(--primary-color);
+}

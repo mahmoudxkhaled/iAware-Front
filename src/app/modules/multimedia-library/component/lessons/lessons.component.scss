@@ -1,0 +1,405 @@
+.card-container {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s;
+}
+
+.card-container:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.lesson-image {
+    border-radius: 10px 10px 0 0;
+    object-fit: fill;
+    transition: transform 0.3s ease-in-out;
+}
+
+.lesson-image:hover {
+    transform: scale(1.05);
+}
+
+
+.lesson-card-image-container {
+    position: relative;
+    width: 100%;
+    padding-top: 66.67%;
+
+    overflow: hidden;
+    border-radius: 8px;
+    background-color: #f4f4f4;
+}
+
+.lesson-card-image-container img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    border-radius: 8px;
+}
+
+.lock-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+}
+
+.lock-overlay .lock-background {
+    backdrop-filter: blur(5px);
+    width: 100%;
+    height: 100%;
+    position: absolute;
+}
+
+.card-content {
+    padding: 15px;
+    text-align: left;
+}
+
+.lesson-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.lesson-description-container {
+    position: relative;
+    margin-top: 10px;
+    text-align: left;
+}
+
+.lesson-description {
+    font-size: 0.9rem;
+    line-height: 1.3;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    text-overflow: ellipsis;
+    white-space: normal;
+}
+
+.expanded-description {
+    -webkit-line-clamp: unset;
+    white-space: normal;
+}
+
+.show-more a {
+    text-decoration: none;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.show-more a:hover {
+    text-decoration: underline;
+}
+
+.lesson-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+.lesson-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    font-weight: bold;
+    text-decoration: none;
+    border-radius: 20px;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    color: #fff;
+    cursor: pointer;
+}
+
+.lesson-link i {
+    font-size: 1.2rem;
+}
+
+.watch-now-link,
+.read-now-link,
+.screenSaver-btn {
+    background: linear-gradient(90deg, #800080, #4b0082) !important;
+}
+
+.watch-now-link:hover:not(.disabled),
+.read-now-link:hover:not(.disabled),
+.screenSaver-btn:hover:not(.disabled) {
+    background: linear-gradient(90deg, #800080, #4b0082) !important;
+    transform: translateY(-2px);
+}
+
+.lesson-link.disabled {
+    background: #ddd !important;
+    color: #aaa !important;
+    cursor: not-allowed !important;
+    box-shadow: none !important;
+    pointer-events: none !important;
+}
+
+.screensaver-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.screensaver-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.screensaver-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.screenSaver-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.actions button {
+    padding: 8px 16px;
+    font-size: 1rem;
+}
+
+.actions .p-button {
+    transition: background-color 0.3s ease;
+}
+
+hr {
+    border-top: 1px solid #e0e0e0;
+    margin-top: 16px;
+    width: 100%;
+}
+
+.screenSaver-details {
+    display: flex;
+}
+
+.screenSaver-icons,
+.screenSaver-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 10px;
+    padding: 10px;
+}
+
+.platform-icon {
+    font-size: 2.5rem;
+}
+
+.platform-icon.pi {
+    line-height: 1;
+}
+
+.pi-linux {
+    content: url('../../../../../assets/customIcons/linux.svg');
+}
+
+.pi-windows {
+    content: url('../../../../../assets/customIcons/windows.svg');
+}
+
+.pi-apple {
+    content: url('../../../../../assets/customIcons/mac.svg');
+}
+
+.lock-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2;
+}
+
+.lock-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.lock-icon {
+    position: relative !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    z-index: 3;
+    height: 58% !important;
+    object-fit: contain;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+
+.lock-overlay:hover .lock-icon {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.upgrade-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.3s ease, background-color 0.3s ease;
+}
+
+.lock-overlay:hover .upgrade-overlay {
+    opacity: 1;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.upgrade-content {
+    text-align: center;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.upgrade-title {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+.upgrade-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    font-weight: bold;
+    text-decoration: none;
+    border-radius: 20px;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    background: linear-gradient(90deg, #800080, #4b0082) !important;
+    color: white !important;
+}
+
+.upgrade-button:hover {
+    transform: translateY(-2px);
+}
+
+.upgrade-description {
+    margin-bottom: 20px;
+}
+
+.lock-overlay:hover .lesson-image {
+    filter: blur(2px);
+}
+
+:host ::ng-deep .p-dataview-emptymessage {
+    display: none !important;
+}
+
+@media only screen and (min-width: 767px) {
+
+    .lesson-see-more {
+
+        h1,
+        h2,
+        h3,
+        h4,
+        p {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: var(--transition);
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5 {
+            -webkit-line-clamp: 2;
+            min-height: 3.2em;
+        }
+
+        p {
+            -webkit-line-clamp: 3;
+            min-height: 4.8em;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5 {
+            font-weight: bold;
+        }
+
+        &:hover {
+            transform: translateY(-5px);
+            transition: transform 1s ease-in-out;
+
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            p {
+                -webkit-line-clamp: unset;
+                overflow: visible;
+                transition: var(--transition, all 0.8s ease-in-out);
+            }
+        }
+    }
+}
+
+.ltr-layout .see-more h1,
+.ltr-layout .see-more h2,
+.ltr-layout .see-more h3,
+.ltr-layout .see-more h4,
+.ltr-layout .see-more h5,
+.ltr-layout .see-more h6,
+.rtl-layout .see-more h1,
+.rtl-layout .see-more h2,
+.rtl-layout .see-more h3,
+.rtl-layout .see-more h4,
+.rtl-layout .see-more h5,
+.rtl-layout .see-more h6 {
+    margin: 0 !important;
+}

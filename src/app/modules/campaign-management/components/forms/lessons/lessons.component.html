@@ -1,0 +1,73 @@
+<div class="stepsdemo-content">
+    <p-card>
+        <ng-template pTemplate="title">
+           <div class="grid">
+               <div class="col-12 pb-0">
+            <app-iAware-info description="{{'campaign-management.campaign-create.lessons.message' | translate}}"
+                    icon="fa fa-solid fa-circle-info text-3xl"
+                    severity="info"></app-iAware-info>
+               </div>
+           </div>
+
+        </ng-template>
+        <ng-template pTemplate="content">
+
+            <div class="iAware-loading-table-container" style="position: relative">
+                <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                <p-dataView 
+                [value]="lessons" 
+                [paginator]="true" 
+                [rows]="9" 
+                layout="grid"
+                [rowsPerPageOptions]="[9, 18, 27]"
+                [totalRecords]="totalRecords"
+                [lazy]="true"
+                (onLazyLoad)="onLazyLoad($event)"
+                >
+                    <ng-template let-lessons pTemplate="gridItem">
+                        <div class="grid grid-nogutter">
+                            <div class="col-12 md:col-4 lesson-see-more" *ngFor="let lesson of lessons">
+                                <div class="p-3 lesson-card">
+                                    <div class="card-container position-relative">
+                                        <div class="p-3">
+                                            <p-checkbox [id]="lesson?.id"
+                                            [(ngModel)]="checkboxStates[lesson?.id]" [binary]="true"
+                                            (onChange)="addToselected($event, lesson)">
+                                            </p-checkbox>
+                                        </div>
+                                        <div (click)="toggleSelection(lesson)" style="cursor: pointer;">
+                                            <!-- Lesson Image -->
+                                            <div class="object-cover  lesson-card-image-container">
+                                                <img [src]="lesson.lessonVideoImageUrl ?? defaultBannerImage"
+                                                class="w-full lesson-image" alt="Lesson Image" height="240" />
+                                            </div>
+                                            <!-- Lesson Details -->
+                                            <div class="p-3 card-content">
+                                                <h4>
+                                                    {{ lesson.name }}
+                                                </h4>
+                                                <p>
+                                                    {{ lesson.description }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-template>
+                </p-dataView>
+            </div>
+
+        </ng-template>
+        <ng-template pTemplate="footer">
+            <div class="grid grid-nogutter justify-content-between">
+                <p-button label="{{ 'campaign-management.campaign-create.lessons.actions.back' | translate }}"
+                    (onClick)="prevPage()" icon="pi pi-angle-left"></p-button>
+                <p-button label="{{ 'campaign-management.campaign-create.lessons.actions.next' | translate }}"
+                    (onClick)="nextPage()" [disabled]="selectedLessons.length === 0" icon="pi pi-angle-right"
+                    iconPos="right"></p-button>
+            </div>
+        </ng-template>
+    </p-card>
+</div>

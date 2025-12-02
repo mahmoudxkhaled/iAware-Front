@@ -1,0 +1,1024 @@
+<div class="grid">
+    <div class="col-12">
+        <div class="card">
+            <p-toast></p-toast>
+
+            <div class="iAware-loading-table-container" style="position: relative">
+                <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                <p-table #dt [value]="trainingLessonsLanguages" responsiveLayout="scroll" [rows]="10"
+                    styleClass="p-datatable-striped" [paginator]="true" [rowsPerPageOptions]="[10, 20, 30]"
+                    [globalFilterFields]="['name']">
+                    <ng-template pTemplate="caption">
+                        <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                            <h5 class="m-0">Manage Training Lesson Languages</h5>
+                            <div class="my-1">
+                                <button pButton pRipple label="New Lesson Language" icon="pi pi-plus"
+                                    class="p-button-success mr-2"
+                                    (click)="navigateToCreateTrainingLessonLanguage()"></button>
+                                <span class="mt-2 md:mt-0 p-input-icon-left">
+                                    <i class="pi pi-search"></i>
+                                    <input pInputText type="text" (input)="onGlobalFilter(dt, $event)"
+                                        placeholder="Search..." class="w-full sm:w-auto" />
+                                </span>
+                            </div>
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>Language</th>
+                            <th>Category</th>
+                            <th>Name</th>
+                            <th style="text-align: center; width: 7%">Book</th>
+                            <th style="text-align: center; width: 7%">Video</th>
+                            <th style="text-align: center">ScreenSavers</th>
+                            <!-- <th style="text-align: center">Wallpapers</th> -->
+                            <th style="text-align: center">Quizzes</th>
+                            <th style="text-align: center">Quotes</th>
+                            <th>Email</th>
+                            <th style="text-align: center">Status</th>
+                            <th colspan="2" style="text-align: center">Actions</th>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="body" let-training>
+                        <tr>
+                            <td [ngClass]="{ 'no-data': !training.languageName }">{{ training.languageName }}</td>
+                            <td>{{ training.category }}</td>
+                            <td [ngClass]="{ 'no-data': !training.name }">{{ training.name }}</td>
+
+                            <td style="text-align: center" [ngClass]="{ 'no-data': !training.lessonBookUrl }">
+                                <a (click)="openPdfViewer(training)">
+                                    <i class="pi pi-book" style="cursor: pointer"></i>
+                                </a>
+                            </td>
+                            <td style="text-align: center" [ngClass]="{ 'no-data': !training.lessonVideoUrl }">
+                                <a (click)="openVideoViewer(training)">
+                                    <i class="pi pi-video" style="cursor: pointer"></i>
+                                </a>
+                            </td>
+
+                            <td style="text-align: center"
+                                [ngClass]="{ 'no-data': training.trainingLessonScreenSavers.length === 0 }">
+                                <a style="cursor: pointer">
+                                    {{ training.trainingLessonScreenSavers.length }}
+                                    <i class="pi pi-images" (click)="openScreenSaverDialog(training)"></i>
+                                </a>
+                            </td>
+                            <!-- <td style="text-align: center;" [ngClass]="{'no-data': training.numberOfWallpapers === 0}">
+                            <a style="cursor: pointer;">
+                                {{ training.numberOfWallpapers || 0 }}
+                                <i class="pi pi-images" (click)="openWallpaperGallery(training)"></i>
+                            </a>
+                        </td> -->
+
+                            <!-- de el sha3`ala ========================== -->
+                            <!-- <td style="text-align: center" [ngClass]="{ 'no-data': training.numberOfWallpapers === 0 }">
+                                <a
+                                    [style]="{ cursor: training.numberOfWallpapers === 0 ? 'not-allowed' : 'pointer' }"
+                                    [class.disabled]="training.numberOfWallpapers === 0"
+                                    (click)="training.numberOfWallpapers > 0 && openWallpaperGallery(training)">
+                                    {{ training.numberOfWallpapers || 0 }}
+                                    <i class="pi pi-images"></i>
+                                </a>
+                            </td> -->
+
+                            <td style="text-align: center"
+                                [ngClass]="{ 'no-data': training.trainingLessonQuizzes.length === 0 }">
+                                <a style="cursor: pointer">
+                                    {{ training.trainingLessonQuizzes.length }}
+                                    <i class="pi pi-file-edit" (click)="openQuizList(training.id)"></i>
+                                </a>
+                            </td>
+
+                            <td style="text-align: center"
+                                [ngClass]="{ 'no-data': training.trainingLessonQuotes.length === 0 }">
+                                <a style="cursor: pointer">
+                                    {{ training.trainingLessonQuotes.length }}
+                                    <i class="pi pi-file-edit" (click)="openQuoteList(training.id)"></i>
+                                </a>
+                            </td>
+
+                            <!-- <td style="text-align: center;"  [ngClass]="{'no-data': !training.lessonAwarenessEmailSubject || isContentEmpty(training.lessonAwarenessEmailContentHtml)}"> -->
+                            <td style="text-align: center"
+                                [ngClass]="{ 'no-data': !training.lessonAwarenessEmailSubject }">
+                                <a style="cursor: pointer">
+                                    <i class="pi pi-envelope" (click)="openEditEmail(training.id)"></i>
+                                </a>
+                            </td>
+
+                            <td style="text-align: center">
+                                <p-inputSwitch [ngModel]="training.isActive" (onChange)="switchActivation(training)"
+                                    [disabled]="isDefaultLanguage(training)" />
+                            </td>
+
+                            <td style="text-align: center">
+                                <button pButton pRipple icon="pi pi-pencil"
+                                    class="p-button-rounded p-button-success mr-2"
+                                    (click)="editTrainingLesson(training)"></button>
+                            </td>
+                            <td style="text-align: center">
+                                <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger"
+                                    [disabled]="isDefaultLanguage(training)"
+                                    (click)="deleteTrainingLesson(training)"></button>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+
+        <p-dialog [(visible)]="editTrainingLanguageDialog" [style]="{ width: '800px', heigth: '900px' }"
+            header="Training Lesson Details" [modal]="true" class="p-fluid">
+            <ng-template pTemplate="content">
+                <form [formGroup]="editTrainingLessonForm" (ngSubmit)="saveEditTrainingLesson()">
+                    <div class="field">
+                        <label for="name">Name</label>
+                        <input type="text" pInputText id="name" formControlName="name" required [ngClass]="{
+                                'ng-invalid ng-dirty': submitted && !editTrainingLessonForm.controls['name'].valid
+                            }" />
+                        <small *ngIf="submitted && !editTrainingLessonForm.controls['name'].valid"
+                            class="ng-dirty ng-invalid text-red-500">Name is required.</small>
+                    </div>
+
+                    <div class="field">
+                        <label for="description">Description</label>
+                        <input type="text" pInputText id="description" formControlName="description" required [ngClass]="{
+                                'ng-invalid ng-dirty':
+                                    submitted && !editTrainingLessonForm.controls['description'].valid
+                            }" />
+                        <small *ngIf="submitted && !editTrainingLessonForm.controls['description'].valid"
+                            class="ng-dirty ng-invalid text-red-500">Description is required.</small>
+                    </div>
+
+                    <div class="field mb-4 col-12">
+                        <label for="languageId" class="font-medium text-900">Language</label>
+                        <span class="p-float-label" style="width: 300px">
+                            <p-dropdown formControlName="languageId" [options]="activeLanguages" optionLabel="name"
+                                optionValue="id">
+                            </p-dropdown>
+                        </span>
+                    </div>
+                </form>
+            </ng-template>
+            <ng-template pTemplate="footer">
+                <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text"
+                    (click)="hideEditTrainingLessonDialog()"></button>
+                <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text"
+                    (click)="saveEditTrainingLesson()"></button>
+            </ng-template>
+        </p-dialog>
+
+        <p-dialog [(visible)]="deletionTrainingLanguageDialog" header="Confirm" [modal]="true"
+            [style]="{ width: '450px' }">
+            <div class="flex align-items-center justify-content-center">
+                <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+                <span *ngIf="trainingLesson">Are you sure you want to delete <b>{{ trainingLesson.name }}</b>?</span>
+            </div>
+            <ng-template pTemplate="footer">
+                <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No"
+                    (click)="deletionTrainingLanguageDialog = false"></button>
+                <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Yes"
+                    (click)="confirmDelete()"></button>
+            </ng-template>
+        </p-dialog>
+
+        <p-dialog [(visible)]="quotesListTrainingLanguageDialog" [modal]="true" [style]="{ width: '900px' }">
+            <div class="iAware-loading-table-container" style="position: relative">
+                <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                <p-table #dt [value]="trainingLessonQuotes" responsiveLayout="scroll" [rows]="10" [paginator]="true"
+                    [rowsPerPageOptions]="[10, 20, 30]" styleClass="p-datatable-striped"
+                    [globalFilterFields]="['quoteText']">
+                    <ng-template pTemplate="caption">
+                        <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                            <h5 class="m-0">Quotes Management</h5>
+                            <div class="my-1">
+                                <button pButton pRipple label="Add Quote" icon="pi pi-plus"
+                                    class="p-button-success mr-2" (click)="addNewQuote()"></button>
+                                <span class="mt-2 md:mt-0 p-input-icon-left">
+                                    <i class="pi pi-search"></i>
+                                    <input pInputText type="text" (input)="onGlobalFilter(dt, $event)"
+                                        placeholder="Search..." class="w-full sm:w-auto" />
+                                </span>
+                            </div>
+                        </div>
+                    </ng-template>
+
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th pSortableColumn="quoteText" style="width: 50%">
+                                Quote Text <p-sortIcon field="quoteText"></p-sortIcon>
+                                <p-columnFilter type="text" field="quoteText" display="menu"></p-columnFilter>
+                            </th>
+                            <th style="text-align: center">Status</th>
+                            <th style="text-align: center">Actions</th>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="body" let-trainingLessonQuote>
+                        <tr>
+                            <td [innerHTML]="trainingLessonQuote.quoteText"></td>
+                            <td style="text-align: center">
+                                <p-inputSwitch [ngModel]="trainingLessonQuote.isActive"
+                                    (onChange)="switchQuoteActivation(trainingLessonQuote)" />
+                            </td>
+
+                            <td style="text-align: center">
+                                <button pButton pRipple icon="pi pi-pencil"
+                                    class="p-button-rounded p-button-success mr-2"
+                                    (click)="editQuoteLesson(trainingLessonQuote)"></button>
+                                <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger"
+                                    (click)="deleteQuoteLesson(trainingLessonQuote)"></button>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </p-dialog>
+
+        <p-dialog [(visible)]="switchQuoteActivationDialog" header="Activation Training Lesson" [modal]="true"
+            [style]="{ width: '450px' }">
+            <div class="flex align-items-center justify-content-center">
+                <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+                <span *ngIf="trainingLessonQuote">
+                    Are you sure you want to
+                    <span style="color: red">{{ trainingLessonQuote.isActive ? 'Deactivate ' : 'Activate ' }} ?</span>
+                    <hr />
+                    <p [innerHTML]="trainingLessonQuote.quoteText"></p>
+                </span>
+            </div>
+            <ng-template pTemplate="footer">
+                <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No"
+                    (click)="declineQuoteActivation()"></button>
+                <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Yes"
+                    (click)="confirmtQuoteActivation()"></button>
+            </ng-template>
+        </p-dialog>
+
+        <p-dialog [(visible)]="editQuoteTrainingLanguageDialog" header="Edit Quote" [modal]="true"
+            [style]="{ width: '450px' }">
+            <ng-template pTemplate="content">
+                <div class="field">
+                    <div class="col-12">
+                        <label for="quoteText" class="font-medium text-900">Quote Text</label>
+                        <app-iAware-rich-text [id]="'quoteText'"
+                            [(ngModel)]="trainingLessonQuote.quoteText"></app-iAware-rich-text>
+                        <!-- <div class="NgxEditor__Wrapper" style="height: 300px">
+                            <ngx-editor-menu [editor]="editor"></ngx-editor-menu>
+                            <ngx-editor [editor]="editor" [(ngModel)]="trainingLessonQuote.quoteText" [disabled]="false"
+                                [placeholder]="'Type here...'"></ngx-editor>
+                        </div> -->
+                    </div>
+
+                    <div class="col-12">
+                        <small *ngIf="submitted && isQuoteTextEmpty(trainingLessonQuote.quoteText)"
+                            class="ng-dirty ng-invalid text-red-500">
+                            Quote Text is required.
+                        </small>
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="footer">
+                <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text"
+                    (click)="hideEditQuoteDialog()"></button>
+                <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text"
+                    (click)="saveEditQuote()"></button>
+            </ng-template>
+        </p-dialog>
+
+        <p-dialog [(visible)]="addQuoteTrainingLanguageDialog" header="Add New Quote" [modal]="true"
+            [style]="{ width: '450px' }">
+            <ng-template pTemplate="content">
+                <div class="field">
+                    <div class="col-12">
+                        <label for="quoteText" class="font-medium text-900">Quote Text</label>
+                        <app-iAware-rich-text [id]="'quoteText'" [(ngModel)]="quoteText"></app-iAware-rich-text>
+                        <!-- <div class="NgxEditor__Wrapper" style="height: 300px">
+                            <ngx-editor-menu [editor]="editor"></ngx-editor-menu>
+                            <ngx-editor [editor]="editor" [(ngModel)]="quoteText" [disabled]="false"
+                                [placeholder]="'Type here...'"></ngx-editor>
+                        </div> -->
+                    </div>
+
+                    <div class="col-12">
+                        <small *ngIf="submitted && isQuoteTextEmpty(quoteText)"
+                            class="ng-dirty ng-invalid text-red-500">
+                            Quote Text is required.
+                        </small>
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="footer">
+                <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text"
+                    (click)="hideNewQuoteDialog()"></button>
+                <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text"
+                    (click)="saveNewQuote()"></button>
+            </ng-template>
+        </p-dialog>
+
+        <p-dialog [(visible)]="deletionQuoteTrainingLessonDialog" header="Delete Training Lesson" [modal]="true"
+            [style]="{ width: '450px' }">
+            <div class="flex align-items-center justify-content-center">
+                <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+                <span *ngIf="trainingLessonQuote">Are you sure you want to delete the quote?
+                    <hr />
+                    <p [innerHTML]="trainingLessonQuote.quoteText"></p>
+                </span>
+            </div>
+            <ng-template pTemplate="footer">
+                <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No"
+                    (click)="declineQuoteDeletion()"></button>
+                <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Yes"
+                    (click)="confirmQuoteDeletion()"></button>
+            </ng-template>
+        </p-dialog>
+    </div>
+</div>
+
+<p-dialog [(visible)]="quizzesListTrainingLanguageDialog" [modal]="true" [style]="{ width: '1200px' }">
+    <div class="iAware-loading-table-container" style="position: relative">
+        <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+        <p-table #dt [value]="trainingLessonQuizzes" responsiveLayout="scroll" [rows]="10" [paginator]="true"
+            [rowsPerPageOptions]="[10, 20, 30]" styleClass="p-datatable-striped" [globalFilterFields]="['quizText']">
+            <ng-template pTemplate="caption">
+                <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                    <h5 class="m-0">Quiz Management</h5>
+                    <div class="my-1">
+                        <button pButton pRipple label="Add Question" icon="pi pi-plus" class="p-button-success mr-2"
+                            (click)="addNewQuizz()"></button>
+                        <span class="mt-2 md:mt-0 p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..."
+                                class="w-full sm:w-auto" />
+                        </span>
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="header">
+                <tr>
+                    <th pSortableColumn="quizText" style="width: 30%">
+                        Questions <p-sortIcon field="quizText"></p-sortIcon>
+                        <p-columnFilter type="text" field="quizText" display="menu"></p-columnFilter>
+                    </th>
+
+                    <th>Answer 1</th>
+                    <th>Answer 2</th>
+                    <th>Answer 3</th>
+                    <th>Answer 4</th>
+
+                    <th style="text-align: center">Status</th>
+                    <th style="text-align: center" colspan="2">Actions</th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-trainingLessonQuiz>
+                <tr>
+                    <td>{{ trainingLessonQuiz.quizText }}</td>
+                    <td [ngClass]="{
+                            'correct-answer': trainingLessonQuiz.trainingLessonQuizAnswers[0]?.isTrueAnswer,
+                            'incorrect-answer': !trainingLessonQuiz.trainingLessonQuizAnswers[0]?.isTrueAnswer
+                        }">
+                        {{ trainingLessonQuiz.trainingLessonQuizAnswers[0]?.answerText }}
+                    </td>
+                    <td [ngClass]="{
+                            'correct-answer': trainingLessonQuiz.trainingLessonQuizAnswers[1]?.isTrueAnswer,
+                            'incorrect-answer': !trainingLessonQuiz.trainingLessonQuizAnswers[1]?.isTrueAnswer
+                        }">
+                        {{ trainingLessonQuiz.trainingLessonQuizAnswers[1]?.answerText }}
+                    </td>
+                    <td [ngClass]="{
+                            'correct-answer': trainingLessonQuiz.trainingLessonQuizAnswers[2]?.isTrueAnswer,
+                            'incorrect-answer': !trainingLessonQuiz.trainingLessonQuizAnswers[2]?.isTrueAnswer
+                        }">
+                        {{ trainingLessonQuiz.trainingLessonQuizAnswers[2]?.answerText }}
+                    </td>
+                    <td [ngClass]="{
+                            'correct-answer': trainingLessonQuiz.trainingLessonQuizAnswers[3]?.isTrueAnswer,
+                            'incorrect-answer': !trainingLessonQuiz.trainingLessonQuizAnswers[3]?.isTrueAnswer
+                        }">
+                        {{ trainingLessonQuiz.trainingLessonQuizAnswers[3]?.answerText }}
+                    </td>
+                    <td style="text-align: center">
+                        <p-inputSwitch [ngModel]="trainingLessonQuiz.isActive"
+                            (onChange)="switchQuizzActivation(trainingLessonQuiz)" />
+                    </td>
+                    <td style="text-align: center">
+                        <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"
+                            (click)="editQuizzLesson(trainingLessonQuiz)"></button>
+                    </td>
+                    <td style="text-align: center">
+                        <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger"
+                            (click)="deleteQuizLesson(trainingLessonQuiz)"></button>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</p-dialog>
+
+<p-dialog [(visible)]="switchQuizActivationDialog" header="Activation Training Lesson" [modal]="true"
+    [style]="{ width: '450px' }">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="trainingLessonQuiz">
+            Are you sure you want to
+            <span style="color: red">{{ trainingLessonQuiz.isActive ? 'Deactivate ' : 'Activate ' }} ?</span>
+            <hr />
+            <p>{{ trainingLessonQuiz.quizText }}</p>
+        </span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No"
+            (click)="declineQuizActivation()"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Yes"
+            (click)="confirmtQuizActivation()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="editQuizTrainingLanguageDialog" header="Edit Question" [modal]="true"
+    [style]="{ width: '600px' }" class="p-fluid">
+    <ng-template pTemplate="content">
+        <div class="p-field p-col-12">
+            <div class="mb-2">
+                <label for="quizText" class="font-medium text-900">Question</label>
+            </div>
+            <textarea id="quizText" name="quizText" [(ngModel)]="trainingLessonQuiz.quizText" pInputTextarea required
+                [ngClass]="{ 'ng-invalid ng-dirty': submitted && !trainingLessonQuiz.quizText }" rows="5"
+                cols="50"></textarea>
+        </div>
+
+        <div class="p-field p-col-12" *ngFor="let answer of fixedAnswers; let i = index">
+            <div class="p-fluid p-grid p-align-center p-justify-between mt-2">
+                <div class="p-col-12 p-md-8">
+                    <div class="mb-2">
+                        <label [for]="'answerText' + i" class="font-medium text-900">Answer {{ i + 1 }}</label>
+                    </div>
+                    <div class="p-inputgroup">
+                        <p-radioButton name="correctAnswer" [value]="i" class="mr-3"
+                            [(ngModel)]="selectedQuizAnswerIndex"></p-radioButton>
+                        <input [id]="'answerText' + i" type="text" pInputText class="p-inputtext"
+                            [placeholder]="'Answer ' + (i + 1)" style="width: 100%" [(ngModel)]="answer.answerText"
+                            name="answerText{{ i }}" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text"
+            (click)="hideEditQuizDialog()"></button>
+        <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text" (click)="saveEditQuiz()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="addQuizTrainingLanguageDialog" [style]="{ width: '600px' }" header="Add New Question"
+    [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <div class="p-field p-col-12">
+            <div class="mb-2">
+                <label for="quizText" class="font-medium text-900">Question</label>
+            </div>
+            <textarea id="quizText" name="quizText" [(ngModel)]="trainingLessonQuiz.quizText" pInputTextarea required
+                [ngClass]="{ 'ng-invalid ng-dirty': submitted && !trainingLessonQuiz.quizText }" rows="5"
+                placeholder="Write Question" cols="50"></textarea>
+        </div>
+        <div class="p-field p-col-12">
+            <div class="p-fluid p-grid p-align-center p-justify-between mt-2"
+                *ngFor="let answer of trainingLessonQuiz.trainingLessonQuizAnswers; let i = index">
+                <div class="p-col-12 p-md-8">
+                    <div class="mb-2">
+                        <label for="quoteText" class="font-medium text-900">Answer {{ i + 1 }}</label>
+                    </div>
+                    <div class="p-inputgroup">
+                        <p-radioButton name="correctAnswer" [value]="i" class="mr-3"
+                            [(ngModel)]="selectedQuizAnswerIndex"></p-radioButton>
+                        <input [id]="'answerText' + i" type="text" pInputText class="p-inputtext"
+                            [placeholder]="'Answer ' + (i + 1)" style="width: 100%" [(ngModel)]="answer.answerText" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text"
+            (click)="addQuizTrainingLanguageDialog = false"></button>
+        <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text" (click)="saveNewQuiz()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="deletionQuizTrainingLessonDialog" header="Delete Training Lesson" [modal]="true"
+    [style]="{ width: '450px' }">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="trainingLessonQuiz">Are you sure you want to delete the quiz?
+            <hr />
+            <p>{{ trainingLessonQuiz.quizText }}</p>
+        </span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No"
+            (click)="declineQuizDeletion()"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Yes"
+            (click)="confirmQuizDeletion()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog header="{{ galleryHeader }}" [(visible)]="displayGallery" [modal]="true"
+    [style]="{ width: '80vw', height: '80vh' }" (onHide)="reInitilizeDialog()">
+    <div class="p-fluid grid m-6">
+        <div class="col-12 md:col-5">
+            <p-galleria #galleria [value]="images" [(activeIndex)]="activeIndex" [numVisible]="5"
+                [containerStyle]="{ 'max-width': '440px' }" [containerClass]="galleriaClass()"
+                [showThumbnails]="showThumbnails" [showItemNavigators]="false" [showItemNavigatorsOnHover]="false"
+                [circular]="false" [autoPlay]="false" [transitionInterval]="3000">
+                <ng-template pTemplate="item" let-item>
+                    <img [src]="item?.itemImageSrc"
+                        [ngStyle]="{ width: !fullscreen ? '100%' : '', display: !fullscreen ? 'block' : '' }"
+                        style="width: 100%; height: 330px; display: block" />
+                </ng-template>
+                <ng-template pTemplate="thumbnail" let-item>
+                    <div class="grid grid-nogutter justify-content-center" style="overflow: hidden">
+                        <img [src]="item.thumbnailImageSrc" style="width: 90px; height: 60px; overflow: hidden" />
+                    </div>
+                </ng-template>
+                <ng-template pTemplate="footer" let-item>
+                    <div class="custom-galleria-footer">
+                        <button type="button" pButton icon="pi pi-list" (click)="onThumbnailButtonClick()"></button>
+                        <span *ngIf="images" class="title-container">
+                            <span>{{ activeIndex + 1 }}/{{ images.length }}</span>
+                            <span class="title">{{ images[activeIndex]?.title }}</span>
+                        </span>
+                        <button type="button" pButton [icon]="fullScreenIcon()" (click)="toggleFullScreen()"
+                            class="fullscreen-button"></button>
+                    </div>
+                </ng-template>
+            </p-galleria>
+        </div>
+        <div class="md:col-1">
+            <p-divider layout="vertical" />
+        </div>
+
+        <div class="col-12 md:col-6">
+            <div>
+                <button pButton pRipple label="Add" icon="pi pi-plus" class="p-button-success mr-2"
+                    (click)="addNewImage(contentType)"></button>
+            </div>
+            <div class="iAware-loading-table-container" style="position: relative">
+                <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                <p-table #dt [value]="images" styleClass="p-datatable-striped">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th style="text-align: center">Order No</th>
+                            <th style="text-align: center">Images</th>
+                            <th>Title</th>
+                            <th style="text-align: center" colspan="2">Actions</th>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="body" let-image>
+                        <tr>
+                            <td style="text-align: center">{{ image.orderNo }}</td>
+
+                            <td style="text-align: center">
+                                <p-image [src]="image.itemImageSrc" alt="Image" width="100" [preview]="true" />
+                            </td>
+                            <td>{{ image.imageTitle }}</td>
+
+                            <td style="text-align: center">
+                                <button pButton pRipple icon="pi pi-pencil"
+                                    class="p-button-rounded p-button-success mr-2" (click)="editImage(image)"></button>
+                            </td>
+                            <td style="text-align: center">
+                                <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger"
+                                    (click)="deleteImage(image)"></button>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+            <p-dialog [(visible)]="deletionImageTrainingLessonDialog" header="Delete Image" [modal]="true"
+                [style]="{ width: '450px' }">
+                <div class="flex align-items-center justify-content-center">
+                    <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+                    <span>Are you sure you want to delete the Image?
+                        <hr />
+                    </span>
+                </div>
+                <ng-template pTemplate="footer">
+                    <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Yes"
+                        (click)="confirmImageDeletion()"></button>
+
+                    <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No"
+                        (click)="declineImageDeletion()"></button>
+                </ng-template>
+            </p-dialog>
+        </div>
+    </div>
+</p-dialog>
+
+<p-dialog header="Screen Saver Management" [(visible)]="screenSaverDialog" [modal]="true"
+    [style]="{ width: '80vw', height: '80vh' }" (onHide)="reInitilizeDialog()">
+    <ng-template pTemplate="content">
+        <div class="p-fluid grid">
+            <div class="col-12">
+                <button pButton pRipple label="Add" icon="pi pi-plus" class="p-button-success mr-2"
+                    (click)="openAddScreenSaver()"></button>
+            </div>
+
+            <div class="col-12">
+                <p-table [value]="screenSavers" [paginator]="true" [rows]="10" [responsive]="true">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>Title</th>
+                            <th>Platform</th>
+                            <th>File</th>
+                            <th>Actions</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-screenSaver>
+                        <tr>
+                            <td>{{ screenSaver.screenSaverTitle }}</td>
+                            <td>{{ screenSaver.screenSaverPlatform || 'N/A' }}</td>
+                            <td>
+                                <i [style.cursor]="screenSaver.screenSaverUrl ? 'pointer' : 'not-allowed'"
+                                    class="fas fa-download"
+                                    (click)="downloadScreenSaverFile(screenSaver.screenSaverUrl)"></i>
+                            </td>
+                            <td>
+                                <button pButton icon="pi pi-pencil"
+                                    class="p-button-rounded p-button-text p-button-success"
+                                    (click)="openEditScreenSaver(screenSaver)"></button>
+                                <button pButton icon="pi pi-trash"
+                                    class="p-button-rounded p-button-text p-button-danger"
+                                    (click)="openDeleteScreenSaver(screenSaver)"></button>
+                            </td>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="emptymessage">
+                        <tr>
+                            <td colspan="7" class="text-center">
+                                <div class="empty-state">
+                                    <p class="empty-state-message">{{ 'No screen savers available' | translate }}</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+
+        <!-- Add Screen Saver -->
+        <p-dialog [(visible)]="addScreenSaverDialog" header="Add Screen Saver" [modal]="true"
+            [style]="{ width: '50vw' }" [contentStyle]="{ padding: '2rem' }">
+            <ng-template pTemplate="content">
+                <div class="p-fluid grid">
+                    <!-- Title Section -->
+                    <div class="col-12">
+                        <h3 class="form-section-header">Screen Saver Details</h3>
+                        <div class="p-inputgroup">
+                            <span class="p-inputgroup-addon">
+                                <i class="pi pi-tag"></i>
+                            </span>
+                            <input id="screenSaverTitle" type="text" pInputText [(ngModel)]="screenSaverTitle"
+                                placeholder="{{
+                                    'security-training.security-training-create.placeholders.title' | translate
+                                }}" />
+                        </div>
+                    </div>
+
+                    <!-- Platform Section -->
+                    <div class="col-12">
+                        <h3 class="form-section-header">Platform</h3>
+                        <p-dropdown id="screenSaverPlatform" [options]="platformOptions"
+                            [(ngModel)]="screenSaverPlatform" placeholder="{{
+                                'security-training.security-training-create.placeholders.platform' | translate
+                            }}">
+                        </p-dropdown>
+                    </div>
+
+                    <!-- Upload Section -->
+                    <div class="col-12">
+                        <h3 class="form-section-header">Upload Screen Saver File</h3>
+                        <div class="file-upload-container">
+                            <p-button icon="pi pi-upload" label="Upload File" class="p-button-outlined p-button-sm"
+                                (click)="fileInputScreenSaver.click()"></p-button>
+                            <input #fileInputScreenSaver type="file" style="display: none"
+                                accept=".scr,.saver,.xscreensaver,.desktop" (change)="onScreenSaverChange($event)" />
+
+                            <!-- Feedback -->
+                            <span *ngIf="isScreenSaverUploaded()" style="color: green; font-weight: bold">
+                                <i class="pi pi-check-circle"></i> File Uploaded Successfully
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="footer">
+                <button pButton pRipple icon="pi pi-check" label="Add" class="p-button-rounded p-button-success"
+                    (click)="addScreenSaver()"></button>
+                <button pButton pRipple icon="pi pi-times" label="Cancel" class="p-button-rounded p-button-danger"
+                    (click)="cancelAddScreenSaver()"></button>
+            </ng-template>
+        </p-dialog>
+
+        <p-dialog [(visible)]="editScreenSaverDialog" header="Edit Screen Saver" [modal]="true"
+            [style]="{ width: '50vw' }" [contentStyle]="{ padding: '2rem' }">
+            <ng-template pTemplate="content">
+                <div class="p-fluid grid">
+                    <!-- Title Section -->
+                    <div class="col-12">
+                        <h3 class="form-section-header">Screen Saver Details</h3>
+                        <div class="p-inputgroup">
+                            <span class="p-inputgroup-addon">
+                                <i class="pi pi-tag"></i>
+                            </span>
+                            <input id="screenSaverTitle" type="text" pInputText [(ngModel)]="screenSaverTitle"
+                                placeholder="{{
+                                    'security-training.security-training-create.placeholders.title' | translate
+                                }}" />
+                        </div>
+                    </div>
+
+                    <!-- Platform Section -->
+                    <div class="col-12">
+                        <h3 class="form-section-header">Platform</h3>
+                        <p-dropdown id="screenSaverPlatform" [options]="platformOptions"
+                            [(ngModel)]="screenSaverPlatform" placeholder="{{
+                                'security-training.security-training-create.placeholders.platform' | translate
+                            }}">
+                        </p-dropdown>
+                    </div>
+
+                    <!-- Upload Section -->
+                    <div class="col-12">
+                        <h3 class="form-section-header">Upload New Screen Saver File</h3>
+                        <div class="file-upload-container">
+                            <p-button icon="pi pi-upload" label="Upload File" class="p-button-outlined p-button-sm"
+                                (click)="fileInputScreenSaver.click()"></p-button>
+                            <input #fileInputScreenSaver type="file" style="display: none"
+                                accept=".scr,.saver,.xscreensaver,.desktop" (change)="onScreenSaverChange($event)" />
+
+                            <!-- Feedback -->
+                            <span *ngIf="isScreenSaverUploaded()" style="color: green; font-weight: bold">
+                                <i class="pi pi-check-circle"></i> File Uploaded Successfully
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="footer">
+                <button pButton pRipple icon="pi pi-check" label="Save Changes"
+                    class="p-button-rounded p-button-success" (click)="editScreenSaver()"></button>
+                <button pButton pRipple icon="pi pi-times" label="Cancel" class="p-button-rounded p-button-danger"
+                    (click)="cancelScreenSaverEdite()"></button>
+            </ng-template>
+        </p-dialog>
+
+        <!-- delete operation -->
+        <p-dialog [(visible)]="deleteScreenSaverDialog" header="Delete Screen Saver" [modal]="true" [responsive]="true"
+            [closable]="false" [style]="{ width: '40vw', height: 'auto' }" class="custom-dialog">
+            <ng-template pTemplate="content">
+                <div class="flex align-items-center justify-content-center py-4">
+                    <i class="pi pi-exclamation-triangle text-red-500" style="font-size: 3rem"></i>
+                    <div class="ml-3">
+                        <p class="text-xl font-semibold mb-2">
+                            Are you sure you want to delete "<b>{{ screenSaverTitle }}</b>"?
+                        </p>
+                        <p class="text-sm text-gray-400">This action cannot be undone.</p>
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="footer">
+                <div class="flex justify-content-end">
+                    <button pButton pRipple icon="pi pi-check" label="Yes" class="p-button-danger mr-2"
+                        (click)="deleteScreenSaver()"></button>
+                    <button pButton pRipple icon="pi pi-times" label="No" class="p-button-secondary"
+                        (click)="cancelScreenSaverDeletion()"></button>
+                </div>
+            </ng-template>
+        </p-dialog>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text" label="Close"
+            (click)="closeScreenSaverDialog()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="displayWallPaperGallery" [closable]="true"
+    [style]="{ border: 'none', 'background-color': 'transparent' }" [modal]="true"
+    [contentStyle]="{ 'background-color': 'transparent', 'box-shadow': 'none' }" [dismissableMask]="true">
+    <ng-template pTemplate="headless">
+        <div class="p-fluid grid m-6">
+            <div class="col-12">
+                <p-galleria #galleria [value]="walls" [(activeIndex)]="activeIndex" [numVisible]="5"
+                    [containerStyle]="{ 'max-width': '440px' }" [containerClass]="wallpaperGalleriaClass()"
+                    [showThumbnails]="showThumbnails" [showItemNavigators]="true" [showItemNavigatorsOnHover]="true"
+                    [circular]="true" [autoPlay]="true" [transitionInterval]="3000">
+                    <ng-template pTemplate="item" let-item>
+                        <img [src]="item?.itemImageSrc"
+                            [ngStyle]="{ width: !fullscreen ? '100%' : '', display: !fullscreen ? 'block' : '' }"
+                            style="width: 100%; height: 330px; display: block" />
+                    </ng-template>
+                    <ng-template pTemplate="thumbnail" let-item>
+                        <div class="grid grid-nogutter justify-content-center" style="overflow: hidden">
+                            <img [src]="item.thumbnailImageSrc" style="width: 90px; height: 60px; overflow: hidden" />
+                        </div>
+                    </ng-template>
+
+                    <ng-template pTemplate="footer" let-item>
+                        <div class="custom-galleria-footer">
+                            <button type="button" pButton icon="pi pi-list" (click)="onThumbnailButtonClick()"></button>
+                            <span *ngIf="images.length !== 0" class="title-container">
+                                <span>{{ activeIndex + 1 }}/{{ images.length }}</span>
+                                <span class="title">{{ images[activeIndex]?.title }}</span>
+                            </span>
+                        </div>
+                    </ng-template>
+                </p-galleria>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Continue" icon="pi pi-check" class="p-button-text"
+            (click)="HideWallPaperGallery()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="imageEditDialog" [style]="{ width: '500px', heigth: '900px' }"
+    header="{{ addImageHeaderDialogText }}" [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <div class="card">
+            <div class="field">
+                <label for="name" class="font-medium text-900">Title</label>
+                <input type="text" pInputText id="name" [(ngModel)]="image.imageTitle" required />
+            </div>
+            <div class="field">
+                <label for="name" class="font-medium text-900">Order No</label>
+                <input type="number" pInputText id="name" [(ngModel)]="image.orderNo" required />
+            </div>
+            <div class="flex justify-content-center flex-wrap">
+                <div class="col-6 flex flex-column">
+                    <div class="flex align-items-center justify-content-center">
+                        <img [src]="imageUrl" alt="Avatar" class="avatar" style="cursor: pointer"
+                            (click)="onUploadImageClick()" />
+                    </div>
+                    <label class="flex justify-content-center">Category Banner</label>
+
+                    <div class="flex align-items-center justify-content-center mt-2" style="display: none">
+                        <p-button label="Upload" icon="pi pi-upload" (click)="onUploadImageClick()"></p-button>
+                        <input type="file" id="image" style="display: none" (change)="onImageSelected($event)" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text"
+            (click)="declineEditImage()"></button>
+        <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text"
+            (click)="confirmEditImage()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="editEmailTrainingLanguageDialog" header="Email" [modal]="true" [style]="{ width: '600px' }"
+    class="p-fluid">
+    <ng-template pTemplate="content">
+        <div class="field col-12 md:col-12">
+            <label for="lessonAwarenessEmailSubject" class="font-medium text-900">Email Subject</label>
+            <input id="lessonAwarenessEmailSubject" type="text" pInputText [(ngModel)]="Email.emailSubject" required />
+        </div>
+        <div class="col-12">
+            <div class="mb-2">
+                <label for="lessonAwarenessEmailContent" class="font-medium text-900">Email Content</label>
+            </div>
+            <app-iAware-rich-text [id]="'emailContent'" [(ngModel)]="Email.emailContent"></app-iAware-rich-text>
+        </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text"
+            (click)="hideEditEmailDialog()"></button>
+        <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text"
+            (click)="saveEditEmail()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="switchActivationTrainingLessonDialog" header="Activation Training Lesson" [modal]="true"
+    [style]="{ width: '450px' }">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="trainingLesson">
+            Are you sure you want to
+            <span style="color: red">{{ trainingLesson.isActive ? 'Deactivate ' : 'Activate ' }}</span>
+            <b>{{ trainingLesson.name }}</b>?
+        </span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No"
+            (click)="declineActivation()"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Yes"
+            (click)="confirmtActivation()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="pdfViewerDialog"
+    [style]="{ border: 'none', width: '80%', height: '100vh', 'background-color': 'transparent' }" [modal]="true"
+    [contentStyle]="{ 'background-color': 'transparent', 'box-shadow': 'none' }" [dismissableMask]="true">
+    <ng-template pTemplate="headless">
+        <div class="m-auto align-items-center flex-column" style="width: 100%">
+            <app-iaware-pdf [pdfUrl]="bookPdfUrl"></app-iaware-pdf>
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <div class="flex flex-wrap justify-content-between">
+            <!-- <button pButton pRipple icon="pi pi-arrow-left" label="Close" (click)="close()"></button> -->
+        </div>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="libraryWallpaperDialog" header="Wallpapers Library" [modal]="true"
+    [style]="{ width: '80%', height: '80vh' }">
+    <div class="mb-4">
+        <p-button (click)="BacktoWallapapersGallery()" icon="pi pi-arrow-left"
+            label="Back to Choose Wallapapers"></p-button>
+    </div>
+    <app-wallpaper-list-wizard></app-wallpaper-list-wizard>
+</p-dialog>
+
+<p-dialog [(visible)]="editBookDialog" header="Book Management" [modal]="true"
+    [style]="{ width: '85%', height: '80vh' }" [closable]="true" [dismissableMask]="true"
+    (onHide)="closeEditBookDilog()">
+    <!-- <p-tabView class="w-full h-full" styleClass="tabview-custom" [(activeIndex)]="selectedTabIndex">
+        <p-tabPanel header="Book File"> -->
+    <div class="flex justify-content-center">
+        <button pButton pRipple icon="pi pi-upload" label="Upload Book PDF" (click)="fileInputBook.click()"></button>
+    </div>
+    <input #fileInputBook type="file" accept="application/pdf" (change)="onlessonBookChange($event, trainingLesson)"
+        style="display: none" />
+
+    <div class="m-auto align-items-center flex-column" style="width: 100%; height: 80%">
+        <app-iaware-pdf *ngIf="bookPdfUrl" [pdfUrl]="bookPdfUrl"></app-iaware-pdf>
+    </div>
+    <!-- </p-tabPanel>
+
+        <p-tabPanel header="Book Cover ">
+            <div class="flex justify-content-center m-4">
+                <button pButton pRipple icon="pi pi-upload" label="Upload Book PDF Image"
+                    (click)="imageInputBook.click()"></button>
+            </div>
+
+            <input #imageInputBook type="file" accept="image/*" style="display: none"
+                (change)="onlessonImageBookChange($event, trainingLesson)" />
+            <div class="flex justify-content-center">
+                <img [src]="bookPdfImageUrl" style="width: 350px; height: 500px; display: block" />
+            </div>
+        </p-tabPanel>
+    </p-tabView> -->
+</p-dialog>
+
+<p-dialog [(visible)]="editVideoDialog" header="Video Management" [modal]="true" (onHide)="closeEditVideoDialog()"
+    [style]="{ width: '85%', height: '80vh' }">
+    <ng-template pTemplate="content">
+        <p-tabView class="w-full h-full" styleClass="tabview-custom" [(activeIndex)]="selectedTabIndex">
+            <p-tabPanel header="Video File">
+                <div class="flex justify-content-center m-4">
+                    <input placeholder="Paste Here Video ID" style="width: 500px; margin-right: 20px" type="text"
+                        pInputText [(ngModel)]="bookVideoUrlInput" />
+
+                    <button pButton pRipple icon="pi pi-upload" label="Upload Video ID"
+                        (click)="editLessonVideoUrl(trainingLesson.id)"></button>
+                </div>
+
+                <div class="flex justify-content-center m-4"
+                    style="display: flex; flex-direction: column; align-items: center">
+                    <div style="display: block">
+                        <!-- <p class="mb-4"><strong> Video ID: </strong> {{bookVideoUrlInput}} </p> -->
+                    </div>
+                    <cloudflare-stream *ngIf="bookVideoUrl" style="width: 50%" [controls]="true"
+                        [src]="bookVideoUrl"></cloudflare-stream>
+                </div>
+            </p-tabPanel>
+
+            <p-tabPanel header="Video Cover">
+                <div class="flex justify-content-center m-4">
+                    <button pButton pRipple icon="pi pi-upload" label="Upload Video Image"
+                        (click)="imageInputVideo.click()"></button>
+                </div>
+
+                <input #imageInputVideo type="file" accept="image/*" style="display: none"
+                    (change)="onlessonImageVideoChange($event, trainingLesson)" />
+                <!-- <div class="surface-card shadow-3 border-round overflow-hidden hover:shadow-5 transition-all"> -->
+                <div class="relative text-center">
+                    <img [(src)]="bookVideoImageUrl" />
+                </div>
+                <!-- </div> -->
+
+                <!-- Recommended Dimensions -->
+                <small class="text-center block m-2">{{ 'shared.messages.recommendedDimensions' | translate}} <strong>{{
+                        'shared.messages.800x449' | translate}}</strong> {{ 'shared.messages.pixels' |
+                    translate}}</small>
+            </p-tabPanel>
+        </p-tabView>
+    </ng-template>
+</p-dialog>

@@ -1,0 +1,7 @@
+<p-dialog [(visible)]="visible" [modal]="true" (onHide)="onHide()" [style]="{ width: '600px' }" header="{{ 'security-training.pdf-viewer-dialog.header' | translate }}">
+  <iframe [src]="pdfUrl"></iframe>
+  <pdf-viewer [src]="pdfUrl"></pdf-viewer>
+  <ng-template pTemplate="footer">
+    <button type="button" pButton icon="pi pi-times" (click)="onHide()" label="{{ 'security-training.pdf-viewer-dialog.close' | translate }}"></button>
+  </ng-template>
+</p-dialog>

@@ -1,0 +1,112 @@
+/* Hide the default step numbers */
+::ng-deep .p-steps-number {
+    visibility: hidden;
+}
+/* Style the label of the current step */
+::ng-deep .p-steps-item.p-highlight.p-steps-current .p-steps-title {
+    color: #5b3b8d;
+    font-weight: bolder;
+}
+
+/* Style the icon of the current step */
+::ng-deep .p-steps-item.p-highlight.p-steps-current .p-steps-number {
+    color: #5b3b8d;
+    font-weight: bold; /* Adjust icon's font weight if necessary */
+    -webkit-animation: spin 2s infinite linear;
+    animation: spin 2s infinite linear;
+}
+
+/* Keyframes for spinning animation */
+@keyframes spin {
+    0% {
+        -webkit-transform: rotate(216deg);
+        transform: rotate(0);
+    }
+    100% {
+        -webkit-transform: rotate(359deg);
+        transform: rotate(360deg);
+    }
+}
+
+/* For step 1 - Settings */
+::ng-deep .p-steps-item:nth-child(1) .p-steps-number {
+    background: none !important;
+    visibility: hidden;
+}
+
+::ng-deep .p-steps-item:nth-child(1) .p-steps-number::after {
+    content: "\e94a";
+    /* PrimeNG build icon (wrench) */
+    font-family: "PrimeIcons";
+    visibility: visible;
+    font-size: 2rem;
+}
+
+/* For step 2 - Build */
+::ng-deep .p-steps-item:nth-child(2) .p-steps-number {
+    background: none !important;
+    visibility: hidden;
+}
+
+::ng-deep .p-steps-item:nth-child(2) .p-steps-number::before {
+    content: "\e9e6";
+    /* PrimeNG build icon (wrench) */
+    font-family: "PrimeIcons";
+    visibility: visible;
+    font-size: 1.5rem;
+}
+
+/* For step 3 - Schedule */
+::ng-deep .p-steps-item:nth-child(3) .p-steps-number {
+    background: none !important;
+    visibility: hidden;
+}
+
+::ng-deep .p-steps-item:nth-child(3) .p-steps-number::before {
+    content: "\ea02";
+    /* PrimeNG calendar icon */
+    font-family: "PrimeIcons";
+    visibility: visible;
+    font-size: 1.5rem;
+}
+
+::ng-deep .p-steps .p-steps-item:before {
+    content: none !important;
+    border-top: none !important;
+    width: 0px !important;
+    top: 0 !important;
+    left: 0 !important;
+    display: none !important;
+    position: absolute !important;
+    margin-top: 0rem !important;
+}
+
+::ng-deep .p-steps .p-steps-item .p-menuitem-link .p-steps-number{
+    border: none !important;
+}
+
+::ng-deep .p-steps-item.p-highlight.p-steps-current:nth-child(3) .p-steps-number {
+    animation: none;
+}
+
+::ng-deep .introjs-helperLayer{
+    box-shadow: rgb(123 49 206 / 80%) 0px 0px 1px 2px, rgba(33, 33, 33, 0.5) 0px 0px 0px 5000px !important;
+}
+
+::ng-deep .introjs-bullets{
+    display: none;
+}
+
+// ::ng-deep .introjs-button{
+//     color: #ffffff;
+//     background: #883cae;
+//     border: 1px solid #883cae;
+//     padding: 0.5rem 0.75rem;
+//     font-size: 1rem;
+//     transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
+//     border-radius: 4px;
+// }
+
+// ::ng-deep .introjs-button:hover {
+//     pointer-events: none !important;
+// }

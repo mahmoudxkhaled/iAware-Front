@@ -1,0 +1,32 @@
+<p-card>
+    <!-- <div class="training-progress"> -->
+    <div class="achievements-header">
+        <h2>{{'dashboards.user-dashboard.trainingProgress.header' | translate }}</h2>
+        <p>{{'dashboards.user-dashboard.trainingProgress.description' | translate }}</p>
+    </div>
+    <div>
+        <div class="progress-bar-container">
+            <div class="progress-bar">
+                <div class="progress-bar-inner" style="width: 0%"></div>
+            </div>
+            <span class="progress-percentage">{{'dashboards.user-dashboard.trainingProgress.percentage' |
+                translate:{assignmentsPercentage: progress} }}</span>
+        </div>
+
+        <div class="alert-box">
+            <div class="alert-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px">
+                    <path d="M0 0h24v24H0z" fill="none" />
+                    <path
+                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 17c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7zm-1-4h2v2h-2zm0-8h2v6h-2z" />
+                </svg>
+                <span>{{'dashboards.user-dashboard.trainingProgress.assignmentsMessage' |
+                    translate:{completedAssignments: completedAssignments, totalAssignments : totalAssignments}
+                    }}</span>
+            </div>
+            <button pButton (click)="navigateToTraining()">{{'dashboards.user-dashboard.buttons.goToTraining' |
+                translate }}</button>
+        </div>
+    </div>
+    <!-- </div> -->
+</p-card>

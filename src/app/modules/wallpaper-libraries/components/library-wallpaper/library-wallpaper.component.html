@@ -1,0 +1,484 @@
+<div *ngIf="!selectedWallpaper">
+    <div class="card">
+        <p-toast></p-toast>
+        <p-dataView #dv [value]="wallpapers" [paginator]="true" [rows]="12" layout="grid">
+            <ng-template pTemplate="header">
+                <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                    <h5 class="m-0">Wallapapers Management</h5>
+                    <div class="my-1">
+                        <button *ngIf="hasPermission(actions.add)" pButton pRipple label="Add" icon="pi pi-plus"
+                            class="p-button  mr-2" (click)="CreateWallpaper()"></button>
+                        <!-- <span class=" mt-2 md:mt-0 p-input-icon-left">
+                        <i class="pi pi-search"></i>
+                        <input pInputText type="text" placeholder="Search..." class="w-full sm:w-auto" />
+                    </span> -->
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template let-walls pTemplate="gridItem">
+                <div class="grid grid-nogutter">
+                    <div class="col-12 md:col-4" *ngFor="let wall of walls">
+                        <div class="m-3" #img>
+                            <div class=" mb-3">
+                                <div class="flex flex-wrap justify-content-center ">
+                                    <img [src]="wall.wallpaperImageUrl" class=" shadow-4 my-3 mx-0 p-1"
+                                        (click)="selectWallpaper(wall.id, wall.wallpaperTitle)"
+                                        style="width: 300px; height: 200px; cursor: pointer;" />
+                                    <button *ngIf="menuItems.length > 0" pButton pRipple type="button"
+                                        icon="pi pi-ellipsis-v"
+                                        class="p-button-rounded p-button-text p-button-plain flex align-items-center "
+                                        (click)="menu.toggle($event); assigneCurrentSelect(wall)"></button>
+                                    <p-menu #menu [model]="menuItems" [appendTo]="dv" [popup]="true"></p-menu>
+                                </div>
+                                <div class="text-center mr-5"
+                                    (click)="navigateToLangauges(wall.id,wall.wallpaperTitle)">
+                                    <div style="cursor: pointer;" class="text-2xl font-bold">{{wall.wallpaperTitle}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+        </p-dataView>
+    </div>
+</div>
+
+
+<div *ngIf="selectedWallpaper">
+    <app-library-wallpaper-language [libraryWallpaperId]="selectedWallpaper.id"
+        [libraryWallpaperName]="selectedWallpaper.title" (backToWallpapers)="handleBackToWallpapers()">
+    </app-library-wallpaper-language>
+</div>
+
+
+<p-dialog [(visible)]="addWallpaperDialog" [style]="{width: '100%', height: '100vh'}" header="Add Wallpaper"
+    [modal]="true" [closeOnEscape]="false" class="p-fluid" [closable]="false">
+    <form [formGroup]="addWallpaperForm" (ngSubmit)="saveAddWallpaper()">
+        <div class="flex flex-wrap justify-content-center">
+            <div class="field mb-4 col-6">
+                <label for="wallpaperTitle" class="font-medium text-900">Wallpaper Title</label>
+                <input type="text" pInputText id="wallpaperTitle" formControlName="wallpaperTitle" required autofocus
+                    [ngClass]="{'ng-invalid ng-dirty': submitted && !addWallpaperForm.controls['wallpaperTitle'].valid}" />
+                <small *ngIf="submitted && !addWallpaperForm.controls['wallpaperTitle'].valid" class="text-red-500">Name
+                    is required.</small>
+            </div>
+            <div class="field mb-4 col-6">
+                <label for="languageId" class="font-medium text-900">Language</label>
+                <span class="p-float-label">
+                    <p-dropdown formControlName="languageId" [options]="defaultLanguage" optionLabel="name"
+                        optionValue="id" placeholder="Select a Language">
+                    </p-dropdown>
+                </span>
+            </div>
+        </div>
+        <div class="grid px-3">
+
+
+            <div class="card col-6 md:col-3"
+                style="display: flex; flex-direction: column; height: 100vh; overflow-y: hidden">
+                <div *ngIf="selectedBackground" class="grid-item background">
+                    <!-- <h3>Selected Background</h3> -->
+                    <img [src]="selectedBackground.backgroundImageUrl" class="shadow-2 my-3 mx-0"
+                        style="width: 150px; height: 150px; cursor: pointer;" />
+                </div>
+                <div class=" flex flex-wrap justify-content-center">
+                    <span class=" mt-2 md:mt-0 p-input-icon-left ">
+                        <i class="pi pi-search"></i>
+                        <input pInputText type="text" (input)="CharactersFilter($event)" placeholder="Search..." />
+                    </span>
+                </div>
+
+
+                <!--  /////////////////////////////////////////// -->
+
+                <p-scrollPanel [style]="{width: '100%', height: 'calc(100vh - 50px)'}">
+
+
+                    <p-dataView #dv [value]="backgrounds" [rows]="12" layout="grid">
+                        <ng-template let-backgrounds pTemplate="gridItem">
+                            <div class=" ">
+                                <div *ngFor="let background of backgrounds">
+                                    <div class="my-3 " (click)="selectBackground(background)">
+                                        <div class=" flex flex-wrap justify-content-center">
+                                            <div class="mb-3 flex flex-column ">
+                                                <div class=" flex align-items-center justify-content-center">
+                                                    <p-radioButton name="libraryBackgroundId" [value]="background.id"
+                                                        formControlName="libraryBackgroundId"
+                                                        (click)="onRadioButtonClick($event, background)">
+                                                    </p-radioButton>
+                                                </div>
+                                                <div class=" flex align-items-center justify-content-center">
+                                                    <img [src]="background.backgroundImageUrl"
+                                                        class="shadow-2 my-3 mx-0"
+                                                        style="width: 150px; height: 150px; cursor: pointer;" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </p-dataView>
+
+
+                </p-scrollPanel>
+            </div>
+
+
+            <div class="card col-6 md:col-3"
+                style="display: flex; flex-direction: column; height: 100vh; overflow-y: hidden">
+                <div *ngIf="selectedCharacter" class="grid-item character">
+                    <!-- <h3>Selected Character</h3> -->
+                    <img [src]="selectedCharacter.characterImageUrl" class="shadow-2 my-3 mx-0"
+                        style="width: 150px; height: 150px; cursor: pointer;" />
+                </div>
+                <div class=" flex flex-wrap justify-content-center">
+                    <span class="    mt-2 md:mt-0 p-input-icon-left ">
+                        <i class="pi pi-search"></i>
+                        <input pInputText type="text" (input)="CharactersFilter($event)" placeholder="Search..." />
+                    </span>
+                </div>
+
+                <!--  /////////////////////////////////////////// -->
+                <p-scrollPanel [style]="{width: '100%', height: 'calc(100vh - 50px)'}">
+
+
+                    <p-dataView #dc [value]="characters" [rows]="12" layout="grid" filterBy="characterName">
+                        <ng-template let-characters pTemplate="gridItem">
+                            <div class=" ">
+                                <div *ngFor="let char of characters">
+                                    <div class="m-3" (click)="selectCharacter(char)">
+                                        <div class=" flex flex-wrap justify-content-center">
+                                            <div class="mb-3 flex flex-column ">
+                                                <div class=" flex align-items-center justify-content-center">
+                                                    <p-radioButton name="libraryLanguageCharacterId" [value]="char.id"
+                                                        formControlName="libraryLanguageCharacterId"
+                                                        (click)="onRadioButtonClick($event, char)">
+                                                    </p-radioButton>
+                                                </div>
+                                                <div class=" flex align-items-center justify-content-center">
+                                                    <img [src]="char.characterImageUrl" class="shadow-2 my-3 mx-0"
+                                                        style="width: 150px; height: 150px; cursor: pointer;" />
+                                                </div>
+                                                <div class=" flex align-items-center justify-content-center">
+                                                    <div class="text-center ext-md">{{char.languageName}}</div>
+                                                </div>
+                                                <div class="lex align-items-center justify-content-center  my-3">
+                                                    <div class=" text-center  text-2xl font-bold">
+                                                        {{char.characterName}}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </p-dataView>
+
+                </p-scrollPanel>
+
+
+            </div>
+
+
+            <div class="card col-12 md:col-6 "
+                style="display: flex; flex-direction: column; height: 100vh; overflow-y: hidden">
+                <div *ngIf="selectedQuote" class="grid-item quote">
+                    <!-- <h3>Selected Quote</h3> -->
+                    <div class="card shadow-2 my-3 mx-0"
+                        style="min-width: 100% ;min-height: 150px;cursor: pointer;align-items: center;vertical-align: middle;display: flex;justify-content: center;">
+                        <div class="text-center mb-2 ">
+                            <strong [innerHTML]="selectedQuote.quoteText" class="text-l"></strong>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex flex-wrap justify-content-center">
+                    <span class="mt-2 md:mt-0 p-input-icon-left ">
+                        <i class="pi pi-search"></i>
+                        <input pInputText type="text" (input)="QuotesFilter($event)" placeholder="Search..." />
+                    </span>
+                </div>
+
+
+                <p-scrollPanel [style]="{width: '100%', height: 'calc(100vh - 50px)'}">
+                    <!--  /////////////////////////////////////////// -->
+
+                    <p-dataView #dq [value]="quotes" [rows]="12" layout="grid" filterBy="quoteText">
+                        <ng-template let-quotes pTemplate="gridItem">
+                            <div class=" ">
+                                <div *ngFor="let quote of quotes">
+                                    <div class="m-3" (click)="selectQuote(quote)">
+                                        <div class=" flex flex-wrap justify-content-center">
+                                            <div class="mb-3 flex flex-column" style="min-width: 100%;">
+                                                <div class=" flex align-items-center justify-content-center"
+                                                    style="min-width: 100%;">
+                                                    <p-radioButton name="libraryLanguageQuoteId" [value]="quote.id"
+                                                        formControlName="libraryLanguageQuoteId"
+                                                        (click)="onRadioButtonClick($event, quote)">
+                                                    </p-radioButton>
+                                                </div>
+                                                <div class="mb-3 my-3 flex align-items-center justify-content-center"
+                                                    style=" cursor: pointer; min-width: 100%;">
+                                                    <div class="shadow-2 my-3 mx-0 card"
+                                                        style="min-width: 100%;   cursor: pointer;">
+                                                        <div class="text-center mb-2">
+                                                            <strong [innerHTML]="quote.quoteText"
+                                                                class="text-l"></strong>
+                                                        </div>
+                                                        <div class="text-center">
+                                                            <div class="text-md">{{quote.languageName}}</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </p-dataView>
+
+
+                </p-scrollPanel>
+            </div>
+
+
+        </div>
+    </form>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text"
+            (click)="declineAddWallpaper()"></button>
+        <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text"
+            (click)="saveAddWallpaper()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="switchActivationWallpaperDialog" header="Activation Wallpaper" [modal]="true"
+    [style]="{width:'450px'}">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="wallpaper">
+            Are you sure you want to <span style=color:red>{{ wallpaper.isActive ? 'Deactivate ' :
+                'Activate ' }}</span> <b>{{
+                wallpaper.wallpaperTitle }}</b>?
+        </span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No"
+            (click)="declineActivation()"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Yes"
+            (click)="confirmtActivation()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="deletionWallpaperDialog" header="Delete Wallpaper" [modal]="true" [style]="{width:'450px'}">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="wallpaper">Are you sure you want to delete <b>{{wallpaper.wallpaperTitle}}</b> ?</span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No"
+            (click)="declineDeletion()"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Yes"
+            (click)="confirmDeletion()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="openCategoryPageContentHtmlDialog" [modal]="true" [style]="{width:'450px'}">
+    <div class="flex align-items-center justify-content-center">
+
+        <strong *ngIf="wallpaper" [innerHTML]="wallpaper.wallpaperQuote"></strong>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text" label="Cancel"
+            (click)="hideCategoryPageContentHtmlDialog()"></button>
+    </ng-template>
+</p-dialog>
+
+
+
+<!-- 
+<p-dialog [(visible)]="addWallpaperDialog" [style]="{width: '100%',height:'100%'}" header="Add Wallpaper" [modal]="true"
+    [closeOnEscape]="false" class="p-fluid" [closable]="false">
+    <form [formGroup]="addWallpaperForm" (ngSubmit)="saveAddWallpaper()">
+
+        <div class="grid ">
+
+            <div class="col-6">
+
+                <div class="flex flex-wrap">
+                    <div class="field mb-4 col-6">
+                        <label for="wallpaperTitle" class="font-medium text-900">Wallpaper Title</label>
+                        <input type="text" pInputText id="wallpaperTitle" formControlName="wallpaperTitle" required
+                            autofocus
+                            [ngClass]="{'ng-invalid ng-dirty' : submitted && !addWallpaperForm.controls['wallpaperTitle'].valid}" />
+                        <small *ngIf="submitted && !addWallpaperForm.controls['wallpaperTitle'].valid"
+                            class="text-red-500">Name
+                            is required.</small>
+                    </div>
+
+                    <div class="field mb-4 col-6">
+                        <label for="languageId" class="font-medium text-900">Language</label>
+                        <span class="p-float-label">
+                            <p-dropdown formControlName="languageId" [options]="defaultLanguage" optionLabel="name"
+                                optionValue="id" placeholder="Select a Language">
+                            </p-dropdown>
+                        </span>
+                    </div>
+                </div>
+                <p-divider align="center" type="dotted">
+                    <b>Backgrounds</b>
+                </p-divider>
+
+                <p-dataView #dv [value]="backgrounds" [paginator]="true" [rows]="12" layout="grid">
+                    <ng-template let-backgrounds pTemplate="gridItem">
+                        <div class="grid">
+                            <div class="col-fixed" *ngFor="let background of backgrounds">
+
+                                <div class="my-3 " (click)="selectBackground(background)">
+                                    <p-radioButton name="libraryBackgroundId" [value]="background.id"
+                                        formControlName="libraryBackgroundId"
+                                        (click)="onRadioButtonClick($event, background)">
+                                    </p-radioButton>
+                                    <div class="mb-3">
+                                        <div class="flex flex-wrap justify-content-center">
+                                            <img [src]="background.backgroundImageUrl" class="shadow-2 my-3 mx-0"
+                                                style="width: 200px; height: 200px; cursor: pointer;" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-template>
+                </p-dataView>
+
+
+                <p-divider align="center" type="dotted">
+                    <b>Characters</b>
+                </p-divider>
+                <p-dataView #dc [value]="characters" [paginator]="true" [rows]="12" layout="grid"
+                    filterBy="characterName">
+
+
+                    <ng-template let-characters pTemplate="gridItem">
+
+                        <span class=" mt-2 md:mt-0 p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input pInputText type="text" (input)="CharactersFilter($event)" placeholder="Search..."
+                                class="w-full sm:w-auto" />
+                        </span>
+                        <div class="grid grid-nogutter">
+                            <div class="col-fixed" *ngFor="let char of characters">
+                                <div class="m-3" (click)="selectCharacter(char)">
+                                    <p-radioButton name="libraryLanguageCharacterId" [value]="char.id"
+                                        formControlName="libraryLanguageCharacterId"
+                                        (click)="onRadioButtonClick($event, char)">
+                                    </p-radioButton>
+
+                                    <div class="mb-3">
+                                        <div class="flex flex-wrap justify-content-center">
+                                            <img [src]="char.characterImageUrl" class="shadow-2 my-3 mx-0"
+                                                style="width: 200px; height: 200px; cursor: pointer;" />
+                                        </div>
+
+                                        <div class="text-center">
+                                            <div class="text-md">{{char.languageName}}</div>
+                                        </div>
+                                        <div class="text-center my-3">
+                                            <div class="text-2xl font-bold">{{char.characterName}}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-template>
+                </p-dataView>
+                <p-divider align="center" type="dotted">
+                    <b>Quotes</b>
+                </p-divider>
+
+                <p-dataView #dq [value]="quotes" [paginator]="true" [rows]="12" layout="grid" filterBy="quoteText">
+                    <ng-template let-quotes pTemplate="gridItem">
+
+
+                        <span class=" mt-2 md:mt-0 p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input pInputText type="text" (input)="QuotesFilter($event)" placeholder="Search..."
+                                class="w-full sm:w-auto" />
+                        </span>
+
+
+                        <div class="grid grid-nogutter">
+                            <div class="col-fixed" *ngFor="let quote of quotes">
+                                <div class="m-3" (click)="selectQuote(quote)">
+                                    <p-radioButton name="libraryLanguageQuoteId" [value]="quote.id"
+                                        formControlName="libraryLanguageQuoteId"
+                                        (click)="onRadioButtonClick($event, quote)">
+                                    </p-radioButton>
+
+                                    <div class="mb-3 flex flex-wrap justify-content-center"
+                                        style="width: 200px; height: 200px; cursor: pointer;">
+
+                                        <div class=" shadow-2 my-3 mx-0 card  "
+                                            style="width: 200px; height: 200px; cursor: pointer;">
+                                            <div class="text-center mb-2">
+                                                <strong [innerHTML]="quote.quoteText" class="text-l"></strong>
+                                            </div>
+                                            <div class="text-center">
+                                                <div class="text-md  ">{{quote.languageName}}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </ng-template>
+                </p-dataView>
+            </div>
+
+            <p-divider layout="vertical" class="col-1 grid-nogutter" />
+
+            <div class="col-4 shadow-4 fixed-section">
+
+                <div class="grid-container">
+                    <div *ngIf="selectedBackground" class="grid-item background">
+                        <h3>Selected Background</h3>
+                        <img [src]="selectedBackground.backgroundImageUrl" class="shadow-2 my-3 mx-0"
+                            style="width: 150px; height: 150px; cursor: pointer;" />
+                    </div>
+                    <div *ngIf="selectedCharacter" class="grid-item character">
+                        <h3>Selected Character</h3>
+                        <img [src]="selectedCharacter.characterImageUrl" class="shadow-2 my-3 mx-0"
+                            style="width: 150px; height: 150px; cursor: pointer;" />
+                    </div>
+                    <div *ngIf="selectedQuote" class="grid-item quote">
+                        <h3>Selected Quote</h3>
+                        <div class="shadow-2 my-3 mx-0 card" style="width: 300px; height: 150px; cursor: pointer;">
+                            <div class="text-center mb-2">
+                                <strong [innerHTML]="selectedQuote.quoteText" class="text-l"></strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+
+
+
+    </form>
+
+    <ng-template pTemplate="footer">
+
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text"
+            (click)="declineAddWallpaper()"></button>
+        <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text"
+            (click)="saveAddWallpaper()"></button>
+
+    </ng-template>
+</p-dialog> -->

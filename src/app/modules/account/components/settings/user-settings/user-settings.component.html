@@ -1,0 +1,39 @@
+<div class="card">
+    <p-toast></p-toast>
+    <form [formGroup]="form" (ngSubmit)="saveSettings()">
+        <div class="col-12">
+            <div class="card">
+                <h5>{{'account.user-settings.title' | translate}}</h5>
+                <div class="p-fluid p-formgrid grid">
+                    <div class="field col-12 md:col-6">
+                        <label htmlFor="adminSessionTimeout">{{'account.user-settings.adminSessionTimeout' | translate}}</label>
+                        <input pInputText id="adminSessionTimeout" type="number" formControlName="adminSessionTimeout"/>
+                    </div>
+                    <div class="field col-12 md:col-6">
+                        <label htmlFor="userSessionTimeout">{{'account.user-settings.userSessionTimeout' | translate}}</label>
+                        <input pInputText id="userSessionTimeout" type="number" formControlName="userSessionTimeout" />
+                    </div>
+                    <div class="field col-12 md:col-6">
+                        <label htmlFor="minimumPasswordLength">{{'account.user-settings.minimumPasswordLength' | translate}}</label>
+                        <input pInputText id="minimumPasswordLength" type="number" formControlName="minimumPasswordLength" />
+                    </div>
+                    <div class="field col-12 md:col-6">
+                        <label htmlFor="rememberDeviceFor">{{'account.user-settings.rememberDeviceFor' | translate}}</label>
+                        <input pInputText id="rememberDeviceFor" type="number" formControlName="rememberDeviceFor" />
+                    </div>
+                    <div class="field col-12">
+                        <label htmlFor="requireMFA">{{'account.user-settings.requireMFA' | translate}}</label>
+                        <input pInputText id="requireMFA" type="text" formControlName="requireMFA" />
+                    </div>
+                    <div class="field col-12 flex flex justify-content-between">
+                        <label htmlFor="rememberTrustedDevice">{{'account.user-settings.rememberTrustedDevice' | translate}}</label>
+                        <p-inputSwitch formControlName="rememberTrustedDevice"></p-inputSwitch>
+                    </div>
+                    <div class="col-12">
+                        <button pButton pRipple label="{{'shared.actions.saveChanges' | translate}}" class="w-auto mt-3" type="submit" [disabled]="!form.valid"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,131 @@
+<div class="card">
+    <p-toast></p-toast>
+    <h5>Blog Category List</h5>
+    <p-dataView #dv [value]="blogCategories" [paginator]="true" [rows]="10" layout="grid">
+        <ng-template pTemplate="header">
+            <div class="flex flex-column md:flex-row md:justify-content-between gap-2">
+                <button pButton pRipple label="Add New Blog Category" icon="pi pi-plus" class="p-button mr-2"
+                    (click)="CreateBlogCategory()"></button>
+            </div>
+        </ng-template>
+        <ng-template let-cats pTemplate="gridItem">
+            <div class="iAware-loading-table-container" style="position: relative">
+                <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                <div class="grid grid-nogutter">
+                    <div class="col-12 md:col-4" *ngFor="let cat of cats">
+                        <div class="p-3">
+                            <div
+                                class="surface-card shadow-3 border-round overflow-hidden hover:shadow-5 transition-all relative">
+                                <div style="cursor: pointer;" class=" object-cover">
+                                    <img (click)="navigateToBlogCategoryPosts(cat.id)" [src]="cat.imageUrl"
+                                        [alt]="cat.title" class="w-full border-round-top square-image" />
+                                </div>
+                                <button pButton pRipple type="button" icon="pi pi-ellipsis-v"
+                                    class="p-button-rounded p-button-text p-button-plain absolute top-0 right-0 m-2 bg-gray-200 shadow-lg border border-gray-300"
+                                    (click)="iAwareMenu.toggle($event); assigneCurrentSelect(cat)">
+                                </button>
+
+                                <p-menu #iAwareMenu [model]="menuItems" [appendTo]="'body'" [popup]="true"></p-menu>
+
+                                <div class="text-center p-3">
+                                    <div (click)="navigateToBlogCategoryPosts(cat.id)" style="cursor: pointer"
+                                        class="text-2xl font-bold">
+                                        {{ cat.title }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+    </p-dataView>
+</div>
+
+
+
+<p-dialog [(visible)]="addBlogCategoryDialog" [style]="{ width: '50%', height: 'auto' }" header="Add New Blog Category"
+    [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <form [formGroup]="addBlogCategoryForm" (ngSubmit)="saveAddBlogCategory()">
+            <div class="col-12">
+                <div class="grid formgrid p-fluid">
+
+                    <div class="field col-12 md:col-12">
+                        <label for="title" class="font-medium text-900">Blog Category Title</label>
+                        <input type="text" pInputText id="title" formControlName="title"
+                            placeholder="Blog Category Title" required [ngClass]="{
+                                    'ng-invalid ng-dirty': submitted && !addBlogCategoryForm.controls['title'].valid
+                                }" />
+                        <small *ngIf="submitted && !addBlogCategoryForm.controls['title'].valid"
+                            class="ng-dirty ng-invalid text-red-500">Title is required</small>
+                    </div>
+
+                    <div class="field col-12 md:col-12">
+                        <label for="languageId" class="font-medium text-900">Select Language</label>
+                        <p-dropdown [readonly]="true" formControlName="languageId" [options]="defaultLanguage"
+                            optionLabel="name" placeholder="Select Language" optionValue="id">
+                        </p-dropdown>
+                    </div>
+
+                    <div class="col-12 md:col-12 mt-2">
+                        <p-panel header="Post Image" class="mb-3">
+
+                            <div class="flex flex-column align-items-center justify-content-center ">
+                                <div class="image-upload-container" (click)="triggerImageUpload()">
+                                    <img [src]="imageUrl" alt="Avatar" class="avatar" style="width: 300px; height: 225px; max-width: 300px; border-radius: 8px;
+                                           object-fit: fill; border: 1px solid #ccc; cursor: pointer;" />
+
+                                    <!-- Overlay text (hidden by default, shown on hover) -->
+                                    <div class="upload-hover-text">
+                                        {{ 'shared.actions.upload' | translate }}
+                                    </div>
+                                </div>
+                                <small class="text-center block m-2">{{ 'shared.messages.recommendedDimensions'
+                                    |
+                                    translate}} <strong>800px x 500px</strong> {{
+                                    'shared.messages.pixels' | translate}}</small>
+                            </div>
+
+                            <!-- Hidden File Input -->
+                            <input type="file" id="myCategoryImage" style="display: none"
+                                (change)="handleImageSelection($event)" />
+
+                        </p-panel>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+            class="p-button-text" (click)="declineAddBlogCategoryDialog()"></button>
+        <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check" class="p-button-text"
+            (click)="saveAddBlogCategory()"></button>
+    </ng-template>
+</p-dialog>
+
+
+<p-dialog [(visible)]="editBlogCategoryDialog" *ngIf="selectedCategory" [header]="selectedCategory.title" [modal]="true"
+    (onHide)="loadblogCategories()" [closable]="false" [style]="{width:'98%', height:'100vh'}" [closable]="true">
+    <app-blog-category-edit [cat]="selectedCategory"></app-blog-category-edit>
+</p-dialog>
+
+
+<p-dialog [(visible)]="deletionBlogCategoryDialog" header="{{ 'shared.headers.delete' | translate }}" [modal]="true"
+    [style]="{ width: 'auto', maxWidth: '90%' }" [closable]="true">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="blogCategory">{{ 'shared.messages.delete' | translate }}
+            <b class="flex flex-wrap justify-content-center">{{ blogCategory.title }}</b>
+        </span>
+    </div>
+    <ng-template pTemplate="footer">
+        <div style="display: flex; justify-content: center; align-items: center; width: 100%;">
+            <button pButton pRipple icon="pi pi-times" class="p-button-text"
+                label="{{ 'shared.actions.cancel' | translate }}" (click)="declineDeletion()"></button>
+            <button pButton pRipple icon="pi pi-check" class="p-button-text"
+                label="{{ 'shared.actions.save' | translate }}" (click)="confirmDeletion()"></button>
+        </div>
+    </ng-template>
+</p-dialog>

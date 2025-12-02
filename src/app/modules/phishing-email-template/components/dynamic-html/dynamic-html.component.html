@@ -1,0 +1,66 @@
+<div class="grid">
+    <div class="col-12">
+        <div class="card">
+
+            <div [innerHTML]="htmlContent"></div>
+        </div>
+    </div>
+</div>
+<button pButton pRipple label="Show" icon="pi pi-plus" class="p-button-success mr-2" (click)="ShowContent()">
+</button>
+
+<!-- <div class="grid">
+    <div class="col-12">
+        <div class="card">
+            <div class="field mb-4 col-12">
+                <label for="templateId" class="font-medium text-900">Template</label>
+                <span class="p-float-label" style="width: 300px;">
+                    <p-dropdown [options]="templateList" optionLabel="emailName" optionValue="id"
+                        [(ngModel)]="selectedTemplateId" (onChange)="onTemplateChange()">
+                    </p-dropdown>
+                </span>
+            </div>
+
+            <div class="field mb-4 col-12">
+                <label for="templateLanguageId" class="font-medium text-900">Template Language</label>
+                <span class="p-float-label" style="width: 300px;">
+                    <p-dropdown [options]="templateLanguagesList" optionLabel="emailName" optionValue="id"
+                        [(ngModel)]="selectedTemplateLanguageId" [disabled]="templateLanguagesList.length === 0">
+                    </p-dropdown>
+                </span>
+            </div>
+
+            <button pButton pRipple label="Show" icon="pi pi-plus" class="p-button-success mr-2"
+                (click)="ShowContent()">
+            </button>
+
+            <hr>
+            <div [innerHTML]="htmlContent"></div>
+        </div>
+    </div>
+</div>
+ -->
+
+<!-- <div class="form-container">
+    <form id="simpleForm">
+        <label for="input1">Input 1</label>
+        <input type="text" id="208a1fe9-8aea-49ae-84de-b5a66698003b" name="input1" required>
+
+        <label for="input2">Input 2</label>
+        <input type="text" id="input2" name="input2" required>
+
+        <button type="submit">Submit</button>
+    </form>
+</div> -->
+<!-- 
+<div class="form-container">
+    <form id="simpleForm">
+        <label for="input1">Input 1</label>
+        <input type="text" id="208a1fe9-8aea-49ae-84de-b5a66698003b" name="input1" required>
+
+        <label for="input2">Input 2</label>
+        <input type="text" id="input2" name="input2" required>
+
+        <button type="submit">Submit</button>
+    </form>
+</div> -->

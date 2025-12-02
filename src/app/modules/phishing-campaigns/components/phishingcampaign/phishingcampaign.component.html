@@ -1,0 +1,228 @@
+<p-card styleClass="cc" [style]="{ border: '2px solid rgb(136 60 174 / 26%)', borderRadius: '8px', margin: '1rem' }">
+    <p-tabView>
+        <p-tabPanel
+            *ngIf="hasPermission(actions.view)"
+            header="{{ 'phishing-campaigns.phishingcampaign.dashboard' | translate }}">
+            <app-phishing-campaigns-dashboard></app-phishing-campaigns-dashboard>
+        </p-tabPanel>
+        
+        <p-tabPanel header="{{ 'phishing-campaigns.phishingcampaign.RunningCampaigns' | translate }}">
+            <div class="iAware-loading-table-container" style="position: relative">
+                <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                <p-table
+                    [value]="currentPhishingDataSource"
+                    rowGroupMode="subheader"
+                    groupRowsBy="campaignName"
+                    sortField="campaignName"
+                    sortMode="single"
+                    [tableStyle]="{ 'min-width': '60rem' }"
+                    [paginator]="true"
+                    [rows]="5"
+                    [showCurrentPageReport]="true"
+                    [lazy]="true"
+                    [totalRecords]="currentTotalRecords"
+                    (onLazyLoad)="onLazyLoadCurrentPhishingCampaigns($event)"
+                    responsiveLayout="scroll"
+                    [rowsPerPageOptions]="[5, 10, 25, 50]">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>{{ 'phishing-campaigns.phishingcampaign.campaignName' | translate }}</th>
+                            <th></th>
+                            <!-- <th></th> -->
+                            <th></th>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="groupheader" let-campaign>
+                        <tr pRowGroupHeader>
+                            <td colspan="3" class="group-header">
+                                <div class="grid justify-content-between">
+                                    <div class="col-8">
+                                        <strong class="font-bold mb-2" style="display: block">
+                                            <a
+                                                style="cursor: pointer"
+                                                [pTooltip]="'phishing-campaigns.phishingcampaign.clicktoviewcampaigndetails' | translate"
+                                                tooltipPosition="right"
+                                                [routerLink]="[
+                                                    '/phishing-campaigns/p-campaign-statistics',
+                                                    campaign.campaignId
+                                                ]"
+                                                >{{ campaign.campaignName }}</a
+                                            >
+                                        </strong>
+                                        <span class="text-sm"
+                                            >{{ campaign.campaignStartDate | date }} -
+                                            {{ campaign.campaignEndDate | date }}</span
+                                        >
+                                    </div>
+                                    <div class="col-4"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="th-table">
+                                {{ 'phishing-campaigns.phishingcampaign.templateName' | translate }}
+                            </th>
+                            <th class="th-table">
+                                {{ 'phishing-campaigns.phishingcampaign.phishingStartDate' | translate }}
+                            </th>
+                            <th class="th-table">
+                                {{ 'phishing-campaigns.phishingcampaign.phishingEndDate' | translate }}
+                            </th>
+                            <!-- <th class="th-table">{{'phishing-campaigns.phishingcampaign.status' | translate}}</th> -->
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="groupfooter" let-campaign>
+                        <tr>
+                            <td colspan="3" class="group-footer text-right font-bold pr-6 pb-7">
+                                {{
+                                    'phishing-campaigns.phishingcampaign.toatalTemplates'
+                                        | translate
+                                            : {
+                                                  calculateCurrentTotalNumberOfTemplates:
+                                                      calculateCurrentTotalNumberOfTemplates(campaign.campaignName)
+                                              }
+                                }}
+                            </td>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="body" let-template>
+                        <tr>
+                            <td class="pl-6">{{ template.templateName }}</td>
+                            <td>{{ template.templatePhishingStartDate | date : 'MMM d, yyyy' }}</td>
+                            <td>{{ template.templatePhishingEndDate | date : 'MMM d, yyyy' }}</td>
+                            <!-- <td> <span [ngClass]="{
+                        'status-active': template.templateStatus === 'Active',
+                        'status-closed': template.templateStatus === 'Closed',
+                    }">{{ template.templateStatus }}</span></td> -->
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="emptymessage">
+                        <tr class="text-center">
+                            <td colspan="5">
+                                <div style="width: 100%; padding: 10px; text-align: center">
+                                    {{ 'training-campaigns.current-campaign.noCampaignsAvailable' | translate }}
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </p-tabPanel>
+
+        <p-tabPanel header="{{ 'phishing-campaigns.phishingcampaign.completedCampaigns' | translate }}">
+            <div class="iAware-loading-table-container" style="position: relative">
+                <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                <p-table
+                    [value]="historyPhishingDataSource"
+                    rowGroupMode="subheader"
+                    groupRowsBy="campaignName"
+                    sortField="campaignName"
+                    sortMode="single"
+                    [tableStyle]="{ 'min-width': '60rem' }"
+                    [paginator]="true"
+                    [rows]="5"
+                    [showCurrentPageReport]="true"
+                    [lazy]="true"
+                    [totalRecords]="historyTotalRecords"
+                    (onLazyLoad)="onLazyLoadHistoryPhishingCampaigns($event)"
+                    responsiveLayout="scroll"
+                    [rowsPerPageOptions]="[5, 10, 25, 50]">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>{{ 'phishing-campaigns.phishingcampaign.campaignName' | translate }}</th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="groupheader" let-campaign>
+                        <tr pRowGroupHeader>
+                            <td colspan="4" class="group-header">
+                                <div class="grid justify-content-between">
+                                    <div class="col-8">
+                                        <strong class="font-bold mb-2" style="display: block">
+                                            <a
+                                                style="cursor: pointer"
+                                                [pTooltip]="'phishing-campaigns.phishingcampaign.clicktoviewcampaigndetails' | translate"
+                                                tooltipPosition="right"
+                                                [routerLink]="[
+                                                    '/phishing-campaigns/p-campaign-statistics',
+                                                    campaign.campaignId
+                                                ]"
+                                                >{{ campaign.campaignName }}</a
+                                            >
+                                        </strong>
+                                        <span class="text-sm"
+                                            >{{ campaign.campaignStartDate | date }} -
+                                            {{ campaign.campaignEndDate | date }}</span
+                                        >
+                                    </div>
+                                    <div class="col-4"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="th-table">
+                                {{ 'phishing-campaigns.phishingcampaign.templateName' | translate }}
+                            </th>
+                            <th class="th-table">
+                                {{ 'phishing-campaigns.phishingcampaign.phishingStartDate' | translate }}
+                            </th>
+                            <th class="th-table">
+                                {{ 'phishing-campaigns.phishingcampaign.phishingEndDate' | translate }}
+                            </th>
+                            <th class="th-table">{{ 'phishing-campaigns.phishingcampaign.status' | translate }}</th>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="groupfooter" let-campaign>
+                        <tr>
+                            <td colspan="4" class="group-footer text-right font-bold pr-6 pb-7">
+                                {{
+                                    'phishing-campaigns.phishingcampaign.toatalTemplates'
+                                        | translate
+                                            : {
+                                                  calculateCurrentTotalNumberOfTemplates:
+                                                      calculateHistoryTotalNumberOfTemplates(campaign.campaignName)
+                                              }
+                                }}
+                            </td>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="body" let-template>
+                        <tr>
+                            <td class="pl-6">{{ template.templateName }}</td>
+                            <td>{{ template.templatePhishingStartDate | date : 'MMM d, yyyy' }}</td>
+                            <td>{{ template.templatePhishingEndDate | date : 'MMM d, yyyy' }}</td>
+                            <td>
+                                <span
+                                    [ngClass]="{
+                        'status-active': template.templateStatus === 'Active',
+                        'status-closed': template.templateStatus === 'Closed',
+                    }"
+                                    >{{ template.templateStatus }}</span
+                                >
+                            </td>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="emptymessage">
+                        <tr class="text-center">
+                            <td colspan="5">
+                                <div style="width: 100%; padding: 10px; text-align: center">
+                                    {{ 'training-campaigns.current-campaign.noCampaignsAvailable' | translate }}
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </p-tabPanel>
+    
+    </p-tabView>
+</p-card>

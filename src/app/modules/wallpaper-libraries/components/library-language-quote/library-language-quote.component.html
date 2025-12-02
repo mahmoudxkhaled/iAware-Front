@@ -1,0 +1,199 @@
+<div *ngIf="!selectedLanguage">
+
+    <p-table #dt [value]="activeLanguages" responsiveLayout="scroll">
+        <ng-template pTemplate="caption">
+            <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                <h5 class="m-0">Quotes Management</h5>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="body" let-lang>
+            <tr (click)="selectLanguage(lang)" class="button-row" style="cursor: pointer;">
+                <td style="text-align: center; border: none;">
+
+                    <button [style]="{width: '100%'}" class=" learn-more p-button-fullwidth shadow-2">
+                        <span style=" display: flex; justify-content: center; align-items: center; width: 100%;
+                        font-size: 30px;">
+                            <strong>{{ lang.name }}</strong>
+                        </span>
+                    </button>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+
+<div *ngIf="selectedLanguage">
+
+    <p-toast></p-toast>
+    <h5> {{selectedLanguage.name}} || Quotes Library</h5>
+    <p-table #dt [value]="libraryQuotes" responsiveLayout="scroll" [rows]="10" [paginator]="true"
+        [rowsPerPageOptions]="[10,20,30]" styleClass="p-datatable-striped" [globalFilterFields]="['quoteText']">
+        <ng-template pTemplate="caption">
+            <div class="flex flex-wrap justify-content-between">
+                <button pButton pRipple icon="pi pi-arrow-left" label="Back to Languages"
+                    (click)="backToLanguages()"></button>
+                <div>
+                    <button *ngIf="hasPermission(actions.add)" pButton pRipple label="Add" icon="pi pi-plus"
+                        class="p-button mr-2" (click)="addNewQuote()"></button>
+                    <span class="    p-input-icon-left">
+                        <i class="pi pi-search"></i>
+                        <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..."
+                            class="w-full sm:w-auto" />
+                    </span>
+                </div>
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Language</th>
+                <th pSortableColumn="quoteText" style="width:50%">Quote Text <p-sortIcon field="quoteText"></p-sortIcon>
+                    <p-columnFilter type="text" field="quoteText" display="menu"></p-columnFilter>
+                </th>
+                <!-- <th style="text-align: center;">Status</th> -->
+                <!-- <th style="text-align: center;">Actions</th> -->
+                <th style="width:10%"></th>
+
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-libraryQuote>
+            <tr>
+                <td> {{libraryQuote.languageName}}</td>
+
+                <td [innerHTML]="libraryQuote.quoteText"></td>
+                <td style="text-align: center;">
+                    <p-inputSwitch *ngIf="hasPermission(actions.active)" [ngModel]="libraryQuote.isActive"
+                        (onChange)="switchQuoteActivation(libraryQuote)" />
+                </td>
+
+                <!-- <td style="text-align: center;">
+                    <button *ngIf="hasPermission(actions.edit)" pButton pRipple icon="pi pi-pencil"
+                        class="p-button-rounded p-button-success mr-2"
+                        (click)="editLibraryQuote(libraryQuote)"></button>
+                    <button *ngIf="hasPermission(actions.delete)" pButton pRipple icon="pi pi-trash"
+                        class="p-button-rounded p-button-danger" (click)="deleteLibraryQuote(libraryQuote)"></button>
+                </td> -->
+
+                <td>
+                    <div class="flex align-items-center justify-content-between">
+
+                        <button *ngIf="normalMenuItems.length > 0 && !libraryQuote.canEdit" pButton pRipple
+                            type="button" icon="pi pi-ellipsis-v"
+                            class="p-button-rounded p-button-text p-button-plain  "
+                            (click)="normalMenu.toggle($event); assigneCurrentSelect(libraryQuote)"></button>
+
+                        <button *ngIf="ownerMenuItems.length > 0 && libraryQuote.canEdit" pButton pRipple type="button"
+                            icon="pi pi-ellipsis-v" class="p-button-rounded p-button-text p-button-plain  "
+                            (click)="ownerMenu.toggle($event); assigneCurrentSelect(libraryQuote)"></button>
+
+                        <p-menu #ownerMenu [model]="ownerMenuItems" [appendTo]="dt" [popup]="true"></p-menu>
+
+                        <p-menu #normalMenu [model]="normalMenuItems" [appendTo]="dt" [popup]="true"></p-menu>
+
+
+
+
+
+
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+<p-dialog [(visible)]="switchQuoteActivationDialog" header="Activation Quote" [modal]="true" [style]="{width:'450px'}">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="libraryQuote">
+            Are you sure you want to <span style=color:red>{{ libraryQuote.isActive ? 'Deactivate ' :
+                'Activate ' }} ?</span>
+            <hr>
+            <p [innerHTML]="libraryQuote.quoteText"></p>
+        </span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No"
+            (click)="declineQuoteActivation()"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Yes"
+            (click)="confirmtQuoteActivation()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="editQuoteDialog" header="Edit Quote" [modal]="true" [style]="{width:'450px'}" class="p-fluid">
+    <ng-template pTemplate="content">
+        <div class="field ">
+            <label for="languageId" class="font-medium text-900">Language</label>
+            <p-dropdown [(ngModel)]="selectedLanguageId" [options]="selectedLanguageAdd" optionLabel="name"
+                placeholder="Select a Language" optionValue="id">
+            </p-dropdown>
+        </div>
+        <div class="field ">
+            <label for="quoteText" class="font-medium text-900">Quote Text</label>
+            <app-iAware-rich-text [id]="'quoteText'" [(ngModel)]="libraryQuote.quoteText"></app-iAware-rich-text>
+            <!-- <div class="NgxEditor__Wrapper" style="height:300px">
+                <ngx-editor-menu [editor]="editor"></ngx-editor-menu>
+                <ngx-editor [editor]="editor" [(ngModel)]="libraryQuote.quoteText" [disabled]="false"
+                    [placeholder]="'Type here...'"></ngx-editor>
+            </div> -->
+        </div>
+        <div class="col-12">
+            <small *ngIf="submitted && isQuoteTextEmpty(libraryQuote.quoteText)"
+                class="ng-dirty ng-invalid text-red-500">
+                Quote Text is required.
+            </small>
+        </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideEditQuoteDialog()">
+        </button>
+        <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text" (click)="saveEditQuote()">
+        </button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="addQuoteDialog" header="Add New Quote" [modal]="true" [style]="{width:'450px'}" class="p-fluid">
+    <ng-template pTemplate="content">
+        <div class="field ">
+            <label for="languageId" class="font-medium text-900">Language</label>
+            <p-dropdown [(ngModel)]="selectedLanguageId" [options]="selectedLanguageAdd" optionLabel="name"
+                placeholder="Select a Language" optionValue="id">
+            </p-dropdown>
+        </div>
+        <div class="field ">
+            <label for="quoteText" class="font-medium text-900">Quote Text</label>
+            <app-iAware-rich-text [id]="'quoteText'" [(ngModel)]="quoteText"></app-iAware-rich-text>
+            <!-- <div class="NgxEditor__Wrapper" style="height:300px">
+                <ngx-editor-menu [editor]="editor"></ngx-editor-menu>
+                <ngx-editor [editor]="editor" [(ngModel)]="quoteText" [disabled]="false"
+                    [placeholder]="'Type here...'"></ngx-editor>
+            </div> -->
+        </div>
+        <div class="col-12">
+            <small *ngIf="submitted && isQuoteTextEmpty(quoteText)" class="ng-dirty ng-invalid text-red-500">
+                Quote Text is required.
+            </small>
+        </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideNewQuoteDialog()">
+        </button>
+        <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text" (click)="saveNewQuote()">
+        </button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="deletionQuoteDialog" header="Delete Quote" [modal]="true" [style]="{width:'450px'}">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="libraryQuote">Are you sure you want to delete the quote?
+            <hr>
+            <p [innerHTML]="libraryQuote.quoteText"></p>
+        </span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No"
+            (click)="declineQuoteDeletion()"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Yes"
+            (click)="confirmQuoteDeletion()"></button>
+    </ng-template>
+</p-dialog>

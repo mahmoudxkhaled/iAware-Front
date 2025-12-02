@@ -1,0 +1,126 @@
+.icon-button i {
+    margin: 0; /* Remove any default margin from icons */
+}
+
+.card {
+    position: relative;
+    overflow: hidden; /* Ensure no content overflow */
+}
+
+.avatar {
+    vertical-align: middle;
+    width: 150px;
+    height: 150px;
+    border: 1px solid black;
+}
+
+input[type='file'] {
+    display: none;
+}
+
+:host ::ng-deep .p-dataview-emptymessage{
+    display: none !important;;
+}
+
+.object-cover {
+    transition: transform 0.3s ease-in-out;
+}
+
+.object-cover:hover {
+    transform: scale(1.05);
+} 
+
+.lock-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2;
+}
+
+.lock-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.lock-icon {
+    z-index: 3;
+    width: 120px;
+    height: 120px;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+
+.lock-overlay:hover .lock-icon {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.upgrade-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.3s ease, background-color 0.3s ease;
+}
+
+.lock-overlay:hover .upgrade-overlay {
+    opacity: 1;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.upgrade-content {
+    text-align: center;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.upgrade-title {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+.upgrade-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    font-weight: bold;
+    text-decoration: none;
+    border-radius: 20px;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    background: linear-gradient(90deg, #800080, #4b0082) !important;
+    color: white !important;
+}
+
+.upgrade-button:hover{
+    transform: translateY(-2px);
+}
+
+.upgrade-description {
+    margin-bottom: 20px;
+}
+
+.lock-overlay:hover .lesson-image {
+    filter: blur(2px);
+}

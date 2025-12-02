@@ -1,0 +1,62 @@
+<div class="card">
+  <span class="text-900 text-xl font-bold mb-4 block">Create Role</span>
+  <form (ngSubmit)="onSubmit()">
+    <div class="grid">
+      <div class="col-12">
+        <div class="grid formgrid p-fluid">
+          <div class="field mb-4 col-6 lg:cpl-6">
+            <label for="roleName" class="font-medium text-900">Role Name:</label>
+            <input id="roleName" type="text" pInputText [(ngModel)]="roleModel.name" name="name" #name="ngModel"
+              required minlength="4">
+            <div style="color: red;" *ngIf="name.invalid && (name.dirty || name.touched)">
+              <div *ngIf="name.errors?.['required']">Role name is required</div>
+              <div *ngIf="name.errors?.['minlength']">Role name must be at least 4 characters long</div>
+            </div>
+          </div>
+          <div class="field mt-5 col-6 lg:cpl-6">
+            <p-checkbox name="isTenantRole" [(ngModel)]="roleModel.isTenantRole" [binary]="true"
+              label="Is Tenant Role"></p-checkbox>
+          </div>
+          <div class="field mb-4 col-12">
+            <label class="font-medium text-900">Role Permissions:</label>
+          </div>
+          <div class="field mb-4 col-12">
+
+            <div class="iAware-loading-table-container" style="position: relative;">
+              <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+
+              <table class="table">
+                <tbody>
+                  @for (permession of permessions; track permession.id) {
+                  <tr>
+                    <td class="text-gray-800">
+                      <div class="flex"><label class="field mb-4">{{permession.pageNameEn}}</label></div>
+                    </td>
+                    <div class="flex">
+                      <ng-container *ngFor="let item of permession.pageItems">
+                        <td>
+                          <div class="d-flex" style="margin-right: 5px;">
+                            <p-checkbox [binary]="true" [value]="item.id" [id]="'primeNgCheckbox_' + item.id"
+                              [name]="item.controlKey" [attr.pageId]="item.aspNetPageId" [label]="item.controlKey"
+                              (onChange)="updatePermissions($event, item.id)">
+                            </p-checkbox>
+                          </div>
+                        </td>
+                      </ng-container>
+                    </div>
+                  </tr>
+                  }
+                </tbody>
+              </table>
+
+
+            </div>
+          </div>
+          <div class="col-12">
+            <button pButton pRipple label="Create Role" class="w-auto mt-3" type="submit"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

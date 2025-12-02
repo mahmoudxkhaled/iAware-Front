@@ -1,0 +1,166 @@
+#flipbook {
+    width: 100%;
+    height: 100%;
+    margin: 0 auto;
+    overflow: hidden;
+    background-color: #f0f0f0;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+    transition: transform 0.3s ease-in-out;
+    justify-content: center;
+}
+
+#flipbook img {
+    max-width: 100%;
+    max-height: 100%;
+    height: auto;
+    display: block;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+.flipbook-page {
+    width: 100%;
+    height: 100%;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    padding: 10px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.turn-page:hover {
+    transform: scale(1.02);
+    transition: transform 0.2s ease-in-out;
+}
+
+#flipbook .highlight {
+    background-color: rgba(255, 255, 0, 0.4);
+    position: absolute;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.flipbook-container:hover {
+    cursor: zoom-in;
+}
+
+#flipbook-container{
+    overflow: visible; 
+    width: 100%; 
+    height: 600px; 
+    border-radius: 10px; 
+    position: relative
+}
+
+.zoom-controls {
+    position: absolute;
+    top: 50%;
+    right: -50px;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    z-index: 10;
+}
+
+.zoom-btn {
+    background: none;
+    border: none;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.3s, 0.3s;
+    font-size: 1.5rem;
+    color: var(--primary-color);
+}
+
+.zoom-btn:hover {
+    transform: scale(1.1);
+}
+
+.zoom-btn:active {
+    transform: scale(0.95);
+}
+
+@media (max-width: 768px) {
+    .zoom-controls {
+        right: -35px;
+    }
+
+    .zoom-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 1.3rem;
+    }
+}
+
+// #flipbook-container {
+//     overflow: visible;
+//     width: 100%;
+//     height: calc(100vh - 100px); /* Dynamically adjust height */
+//     border-radius: 10px;
+//     position: relative;
+//     display: flex;
+//     justify-content: center;
+//     align-items: center;
+// }
+
+// #flipbook {
+//     width: 90%;
+//     height: 100%;
+//     margin: auto;
+//     background-color: #f0f0f0;
+//     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+//     border: 1px solid #ccc;
+//     transform-origin: center;
+//     transition: transform 0.3s ease-in-out;
+//     display: flex;
+//     justify-content: center;
+//     align-items: center;
+//     direction: var(--direction, ltr); /* Dynamically set direction */
+// }
+
+// .zoom-controls {
+//     position: absolute;
+//     top: 10%;
+//     right: 20px;
+//     display: flex;
+//     flex-direction: column;
+//     gap: 10px;
+//     z-index: 10;
+// }
+
+// .zoom-btn {
+//     background: none;
+//     border: 1px solid #ccc;
+//     border-radius: 5px;
+//     width: 45px;
+//     height: 45px;
+//     display: flex;
+//     justify-content: center;
+//     align-items: center;
+//     font-size: 1.2rem;
+//     cursor: pointer;
+//     transition: transform 0.2s ease-in-out;
+// }
+
+// .zoom-btn:hover {
+//     transform: scale(1.1);
+// }
+
+// @media (max-width: 768px) {
+//     #flipbook-container {
+//         height: calc(100vh - 50px);
+//     }
+//     .zoom-btn {
+//         width: 35px;
+//         height: 35px;
+//     }
+// }

@@ -1,0 +1,21 @@
+<div class="grid">
+    <div class="col-12 pb-0 pt-0" *ngIf="hasPermission(actions.iAwareAdminDashboard)">
+        <app-iaware-admin-dashboard></app-iaware-admin-dashboard>
+    </div>
+
+    <div class="col-12 pb-0 pt-0" *ngIf="hasPermission(actions.organization)">
+        <app-organization></app-organization>
+    </div>
+    <div class="col-12" *ngIf="hasPermission(actions.phishing)">
+        <app-phishing></app-phishing>
+    </div>
+
+    <div class="col-12" *ngIf="hasPermission(actions.training)">
+        <app-training></app-training>
+    </div>
+    <app-user-dashboard *ngIf="hasPermission(actions.userDashboard) && !(hasPermission(actions.organization) && hasPermission(actions.phishing) && hasPermission(actions.training))" ></app-user-dashboard>
+</div>
+
+<!-- <div class="col-12">
+        <app-phish-alert-button></app-phish-alert-button>
+    </div> -->

@@ -1,0 +1,64 @@
+<div class="card">
+    <p-toast></p-toast>
+    <form [formGroup]="form" (ngSubmit)="saveSettings()">
+        <div class="col-12">
+            <h5 class="font-medium text-900 text-xl font-bold">{{'account.organization-information.title' | translate}}:
+            </h5>
+            <div class="p-fluid p-formgrid grid">
+
+                <div class="field col-12 md:col-6">
+                    <label class="font-medium text-900 " htmlFor="streetAddress1">
+                        <i class="pi pi-map-marker" style="font-size: 0.9rem;"></i>
+                        {{'account.organization-information.streetAddress1' | translate}}
+                    </label>
+                    <input pInputText id="streetAddress1" type="text" formControlName="streetAddress1" />
+                </div>
+
+                <div class="field col-12 md:col-6">
+                    <label class="font-medium text-900 " htmlFor="streetAddress2">
+                        <i class="pi pi-map-marker" style="font-size: 0.9rem;"></i>
+                        {{'account.organization-information.streetAddress2' | translate}}
+                    </label>
+                    <input pInputText id="streetAddress2" type="text" formControlName="streetAddress2" />
+                </div>
+
+                <div class="field col-12 md:col-6">
+                    <label class="font-medium text-900 " htmlFor="suiteNumber">
+                        <i class="pi pi-sort-numeric-up" style="font-size: 0.9rem;"></i>
+                        {{'account.organization-information.suiteNumber' | translate}}
+                    </label>
+                    <p-inputNumber id="suiteNumber" formControlName="suiteNumber" />
+                </div>
+
+                <div class="field col-12 md:col-6">
+                    <label class="font-medium text-900 " htmlFor="city">
+                        <i class="pi pi-map" style="font-size: 0.9rem;"></i>
+                        {{'account.organization-information.city' | translate}}
+                    </label>
+                    <input pInputText id="city" type="text" formControlName="city" />
+                </div>
+
+                <div class="field col-12 md:col-6">
+                    <label class="font-medium text-900 " htmlFor="state">
+                        <i class="pi pi-compass" style="font-size: 0.9rem;"></i>
+                        {{'account.organization-information.state' | translate}}
+                    </label>
+                    <input pInputText id="state" type="text" formControlName="state" />
+                </div>
+
+                <div class="field col-12 md:col-6">
+                    <label class="font-medium text-900 " htmlFor="zipeCode">
+                        <i class="pi pi-code" style="font-size: 0.9rem;"></i>
+                        {{'account.organization-information.zipCode' | translate}}
+                    </label>
+                    <p-inputNumber id="zipeCode" formControlName="zipeCode" />
+                </div>
+                
+                <div class="col-12">
+                    <button pButton pRipple label="{{'shared.actions.saveChanges' | translate}}" class="w-auto mt-3"
+                        type="submit" [disabled]="!form.valid"></button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

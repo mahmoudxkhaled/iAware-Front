@@ -1,0 +1,8 @@
+@if(showInCard){
+    <p-card [header]="needleChartTitle">
+        <div id="gaugeArea"></div>
+    </p-card>
+}@else {
+    <h4 [class]="isTextCentered ?'text-center' : 'text-left'">{{ showTitle ? needleChartTitle : ''}}</h4>
+    <div id="gaugeArea"></div>
+}

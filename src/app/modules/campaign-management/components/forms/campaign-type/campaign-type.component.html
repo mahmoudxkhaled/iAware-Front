@@ -1,0 +1,99 @@
+<p-card styleClass="c">
+    <p-toast></p-toast>
+    <div class="grid">
+        <div class="col-12 pb-0">
+            <!-- <p-messages severity="info" [showTransitionOptions]="'500ms'" [hideTransitionOptions]="'500ms'"
+            [enableService]="false" [closable]="true">
+                <ng-template pTemplate>
+                    <div class="mx-1 text-center m-auto">
+                        <i class="pi pi-sun" style="color: rgb(255, 196, 0);font-size: 1.5rem"></i>
+                        <span class="ml-2">{{ 'campaign-management.campaign-create.campaign-type.message' | translate }}</span>
+                    </div>
+                </ng-template>
+            </p-messages> -->
+            <app-iAware-info description="{{'campaign-management.campaign-create.campaign-type.message' | translate}}"
+                    icon="fa fa-solid fa-circle-info text-3xl"
+                    severity="info"></app-iAware-info>
+                    
+        </div>
+    </div>
+    <ng-template pTemplate="content">
+        <p-card styleClass="cc"
+            [style]="{ border: '2px solid rgb(136 60 174 / 26%)', borderRadius:'8px', margin:'1rem' }">
+            <form [formGroup]="campaignTypeForm">
+                <div class="grid formgrid p-fluid">
+
+                    <div class="field mb-4 col-12 lg:col-6" id="name">
+                        <label for="name" class="font-medium text-1000">{{'campaign-management.campaign-create.campaign-type.fields.name' | translate }} 
+                            <span style="color: red;" pTooltip="{{ 'shared.messages.required' | translate }}">{{ 'shared.labels.*' | translate }}</span>
+                        </label>
+                        <input id="name" type="text" placeholder="{{ 'campaign-management.campaign-create.campaign-type.placeholders.name' | translate }}" pInputText formControlName="name">
+                    </div>
+
+                    <div class="field mb-4 col-12 lg:col-6" id="type">
+                        <label for="name" class="font-medium text-900">{{ 'campaign-management.campaign-create.campaign-type.fields.type' | translate }} 
+                        <span style="color: red;" pTooltip="{{ 'shared.messages.required' | translate }}">{{ 'shared.labels.*' | translate }}</span>
+                        </label>
+                        <p-dropdown [options]="types" formControlName="type" optionLabel="name" optionValue="code"
+                            placeholder="{{ 'campaign-management.campaign-create.campaign-type.fields.campaigntype' | translate }}" (onChange)="onCampaignTypeChange($event)" />
+                    </div>
+
+                    <div class="field mb-4 col-12 lg:col-6" id="startDate">
+                        <label class="font-medium text-900">{{ 'campaign-management.campaign-create.campaign-type.fields.startDate' | translate }} 
+                        </label>
+                        <input class="startDate" type="date" formControlName="startDate" id="startDate" (change)="onStartDateChange($event)">
+
+                        <div *ngIf="showInvalidDateMessage" class="invalid-date-message">
+                            {{ 'campaign-management.campaign-create.campaign-type.validations.startDate' | translate }}
+                        </div>
+                    </div>
+
+                    <div class="field mb-4 col-12 lg:col-6" id="endDate">
+                        <label class="font-medium text-900">{{
+                            'campaign-management.campaign-create.campaign-type.fields.endDate' | translate }}  </label>
+                        <input class="startDate" type="date" formControlName="endDate"
+                            (change)="onEndDateChange($event)" id="endDate">
+                            
+                        <div *ngIf="isDateInvalid" class="invalid-date-message">
+                            {{ 'campaign-management.campaign-create.campaign-type.validations.endDate' | translate }}
+                        </div>
+                    </div>
+
+
+                    <div class="mb-4 col-12 mg:col-6">
+                        <label class="font-medium text-900">{{ 'campaign-management.campaign-create.campaign-type.fields.users' | translate }}
+                            <span style="color: red;" pTooltip="{{ 'shared.messages.required' | translate }}">{{ 'shared.labels.*' | translate }}</span>    
+                        </label>
+                        <div class="mt-3">
+                            <p-selectButton                            
+                            [options]="selectUsersOptions" 
+                            [(ngModel)]="selectUsersValue" 
+                            optionLabel="name" 
+                            optionValue="value"
+                            styleClass="custom-select-button"
+                            [ngModelOptions]="{standalone: true}"
+                            (onChange)="onSelectUsersOptionsChange($event)"/>
+                        </div>
+                    </div>
+
+                    <div class="field mb-4 col-12" *ngIf="unitsUsers" id="users">
+                        <p-tree [value]="tenantUnitsUsersTree" selectionMode="checkbox" [(selection)]="selectedTenantUnitsUsers"></p-tree>
+                    </div>
+
+                    <div class="field mb-4 col-12"  *ngIf="groupsUsers" id="groups">
+                        <p-tree [value]="groupsWithUsersVIITree" selectionMode="checkbox" [(selection)]="selectedGroupsWithUsersVII"></p-tree>
+                    </div>
+                </div>
+            </form>
+        </p-card>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <div class="grid grid-nogutter justify-content-end">
+            <p-button id="stepLast"
+                label="{{ 'campaign-management.campaign-create.campaign-type.actions.next' | translate }}"
+                (onClick)="nextPage()" icon="pi pi-angle-right"
+                [disabled]="!campaignTypeForm.valid || isDateInvalid "
+                iconPos="right"></p-button>
+        </div>
+    </ng-template>
+</p-card>

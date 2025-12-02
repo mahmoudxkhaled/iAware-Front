@@ -1,0 +1,181 @@
+.icon-button {
+    background-color: #883cae; /* Customize button background color */
+    border: none;
+    border-radius: 50%;
+    width: 30px; /* Adjust size */
+    height: 30px; /* Adjust size */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 5px; /* Adjust spacing between buttons */
+    cursor: pointer; /* Optional: make buttons look clickable */
+    color: white; /* Icon color */
+    font-size: 14px; /* Adjust icon size */
+}
+
+.icon-button i {
+    margin: 0; /* Remove any default margin from icons */
+}
+
+:host ::ng-deep .p-dataview-emptymessage{
+    display: none !important;;
+}
+
+.object-cover {
+    transition: transform 0.3s ease-in-out;
+}
+
+.object-cover:hover {
+    transform: scale(1.05);
+} 
+
+.lock-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2;
+}
+
+.lock-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.lock-icon {
+    z-index: 3;
+    width: 120px;
+    height: 120px;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+
+.lock-overlay:hover .lock-icon {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.upgrade-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.3s ease, background-color 0.3s ease;
+}
+
+.lock-overlay:hover .upgrade-overlay {
+    opacity: 1;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.upgrade-content {
+    text-align: center;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.upgrade-title {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+.upgrade-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    font-weight: bold;
+    text-decoration: none;
+    border-radius: 20px;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    background: linear-gradient(90deg, #800080, #4b0082) !important;
+    color: white !important;
+}
+
+.upgrade-button:hover{
+    transform: translateY(-2px);
+}
+
+.upgrade-description {
+    margin-bottom: 20px;
+}
+
+.lock-overlay:hover .lesson-image {
+    filter: blur(2px);
+}
+
+
+
+
+
+
+@media only screen and (min-width: 767px)  {
+
+    .phishing-see-more{
+    h1, h2, h3, h4, h5, p {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        transition: var(--transition);
+     
+    }
+
+    h1, h2, h3, h4, h5, p {
+        -webkit-line-clamp: 1; /* Minimum of 2 lines */
+        // min-height: 1.6em; /* Adjust based on font size and line-height */
+    }
+      
+    &:hover {
+        transform: translateY(-5px);
+        transition: transform 1s ease-in-out; /* Transition for transform */
+
+        h1, h2, h3, h4, h5, p {
+            -webkit-line-clamp: unset; /* Remove line limit */
+            overflow: visible; /* Show full content */
+            transition: var(--transition, all 0.8s ease-in-out); /* Apply transition */
+
+        }
+    }
+}
+}
+
+
+
+
+// .phishing-card-image-container {
+//     width: 100%; /* Makes the image container responsive */
+//     padding-top: 100%; /* Aspect ratio 1:1 (square) */
+//     overflow: hidden;
+//     border-radius: 8px; /* Optional: add rounded corners */
+//     background-color: #f4f4f4; /* Fallback background color */
+// }
+
+// .card-image-container img {
+//     top: 0;
+//     left: 0;
+//     width: 100%;
+//     height: 100%;
+//     object-fit: cover; /* Ensures the image covers the container without distortion */
+//     border-radius: 8px; /* Optional: match the container's rounded corners */
+// }

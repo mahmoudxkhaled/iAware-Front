@@ -1,0 +1,45 @@
+<div class="card">
+  <div class="iAware-loading-table-container" style="position: relative">
+    <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+    <p-dataView [value]="trainingCategories" [paginator]="true" [rows]="12" filterBy="title" layout="grid">
+      <ng-template let-cats pTemplate="gridItem">
+        <div class="grid grid-nogutter">
+          <div class="col-12 md:col-6 lg:col-4 see-more" *ngFor="let cat of cats">
+            <div class="p-3">
+              <div (click)="navigateToLessons(cat)" style="cursor: pointer;"
+                class="object-cover surface-card shadow-3 border-round overflow-hidden hover:shadow-5 transition-all">
+                <div class="  card-image-container">
+                  <img [src]="cat.trainingCategoryImageUrl ?? defaultBannerImage" alt="{{ cat.name }}" />
+                </div>
+                <div class="p-3">
+                  <h4>
+                    {{ cat.name }}
+                  </h4>
+                  <div class="category-container">
+                    <p>{{cat.description}}</p>
+                  </div>
+
+                  <div class="flex align-items-center justify-content-between mt-4">
+                    <a [routerLink]="cat.lessonsCount > 0 ? ['/multimedia/Lessons', cat.id] : null"
+                      [class.disabled-link]="cat.lessonsCount === 0"
+                      class="font-medium flex align-items-center gap-1 show-less-link"
+                      [attr.aria-disabled]="cat.lessonsCount === 0 ? 'true' : null">
+                      <span>
+                        {{'multimedia-library.showLessons' | translate}}
+                        <i class="pi pi-arrow-right arrow-icon"></i>
+                      </span>
+                    </a>
+                    <span class="bg-blue-50 text-blue-600 px-2 py-1 border-round text-xs font-semibold"
+                      *ngIf="cat.lessonsCount">
+                      {{ cat.lessonsCount }} {{'multimedia-library.lessons' | translate}}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </p-dataView>
+  </div>
+</div>

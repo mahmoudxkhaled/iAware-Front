@@ -1,0 +1,174 @@
+<p-dialog [(visible)]="celebratingDialog" (onHide)="onDoneClick()" [style]="{ width: '60%', height: '75%' }"
+    header="{{'training-campaigns.campaign-details.congratulations' | translate}}" [modal]="true">
+    <ng-template pTemplate="content">
+        <div class="card p-card">
+            <div class="text-center">
+                <p class="celebration-message" [innerHTML]="
+                        'training-campaigns.campaign-details.correctAnswers'
+                            | translate : { correctanswers: correctanswers }
+                    "></p>
+                <hr />
+                <p class="celebration-message" *ngIf="score > 50" [innerHTML]="
+                        'training-campaigns.campaign-details.earnedPoints' | translate : { points: correctanswers }
+                    "></p>
+                <hr *ngIf="score > 50" />
+                <p *ngIf="isVideoCompleted" class="celebration-message"
+                    [innerHTML]="'training-campaigns.campaign-details.videoPoints' | translate: {videoPointValue:pointingValues.videoPointValue}"></p>
+                <hr *ngIf="isVideoCompleted" />
+                <p *ngIf="isBookViewed" class="celebration-message"
+                    [innerHTML]="'training-campaigns.campaign-details.bookPoints' | translate : {bookPointValue:pointingValues.videoPointValue}"></p>
+                <hr *ngIf="isBookViewed" />
+            </div>
+
+            <div class="text-center">
+                <img src="assets/images/celebrating.gif" alt="Congratulations" class="celebration-image" />
+            </div>
+        </div>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="certificateDialog"
+    [style]="{ border: 'none', width: '60%', height: '100vh', 'background-color': 'transparent' }" [modal]="true"
+    [contentStyle]="{ 'background-color': 'transparent', 'box-shadow': 'none' }" [dismissableMask]="true">
+    <ng-template pTemplate="headless">
+        <div style="display: flex; height: 100%; align-items: center">
+            <!-- Left side: Share buttons -->
+            <div style="
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    gap: 1rem;
+                    width: 10%;
+                ">
+                <p style="font-size: 1.2rem; font-weight: bold; margin-bottom: 1rem; color: white">Share</p>
+                <p-button icon="pi pi-facebook" (onClick)="shareOnFacebook()" [style]="{
+                        'background-color': '#3b5998',
+                        color: 'white',
+                        'border-color': '#3b5998',
+                        'border-radius': '50%',
+                        width: '2.5rem',
+                        height: '2.5rem',
+                        'font-size': '1.5rem'
+                    }"></p-button>
+                <p-button icon="pi pi-twitter" (onClick)="shareOnTwitter()" [style]="{
+                        'background-color': '#1da1f2',
+                        color: 'white',
+                        'border-color': '#1da1f2',
+                        'border-radius': '50%',
+                        width: '2.5rem',
+                        height: '2.5rem',
+                        'font-size': '1.5rem'
+                    }"></p-button>
+                <p-button icon="pi pi-linkedin" (onClick)="shareOnLinkedIn()" [style]="{
+                        'background-color': '#0077b5',
+                        color: 'white',
+                        'border-color': '#0077b5',
+                        'border-radius': '50%',
+                        width: '2.5rem',
+                        height: '2.5rem',
+                        'font-size': '1.5rem'
+                    }"></p-button>
+                <p-button icon="pi pi-envelope" (onClick)="shareViaGmail()" [style]="{
+                        'background-color': '#db4437',
+                        color: 'white',
+                        'border-color': '#db4437',
+                        'border-radius': '50%',
+                        width: '2.5rem',
+                        height: '2.5rem',
+                        'font-size': '1.5rem'
+                    }"></p-button>
+                <p-button icon="pi pi-whatsapp" (onClick)="shareOnWhatsApp()" [style]="{
+                        'background-color': '#25d366',
+                        color: 'white',
+                        'border-color': '#25d366',
+                        'border-radius': '50%',
+                        width: '2.5rem',
+                        height: '2.5rem',
+                        'font-size': '1.5rem'
+                    }"></p-button>
+                <p-button icon="fas fa-download" (onClick)="downloadCertificate()" [style]="{
+                        'background-color': '#883cae',
+                        color: 'white',
+                        'border-color': '#25d366',
+                        'border-radius': '50%',
+                        width: '2.5rem',
+                        height: '2.5rem',
+                        'font-size': '1.5rem'
+                    }"></p-button>
+            </div>
+
+            <!-- Right side: Certificate image -->
+            <div class="image-container"
+                style="flex-grow: 1; display: flex; justify-content: center; align-items: center">
+                <img [src]="generatedCertificate" alt="Certificate" class="certificate-image"
+                    style="max-width: 100%; max-height: 100%" />
+            </div>
+        </div>
+    </ng-template>
+</p-dialog>
+
+<p-card>
+    <ng-template pTemplate="title">
+        {{ 'campaign.campaignDetails.titles.result' | translate }}
+    </ng-template>
+    <ng-template pTemplate="content">
+        <div *ngIf="isPassed(); else failTemplate">
+            <h2>{{ 'campaign.campaignDetails.messages.congrat' | translate }}</h2>
+            <p>{{ 'campaign.campaignDetails.messages.congratMessage' | translate }}</p>
+            <p>{{ 'campaign.campaignDetails.messages.score' | translate }} {{ score }}%</p>
+        </div>
+        <ng-template #failTemplate>
+            <h2>{{ 'campaign.campaignDetails.messages.faild' | translate }}</h2>
+            <p>{{ 'campaign.campaignDetails.messages.faildMessage' | translate }}</p>
+            <p>{{ 'campaign.campaignDetails.messages.score' | translate }} {{ score }}%</p>
+        </ng-template>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <div class="grid grid-nogutter justify-content-end">
+            <p-button label="{{ 'campaign.campaignDetails.actions.finish' | translate }}"
+                (click)="backToLessonsPage()"></p-button>
+        </div>
+    </ng-template>
+</p-card>
+
+<div class="mt-6" *ngIf="isPassed()">
+    <p-card>
+        <ng-template pTemplate="title">
+            {{ 'campaign.campaignDetails.messages.answars' | translate }}
+        </ng-template>
+        <ng-template pTemplate="content">
+            <div *ngFor="let quiz of quizzes; let i = index" class="mb-5">
+                <div class="mb-3">
+                    <p style="font-weight: bold">({{ i + 1 }}) {{ quiz.quizText }}</p>
+                </div>
+                <div class="p-field p-col-12">
+                    <div class="p-fluid p-grid p-align-center p-justify-between mt-2"
+                        *ngFor="let answer of quiz.trainingLessonQuizAnswers; let j = index" [ngClass]="{
+                            'selected-correct': isSelectedCorrect(i, j) && isTrueAnswer(i, j),
+                            'selected-incorrect': isSelectedCorrect(i, j) && !isTrueAnswer(i, j),
+                            correct: !isSelectedCorrect(i, j) && isTrueAnswer(i, j)
+                        }">
+                        <div class="p-col-12 p-md-8">
+                            <div class="mb-2">
+                                <p-radioButton name="quizAnswer{{ i }}" [value]="j" [disabled]="true"
+                                    [(ngModel)]="selectedAnswers[i.toString()]"></p-radioButton>
+                                <label style="padding-left: 5px" [ngClass]="{
+                                        'text-success': isSelectedCorrect(i, j) && isTrueAnswer(i, j),
+                                        'text-danger': isSelectedCorrect(i, j) && !isTrueAnswer(i, j),
+                                        'text-info': !isSelectedCorrect(i, j) && isTrueAnswer(i, j)
+                                    }">{{ answer.answerText }}</label>
+                                <span *ngIf="isSelectedCorrect(i, j) && isTrueAnswer(i, j)" class="ml-2"
+                                    style="color: green">✓</span>
+                                <span *ngIf="isSelectedCorrect(i, j) && !isTrueAnswer(i, j)" class="ml-2"
+                                    style="color: red">✗</span>
+                                <span *ngIf="!isSelectedCorrect(i, j) && isTrueAnswer(i, j)" class="ml-2"
+                                    style="color: green">✓</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+    </p-card>
+</div>

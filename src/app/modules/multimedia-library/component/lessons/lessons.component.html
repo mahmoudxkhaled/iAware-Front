@@ -1,0 +1,172 @@
+<p-toast></p-toast>
+
+<button class="mb-3" pButton pRipple icon="pi pi-arrow-left" label="{{ 'shared.actions.back' | translate }}"
+    (click)="backToCategories()"></button>
+
+<div class="mb-1">
+    <!-- <app-tag-filter (filterApplied)="onTagFilterChanged($event)" [componentName]="'Lessons'"></app-tag-filter> -->
+</div>
+
+<div class="card">
+    <div class="iAware-loading-table-container" style="position: relative">
+        <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+        <p-dataView (onLazyLoad)="lazyLoadTrainingLessons($event)" [totalRecords]="totalRecords" [lazy]="true"
+            [value]="filteredTrainingCategoryLessons" [paginator]="true" [rows]="12" layout="grid">
+            <ng-template let-lessons pTemplate="gridItem">
+                <div class="grid grid-nogutter">
+                    <div class="col-12 md:col-4 lesson-see-more" *ngFor="let lesson of lessons">
+                        <div class="p-3 lesson-card" [class.disabled]="!lesson.isCovered">
+                            <div class="card-container position-relative" [class.locked-lesson]="!lesson.isCovered">
+                                <!-- Lesson Image -->
+                                <div class="object-cover  lesson-card-image-container">
+                                    <img [src]="lesson.lessonVideoImageUrl ?? defaultBannerImage"
+                                        class="w-full lesson-image" alt="Lesson Image" height="240" />
+
+                                    <!-- Lock Overlay -->
+                                    <div *ngIf="!lesson.isCovered" class="lock-overlay">
+                                        <div class="lock-background"></div>
+                                        <img src="/assets/media/Locker.png" style="width: 50% !important;" alt="Locked"
+                                            class="lock-icon" />
+
+                                        <!-- Upgrade Overlay -->
+                                        <div class="upgrade-overlay">
+                                            <div class="upgrade-content">
+                                                <p class="upgrade-title text-lg font-bold">
+                                                    {{ 'multimedia-library.upgradeYourPlan' | translate }}
+                                                </p>
+                                                <p class="upgrade-description">
+                                                    {{ 'multimedia-library.upgradeMessage' | translate }}
+                                                </p>
+                                                <a [routerLink]="['/users/profile']" [queryParams]="{ tapIndex: 2 }"
+                                                    class="upgrade-button">{{ 'multimedia-library.upgradeBtn' |
+                                                    translate }}</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Lesson Details -->
+                                <div class="p-3 card-content">
+                                    <h4>
+                                        {{ lesson.name }}
+                                    </h4>
+                                    <p>
+                                        {{ lesson.description }}
+                                    </p>
+
+                                    <div
+                                        class="lesson-actions flex justify-content-between align-items-center gap-4 mt-4">
+                                        <!-- Watch Now Link -->
+                                        <a class="lesson-link watch-now-link rounded" tooltipPosition="bottom"
+                                            pTooltip="{{ 'multimedia-library.watchNow' | translate }}"
+                                            (click)="openVideo(lesson)"
+                                            [class.disabled]="!lesson.isCovered || !lesson.lessonVideoUrl">
+                                            <i class="fas fa-video"></i>
+                                        </a>
+
+                                        <!-- Read Now Link -->
+                                        <a class="lesson-link read-now-link" tooltipPosition="bottom"
+                                            pTooltip="{{ 'multimedia-library.readNow' | translate }}"
+                                            (click)="openBook(lesson)"
+                                            [class.disabled]="!lesson.isCovered || !lesson.lessonBookUrl">
+                                            <i class="fas fa-book-open"></i>
+                                        </a>
+
+                                        <!-- Download Screensavers Link -->
+                                        <a class="lesson-link screenSaver-btn" tooltipPosition="bottom"
+                                            pTooltip="{{ 'multimedia-library.downloadScreensavers' | translate }}"
+                                            (click)="openScreensaverDialog(lesson)"
+                                            *ngIf="hasPermission(actions.downlaodScreenSavers)" [class.disabled]="
+                                                !lesson.isCovered ||
+                                                lesson.trainingLessonScreenSaver == null ||
+                                                lesson.trainingLessonScreenSaver.length == 0
+                                            ">
+                                            <i class="fas fa-desktop"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+        </p-dataView>
+    </div>
+</div>
+
+<!-- <p-dialog [(visible)]="videoPreviewDialog" [modal]="true" [dismissableMask]="true"
+    [style]="{ width: '100vw', maxWidth: '1000px', border: 'none', background: 'transparent' }"
+    [contentStyle]="{ background: 'transparent', boxShadow: 'none', padding: '0' }" [showHeader]="false"
+    [closeOnEscape]="true" (onHide)="close()">
+    <ng-template pTemplate="headless">
+        <div style="position: relative; padding-top: 56.25%; height: 0; overflow: hidden">
+            <app-vdo-player *ngIf="videoUrl" [videoId]="videoUrl"
+                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%"></app-vdo-player>
+        </div>
+    </ng-template>
+</p-dialog> -->
+
+<p-dialog [(visible)]="videoPreviewDialog" [modal]="true" [dismissableMask]="true"
+    [style]="{ width: '100vw', maxWidth: '1000px', border: 'none', background: 'transparent' }"
+    [contentStyle]="{ background: 'transparent', boxShadow: 'none', padding: '0' }" [showHeader]="false"
+    [closeOnEscape]="true" (onHide)="close()">
+    <ng-template pTemplate="headless">
+        <app-video-player *ngIf="videoUrl" [videoUrl]="videoUrl" (videoCompleted)="onVideoEnded()">
+        </app-video-player>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="bookPreviewDialog" [style]="{ border: 'none', width: '70%', height: '100vh', }" [modal]="true"
+    [contentStyle]="{ 'background-color': 'transparent', 'box-shadow': 'none' }" [dismissableMask]="true"
+    (onHide)="close()">
+    <ng-template pTemplate="headless">
+        <div class="m-auto align-items-center flex-column" style="width: 100%">
+            <app-iaware-pdf *ngIf="bookUrl" [pdfUrl]="bookUrl"
+                (lastPageReached)="handleLastPageReached()"></app-iaware-pdf>
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <div class="flex flex-wrap justify-content-between">
+            <button pButton pRipple icon="pi pi-arrow-left" label="{{ 'shared.actions.close' | translate }}"
+                (click)="close()"></button>
+        </div>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="downloadScreenSaversDialog" [style]="{ border: 'none', width: '40%', height: '70%' }"
+    [modal]="true" [showHeader]="false"
+    [contentStyle]="{ 'box-shadow': '0px 4px 10px rgba(0, 0, 0, 0.1)', 'border-radius': '8px' }"
+    [dismissableMask]="true" (onHide)="close()">
+    <div class="dialog-header">
+        <h2 class="text-center">{{ 'multimedia-library.selectScreensavers' | translate }}</h2>
+    </div>
+
+    <div class="screensaver-list">
+        <div *ngFor="let screenSaver of screensaversToDownload"
+            class="screensaver-item flex justify-content-between align-items-center p-4 border-rounded shadow-2">
+            <div class="screenSaver-details">
+                <div class="screenSaver-icons">
+                    <i [class]="
+                            screenSaver.screenSaverPlatform === 'Linux'
+                                ? 'fab fa-linux platform-icon'
+                                : screenSaver.screenSaverPlatform === 'Windows'
+                                ? 'fab fa-windows platform-icon'
+                                : screenSaver.screenSaverPlatform === 'Mac'
+                                ? 'fab fa-apple platform-icon'
+                                : 'platform-icon'
+                        "></i>
+                </div>
+                <div class="screenSaver-text">
+                    <h4 class="screenSaver-title m-0">{{ screenSaver.screenSaverTitle }}</h4>
+                </div>
+            </div>
+            <div class="actions flex gap-3 align-items-center">
+                <button pButton pRipple [disabled]="!screenSaver.screenSaverUrl" class="p-button-sm p-button-rounded"
+                    (click)="addToDownload(screenSaver.screenSaverUrl)">
+                    <i class="fas fa-download" style="font-size: 1.6rem"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</p-dialog>

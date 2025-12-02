@@ -1,0 +1,49 @@
+<!-- <p-messages severity="info" [showTransitionOptions]="'500ms'" [hideTransitionOptions]="'500ms'" [enableService]="false"
+    [closable]="true">
+    <ng-template pTemplate>
+        <div class="ml-1 text-center">
+            <i class="pi pi-sun" style="color: rgb(255, 196, 0);font-size: 1.5rem"></i>
+            {{'account.message' | translate}}
+        </div>
+    </ng-template>
+</p-messages> -->
+
+<app-iAware-info description="{{'account.message' | translate}}"
+                    icon="fa fa-solid fa-circle-info text-3xl"
+                    severity="info"></app-iAware-info>
+
+@if(isTenantLoaded){
+<div class="mt-1 mb-2">
+    <app-profile-details [tenant]="tenantModel"></app-profile-details>
+</div>
+<div class="mt-1 mb-2">
+    <app-organization-information [tenant]="tenantModel"></app-organization-information>
+</div>
+<!--<div class="mt-1 mb-2">
+    <app-branding [tenant]="tenantModel"></app-branding>
+</div>
+ <div class="mt-1 mb-1">
+    <app-user-provisioning [tenant]="tenantModel"></app-user-provisioning>
+</div> -->
+<!-- <div class="mt-1 mb-1">
+    <app-ad-settings [tenant]="tenantModel"></app-ad-settings>
+</div> -->
+<!-- <div class="mt-1 mb-1">
+    <app-user-provisioning-notifications [tenant]="tenantModel"></app-user-provisioning-notifications>
+</div> -->
+<!-- <div class="mt-1 mb-1">
+    <app-user-settings [tenant]="tenantModel"></app-user-settings>
+</div> -->
+<!-- <div class="mt-1 mb-1">
+    <app-phishing-settings [tenant]="tenantModel"></app-phishing-settings>
+</div> 
+<div class="mt-1 mb-1">
+    <app-training-settings [tenant]="tenantModel"></app-training-settings>
+</div>
+<div class="mt-1 mb-1">
+    <app-learner-experience [tenant]="tenantModel"></app-learner-experience>
+</div>
+<div class="mt-1 mb-1">
+    <app-account-integration-settings [tenant]="tenantModel"></app-account-integration-settings>
+</div>-->
+}

@@ -1,0 +1,45 @@
+<p-card *ngIf="quizzes && quizzes.length > 0">
+    <ng-template pTemplate="content">
+        <div class="p-field p-col-12">
+            <div class="mb-4">
+                <label class="font-medium text-900">
+                    {{'training-campaigns.campaign-details.question' | translate:{currentQuestionIndex:currentQuestionIndex + 1, quizzes:quizzes.length} }}</label>
+            </div>
+            <div class="mb-4">
+                <p style="font-weight: bold">{{ quizzes[currentQuestionIndex].quizText }}</p>
+            </div>
+        </div>
+
+        <div class="p-field p-col-12">
+            <div class="p-fluid p-grid p-align-center p-justify-between mt-2"
+                *ngFor="let answer of quizzes[currentQuestionIndex].trainingLessonQuizAnswers; let i = index">
+                <div class="p-col-12 p-md-8">
+                    <div class="mb-2">
+                        <p-radioButton name="quizAnswer" [value]="i"
+                            [(ngModel)]="selectedQuizAnswerIndex"></p-radioButton>
+                        <label style="padding-left: 5px;">{{ answer.answerText }}</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+    <ng-template pTemplate="footer" class="p-2">
+        <div class="grid grid-nogutter justify-content-between" style="padding: 10px;">
+            <div class="p-col-6">
+                <p-button label="{{ 'campaign.campaignDetails.actions.previous' | translate }}" icon="pi pi-arrow-left"
+                    iconPos="left" class="p-button-text" (click)="prevQuestion()"
+                    [disabled]="currentQuestionIndex === 0"></p-button>
+            </div>
+            <div class="p-col-6 text-right">
+                <p-button *ngIf="currentQuestionIndex < quizzes.length - 1"
+                    label="{{ 'campaign.campaignDetails.actions.next' | translate }}" icon="pi pi-arrow-right"
+                    iconPos="right" class="p-button-text" (click)="nextQuestion()"
+                    [disabled]="selectedQuizAnswerIndex === -1"></p-button>
+                <p-button *ngIf="currentQuestionIndex === quizzes.length - 1"
+                    label="{{ 'campaign.campaignDetails.actions.submit' | translate }}" icon="pi pi-check"
+                    iconPos="right" class="p-button-text" (click)="submitQuiz()"
+                    [disabled]="selectedQuizAnswerIndex === -1" severity="success"></p-button>
+            </div>
+        </div>
+    </ng-template>
+</p-card>

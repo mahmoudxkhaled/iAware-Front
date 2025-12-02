@@ -1,0 +1,499 @@
+<div class="field col-12">
+    <div class="flex flex-wrap justify-content-center">
+        <button pButton pRipple label="{{'gamification.game_edit.addNewGameLanguage' | translate}}" icon="pi pi-plus"
+            class="p-button-success mr-2" (click)="addNewGameLanguage()"></button>
+    </div>
+    <p-tabView [style]="{ width: '100%' } " *ngIf=" gameDetails" [(activeIndex)]="activeTabIndex">
+
+        <p-tabPanel header="{{'gamification.game_edit.general' | translate}}">
+            <div class="invoice-card mb-4">
+                <div class="grid p-fluid flex flex-wrap">
+                    <div class=" col-6  md-12">
+                        <div class="p-field mb-4">
+                            <div class="mb-2">
+                                <label for="id" class="font-medium text-900">{{'gamification.game_edit.id' |
+                                    translate}}</label>
+                            </div>
+                            <div class="p-fluid">
+                                <input type="text" pInputText id="id" [(ngModel)]="gameDetails.id" readonly
+                                    [disabled]="true" />
+                            </div>
+                        </div>
+
+                        <div class="p-field mb-4">
+                            <div class="mb-2">
+                                <label for="questionCount" class="font-medium text-900">
+                                    {{'gamification.game_edit.questionCount' | translate}}</label>
+                            </div>
+                            <div class="p-fluid">
+                                <p-inputNumber id="questionCount" [(ngModel)]="gameDetails.questionCount"
+                                    name="questionCount"></p-inputNumber>
+                            </div>
+                        </div>
+
+                        <div class="p-field flex flex-wrap  ">
+                            <div class="field mt-4  ">
+                                <p-checkbox [(ngModel)]="gameDetails.autoNextAllowed" name="autoNextAllowed"
+                                    [binary]="true"
+                                    label="{{'gamification.game_edit.autoNextAllowed' | translate}}"></p-checkbox>
+                            </div>
+
+                            <div class="field mt-4  ml-4">
+                                <p-checkbox [(ngModel)]="gameDetails.previousAllowed" name="previousAllowed"
+                                    [binary]="true"
+                                    label="{{'gamification.game_edit.previousAllowed' | translate}}"></p-checkbox>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class=" col-6  md-12">
+                        <div class="p-field">
+                            <div class="flex justify-content-center flex-wrap">
+                                <div class="md:col-6 flex flex-column">
+                                    <div class="flex align-items-center justify-content-center">
+                                        <img [src]="imageUrl" alt="Avatar" class="avatar" style="cursor: pointer;"
+                                            (click)="onUploadGameImageClick()">
+                                    </div>
+                                    <label
+                                        class="flex justify-content-center font-medium text-900 m-2">{{'gamification.game_edit.gameImage'
+                                        | translate}}</label>
+                                    <div class="flex align-items-center justify-content-center m-2"
+                                        style="display: none;">
+                                        <p-button label="{{'gamification.game_edit.upload' | translate}}"
+                                            icon="pi pi-upload" (click)="onUploadGameImageClick()"></p-button>
+                                        <input type="file" id="GameImage" style="display: none;"
+                                            (change)="onGameImageSelected($event)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="flex flex-wrap justify-content-center">
+                    <button pButton pRipple label="{{'gamification.game_edit.update' | translate}}" icon="pi pi-check"
+                        class="p-button-success mr-2" (click)="saveUpdateGameDetails()"></button>
+                </div>
+            </div>
+
+        </p-tabPanel>
+        <ng-container *ngFor="let gameLanguage of gameDetails?.gameLanguages">
+            <p-tabPanel [header]="gameLanguage.languageName">
+                <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+
+                </div>
+                <div class="invoice-card mb-4">
+                    <div class="grid p-fluid">
+                        <div class=" col-6  md-12">
+                            <div class="p-field">
+                                <div class="mb-2">
+                                    <label for="name" class="font-medium text-900">{{'gamification.game_edit.name' |
+                                        translate}}</label>
+                                </div>
+                                <div class="p-fluid">
+                                    <input type="text" pInputText id="name" [(ngModel)]="gameLanguage.name" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class=" col-6  md-12">
+                            <div class="p-field">
+                                <div class="mb-2">
+                                    <label for="layoutUrl"
+                                        class="font-medium text-900">{{'gamification.game_edit.layoutUrl' |
+                                        translate}}</label>
+                                </div>
+                                <div class="p-fluid">
+                                    <input type="text" pInputText id="layoutUrl" [(ngModel)]="gameLanguage.layoutUrl" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-6 md-12">
+                            <div class="p-field">
+                                <div class="mb-2">
+                                    <label for="instruction"
+                                        class="font-medium text-900">{{'gamification.game_edit.instruction' |
+                                        translate}}</label>
+                                </div>
+                                <div class="p-fluid">
+                                    <textarea id="instruction" pInputTextarea required rows="3" cols="20"
+                                        [(ngModel)]="gameLanguage.instruction"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class=" col-6  md-12">
+                            <div class="p-field">
+                                <div class="mb-2">
+                                    <label for="description"
+                                        class="font-medium text-900">{{'gamification.game_edit.description' |
+                                        translate}}</label>
+                                </div>
+                                <div class="p-fluid">
+                                    <textarea id="description" pInputTextarea required rows="3" cols="20"
+                                        [(ngModel)]="gameLanguage.description"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="flex flex-wrap justify-content-between">
+
+                        <div class="col-6">
+                            <p-button [raised]="true" label="{{'gamification.game_edit.update' | translate}}"
+                                severity="success" icon="pi pi-check" (onClick)="updateGameLanguage(gameLanguage)" />
+
+                        </div>
+                        <div class="col-6  ">
+                            <div class="flex flex-wrap justify-content-end ">
+                                <div class="mr-4">
+                                    <p-button [raised]="true" label="{{'gamification.game_edit.delete' | translate}}"
+                                        severity="danger" icon="pi pi-trash"
+                                        (onClick)="deleteGameLanguage(gameLanguage)" />
+                                </div>
+                                <div class="p-field flex flex-column align-items-center ">
+                                    <!-- <div class="mb-2">
+                                        <label class="font-medium text-900">Activation</label>
+                                    </div> -->
+                                    <div class="p-fluid">
+                                        <p-inputSwitch [ngModel]="gameLanguage.isActive"
+                                            (onChange)="switchGameLanguageActivation(gameLanguage)" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="iAware-loading-table-container" style="position: relative;">
+                    <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+
+                    <p-table #dt [value]="gameLanguage.gameLanguageQuestions" responsiveLayout="scroll" [rows]="10"
+                        [paginator]="true" [rowsPerPageOptions]="[10,20,30]" styleClass="p-datatable-striped"
+                        [globalFilterFields]="['questionText']">
+                        <ng-template pTemplate="caption">
+                            <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                                <h5 class="m-0">{{'gamification.game_edit.gameManagement' | translate}}</h5>
+                                <button pButton pRipple label="Add Question" icon="pi pi-plus"
+                                    class="p-button-success mr-2" (click)="addNewGameQuestion(gameLanguage)"></button>
+                                <span class="mt-2 md:mt-0 p-input-icon-left">
+                                    <i class="pi pi-search"></i>
+                                    <input pInputText type="text" (input)="onGlobalFilter(dt, $event)"
+                                        placeholder="{{'gamification.game_edit.search' | translate}}"
+                                        class="w-full sm:w-auto" />
+                                </span>
+                            </div>
+                        </ng-template>
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th pSortableColumn="questionText" style="width:30%">Questions <p-sortIcon
+                                        field="questionText"></p-sortIcon>
+                                    <p-columnFilter type="text" field="questionText" display="menu"></p-columnFilter>
+                                </th>
+                                <th>{{'gamification.game_edit.answer1' | translate}} 1</th>
+                                <th>{{'gamification.game_edit.answer2' | translate}} 2</th>
+                                <th>{{'gamification.game_edit.answer3' | translate}} 3</th>
+                                <th>{{'gamification.game_edit.answer4' | translate}} 4</th>
+                                <th style="text-align: center;">{{'gamification.game_edit.status' | translate}}</th>
+                                <th style="text-align: center;" colspan="2">{{'gamification.game_edit.actions' |
+                                    translate}}</th>
+                            </tr>
+                        </ng-template>
+
+                        <ng-template pTemplate="body" let-gameLanguageQuestion>
+                            <tr>
+                                <td>{{ gameLanguageQuestion.questionText }}</td>
+                                <td
+                                    [ngClass]="{'correct-answer': gameLanguageQuestion.gameLanguageQuestionAnswers[0]?.isTrueAnswer, 'incorrect-answer': !gameLanguageQuestion.gameLanguageQuestionAnswers[0]?.isTrueAnswer}">
+                                    {{ gameLanguageQuestion.gameLanguageQuestionAnswers[0]?.answerText }}
+                                </td>
+                                <td
+                                    [ngClass]="{'correct-answer': gameLanguageQuestion.gameLanguageQuestionAnswers[1]?.isTrueAnswer, 'incorrect-answer': !gameLanguageQuestion.gameLanguageQuestionAnswers[1]?.isTrueAnswer}">
+                                    {{ gameLanguageQuestion.gameLanguageQuestionAnswers[1]?.answerText }}
+                                </td>
+                                <td
+                                    [ngClass]="{'correct-answer': gameLanguageQuestion.gameLanguageQuestionAnswers[2]?.isTrueAnswer, 'incorrect-answer': !gameLanguageQuestion.gameLanguageQuestionAnswers[2]?.isTrueAnswer}">
+                                    {{ gameLanguageQuestion.gameLanguageQuestionAnswers[2]?.answerText }}
+                                </td>
+                                <td
+                                    [ngClass]="{'correct-answer': gameLanguageQuestion.gameLanguageQuestionAnswers[3]?.isTrueAnswer, 'incorrect-answer': !gameLanguageQuestion.gameLanguageQuestionAnswers[3]?.isTrueAnswer}">
+                                    {{ gameLanguageQuestion.gameLanguageQuestionAnswers[3]?.answerText }}
+                                </td>
+                                <td style="text-align: center;">
+                                    <p-inputSwitch [ngModel]="gameLanguageQuestion.isActive"
+                                        (onChange)="switchQuestionActivation(gameLanguageQuestion,gameLanguage)" />
+                                </td>
+                                <td style="text-align: center;">
+                                    <button pButton pRipple icon="pi pi-pencil"
+                                        class="p-button-rounded p-button-success mr-2"
+                                        (click)="editGameQuestion(gameLanguageQuestion,gameLanguage)"></button>
+                                </td>
+                                <td style="text-align: center;">
+                                    <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger"
+                                        (click)="deleteGameQuestion(gameLanguageQuestion,gameLanguage)"></button>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+
+                <ng-template #noData>
+                    <p>{{'gamification.game_edit.noGameData' | translate}}</p>
+                </ng-template>
+            </p-tabPanel>
+        </ng-container>
+    </p-tabView>
+</div>
+
+
+<p-dialog [(visible)]="addNewQuestionDialog" [style]="{width: '600px'}"
+    header="{{'gamification.game_edit.addNewQuestionDialog.header' | translate}}" [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <div class="p-field p-col-12">
+            <div class="mb-2">
+                <label for="questionText"
+                    class="font-medium text-900 ">{{'gamification.game_edit.addNewQuestionDialog.question' |
+                    translate}}</label>
+            </div>
+            <textarea id="questionText" name="questionText" [(ngModel)]="gameQuestion.questionText" pInputTextarea
+                required [ngClass]="{'ng-invalid ng-dirty': submitted && !gameQuestion.questionText}" rows="5"
+                placeholder="{{'gamification.game_edit.addNewQuestionDialog.writeQuestionPlaceholder' | translate}}"
+                cols="50"></textarea>
+        </div>
+        <div class="p-field p-col-12">
+            <div class="p-fluid p-grid p-align-center p-justify-between mt-2"
+                *ngFor="let answer of gameQuestion.gameLanguageQuestionAnswers; let i = index">
+                <div class="p-col-12 p-md-8">
+                    <div class="mb-2">
+                        <label for="quoteText"
+                            class="font-medium text-900 ">{{'gamification.game_edit.addNewQuestionDialog.answer' |
+                            translate}} {{i+1}}</label>
+                    </div>
+                    <div class="p-inputgroup">
+                        <p-radioButton name="correctAnswer" [value]="i" class="mr-3"
+                            [(ngModel)]="selectedQuestionAnswerIndex"></p-radioButton>
+                        <input [id]="'answerText' + i" type="text" pInputText class="p-inputtext"
+                            [placeholder]="('gamification.game_edit.addNewQuestionDialog.answerPlaceholder' | translate) + (i + 1)"
+                            style="width: 100%;" [(ngModel)]="answer.answerText">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{'shared.actions.cancel' | translate}}" icon="pi pi-times" class="p-button-text"
+            (click)="hideAddNewQuestionDialog()"></button>
+        <button pButton pRipple label="{{'shared.actions.save' | translate}}" icon="pi pi-check" class="p-button-text"
+            (click)="saveAddNewQuestion()"></button>
+    </ng-template>
+</p-dialog>
+
+
+<p-dialog [(visible)]="addNewGameLanguageDialog" [style]="{width: '800px', heigth:'900px'}"
+    header="{{'gamification.game_edit.addNewGameLanguageDialog.header' | translate}}" [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+
+        <form [formGroup]="addNewGameLanguageForm" (ngSubmit)="saveAddNewGameLanguage()">
+
+            <div class="field">
+                <label for="languageId"
+                    class="font-medium text-900">{{'gamification.game_edit.addNewGameLanguageDialog.language' |
+                    translate}}</label>
+                <span class="p-float-label">
+                    <p-dropdown formControlName="languageId" [options]="activeLanguages" optionLabel="name"
+                        optionValue="id"
+                        placeholder="{{'gamification.game_edit.addNewGameLanguageDialog.chooseLanguage' | translate}}">
+                    </p-dropdown>
+                </span>
+            </div>
+
+            <div class="field">
+                <label for="name" class="font-medium text-900"> {{'gamification.game_edit.addNewGameLanguageDialog.name'
+                    | translate}} </label>
+                <input type="text" pInputText id="name" formControlName="name" />
+            </div>
+            <!-- 
+            <div class="field">
+                <label for="backgroundInstruction" class="font-medium text-900"> BackgroundInstruction </label>
+                <input type="text" pInputText id="backgroundInstruction" formControlName="backgroundInstruction" />
+            </div> -->
+
+
+            <div class="field">
+                <label for="description" class="font-medium text-900">
+                    {{'gamification.game_edit.addNewGameLanguageDialog.description' | translate}} </label>
+                <textarea id="description" pInputTextarea formControlName="description" required rows="3"
+                    cols="20"></textarea>
+            </div>
+            <div class="field">
+                <label for="instruction" class="font-medium text-900">
+                    {{'gamification.game_edit.addNewGameLanguageDialog.instruction' | translate}} </label>
+                <textarea id="instruction" pInputTextarea formControlName="instruction" required rows="3"
+                    cols="20"></textarea>
+            </div>
+
+
+            <div class="field">
+                <label for="layoutUrl" class="font-medium text-900">
+                    {{'gamification.game_edit.addNewGameLanguageDialog.layoutUrl' | translate}} </label>
+                <input type="text" pInputText id="layoutUrl" formControlName="layoutUrl" />
+            </div>
+
+
+            <!-- <div class="flex justify-content-center flex-wrap">
+                <div class="md:col-6 flex flex-column">
+                    <div class="flex align-items-center justify-content-center">
+                        <img [src]="imageUrl" alt="Avatar" class="avatar" style="cursor: pointer;"
+                            (click)="onUploadGameImageClick()">
+                    </div>
+                    <label class="flex justify-content-center font-medium text-900">Game Image</label>
+                    <div class="flex align-items-center justify-content-center mt-2" style="display: none;">
+                        <p-button label="Upload" icon="pi pi-upload" (click)="onUploadGameImageClick()"></p-button>
+                        <input type="file" id="GameImage" style="display: none;" (change)="onGameImageSelected($event)">
+                    </div>
+                </div>
+            </div> -->
+
+        </form>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{'shared.actions.cancel' | translate}}" icon="pi pi-times" class="p-button-text"
+            (click)="declineAddNewGameLanguage()"></button>
+        <button pButton pRipple label="{{'shared.actions.save' | translate}}" icon="pi pi-check" class="p-button-text"
+            (click)="saveAddNewGameLanguage()"></button>
+    </ng-template>
+</p-dialog>
+
+
+<p-dialog [(visible)]="deleteGameLanguageDialog" header="{{'shared.headers.delete' | translate}}" [modal]="true"
+    [style]="{width:'450px'}">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="gameLanguage">{{'shared.messages.delete' | translate}}
+            <hr>
+            <div class="flex flex-wrap justify-content-center ">
+                <p>{{gameLanguage.name}}</p>
+            </div>
+        </span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text" label="{{'shared.actions.cancel' | translate}}"
+            (click)="declineGameLanguageDeletion()"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{'shared.actions.save' | translate}}"
+            (click)="confirmGameLanguageDeletion()"></button>
+    </ng-template>
+</p-dialog>
+
+
+<p-dialog [(visible)]="switchActivationGameLanguageDialog" header="{{'shared.headers.active' | translate}}"
+    [modal]="true" [style]="{width:'450px'}">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+      @if (gameLanguage) {
+        @if ( gameLanguage.isActive) {
+            <span>
+                {{ 'shared.messages.deactive' | translate }} <b>{{ gameLanguage.name }}</b></span>
+            }@else {
+            <span>{{ 'shared.messages.active' | translate }} <b>{{ gameLanguage.name }}</b></span>
+            }
+      }
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text" label="{{'shared.actions.cancel' | translate}}"
+            (click)="declineGameLanguageActivation()"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{'shared.actions.save' | translate}}"
+            (click)="confirmGameLanguageActivation()"></button>
+    </ng-template>
+</p-dialog>
+
+
+<p-dialog [(visible)]="switchActivationQuestionDialog" header="{{'shared.headers.active' | translate}}" [modal]="true"
+    [style]="{width:'450px'}">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        @if (gameQuestion && gameQuestion.isActive) {
+        <span>
+            {{ 'shared.messages.deactive' | translate }} <b>{{ gameQuestion.questionText }}</b></span>
+        }@else {
+        <span>{{ 'shared.messages.active' | translate }} <b>{{ gameQuestion.questionText }}</b></span>
+        }
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text" label="{{'shared.actions.cancel' | translate}}"
+            (click)="declineQuestionActivation()"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{'shared.actions.save' | translate}}"
+            (click)="confirmtQuestionActivation()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="deleteQuestionDialog" header="{{'shared.headers.delete' | translate}}" [modal]="true"
+    [style]="{width:'450px'}">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="gameQuestion">{{'shared.messages.delete' | translate}}
+            <hr>
+            <div class="flex flex-wrap justify-content-center ">
+                <p>{{gameQuestion.questionText}}</p>
+            </div>
+        </span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text" label="{{'shared.actions.cancel' | translate}}"
+            (click)="declineQuestionDeletion()"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{'shared.actions.save' | translate}}"
+            (click)="confirmQuestionDeletion()"></button>
+    </ng-template>
+</p-dialog>
+
+
+<p-dialog [(visible)]="editGameLanguageQuestionDialog"
+    header="{{'gamification.game_edit.editGameLanguageQuestionDialog.header' | translate}}" [modal]="true"
+    [style]="{width:'600px'}" class="p-fluid">
+
+    <ng-template pTemplate="content">
+        <div class="p-field p-col-12">
+            <div class="mb-2">
+                <label for="questionText"
+                    class="font-medium text-900">{{'gamification.game_edit.editGameLanguageQuestionDialog.question' |
+                    translate}}</label>
+            </div>
+            <textarea id="questionText" name="questionText" [(ngModel)]="gameQuestion.questionText" pInputTextarea
+                required [ngClass]="{'ng-invalid ng-dirty': submitted && !gameQuestion.questionText}" rows="5"
+                cols="50"></textarea>
+        </div>
+
+        <div class="p-field p-col-12" *ngFor="let answer of fixedAnswers; let i = index">
+            <div class="p-fluid p-grid p-align-center p-justify-between mt-2">
+                <div class="p-col-12 p-md-8">
+                    <div class="mb-2">
+                        <label [for]="'answerText' + i"
+                            class="font-medium text-900">{{'gamification.game_edit.editGameLanguageQuestionDialog.answer'
+                            | translate}} {{i+1}}</label>
+                    </div>
+                    <div class="p-inputgroup">
+                        <p-radioButton name="correctAnswer" [value]="i" class="mr-3"
+                            [(ngModel)]="selectedQuestionAnswerIndex"></p-radioButton>
+                        <input [id]="'answerText' + i" type="text" pInputText class="p-inputtext"
+                            [placeholder]="('gamification.game_edit.editGameLanguageQuestionDialog.answerSpace' | translate) + (i + 1)"
+                            style="width: 100%;" [(ngModel)]="answer.answerText" name="answerText{{i}}">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{'shared.actions.cancel' | translate}}" icon="pi pi-times" class="p-button-text"
+            (click)="hideEditQuestionDialog()"></button>
+        <button pButton pRipple label="{{'shared.actions.save' | translate}}" icon="pi pi-check" class="p-button-text"
+            (click)="saveEditQuestion()"></button>
+    </ng-template>
+</p-dialog>

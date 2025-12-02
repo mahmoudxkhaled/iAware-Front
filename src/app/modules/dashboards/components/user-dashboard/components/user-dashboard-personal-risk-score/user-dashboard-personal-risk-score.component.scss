@@ -1,0 +1,25 @@
+.userDashboard-Personal-Risk-Score-header {
+    text-align: center;
+}
+
+.userDashboard-Personal-Risk-Score-header h2 {
+    text-align: center;
+    font-size: clamp(1.8rem, 2vw, 2.5rem);
+    color: var(--primary-color);
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.userDashboard-Personal-Risk-Score-header h2::after {
+    content: "";
+    display: block;
+    width: 100px;
+    height: 4px;
+    background: var(--primary-color);
+    margin: 10px auto 0;
+    border-radius: 10px;
+}
+
+.userDashboard-Personal-Risk-Score-header p {
+    font-size: 18px;
+}

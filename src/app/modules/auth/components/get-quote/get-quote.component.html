@@ -1,0 +1,1254 @@
+<div *ngIf="currentPage === 'pricing'" class="surface-card bg-primary-50" style="background-color: white !important">
+    <div class="bg-primary-50">
+
+
+        <div class="grid">
+            <div class="col-12">
+                <div class="px-4 py-8 md:px-6 lg:px-8">
+                    <div class="text-900 font-bold text-6xl mb-4 text-center">Pricing Plans</div>
+                    <div class="text-700 text-xl mb-6 text-center line-height-3">
+                        Choose the perfect plan for your organization and start strengthening your security awareness.
+                        Whether you're a small team or a large enterprise, we have a solution tailored to meet your
+                        needs.
+                    </div>
+
+                    <div class="iAware-loading-table-container" style="position: relative;">
+                        <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+
+                        <div class="grid">
+                            <div class="col-12 lg:col-4" *ngFor="let sub of subscriptionsList">
+                                <div class="p-3 h-full">
+                                    <div class="shadow-2 p-3 h-full flex flex-column surface-card"
+                                        style="border-radius: 6px">
+                                        <div class="w-full m-auto" [ngClass]="{
+                                            'platinum-background': sub.title === 'Platinum',
+                                            'gold-background': sub.title === 'Gold',
+                                            'silver-background': sub.title === 'Silver',
+                                            'diamond-background': sub.title === 'Diamond',
+                                            'free-plan-background': sub.title === 'Free Plan'
+                                        }">
+                                            <div class="text-900 font-medium text-2xl mb-2">{{ sub.title }}</div>
+                                        </div>
+
+                                        <div class="text-600">{{ sub.description }}</div>
+                                        <hr class="my-3 mx-0 border-top-1 border-none surface-border" />
+                                        <div class="flex align-items-center">
+                                            <span class="font-bold text-2xl text-900">${{ sub.userPrice }}</span><span
+                                                class="ml-2 font-medium text-600">per user</span>
+                                        </div>
+                                        <hr class="my-3 mx-0 border-top-1 border-none surface-border" />
+
+                                        <strong>Active Languages</strong>
+                                        <div *ngFor=" let subb of sub.languagesName" class="flex align-items-center">
+                                            <span class=" text-black-500 mt-2 mb-2 mr-2"> <i
+                                                    class="pi pi-check-circle text-green-500 mr-2"></i> {{
+                                                subb }}</span><span class="ml-2 font-medium text-600"> </span>
+                                        </div>
+                                        <hr class="my-3 mx-0 border-top-1 border-none surface-border" />
+
+                                        <strong class="mb-2 ">Features</strong>
+                                        <ul class="list-none p-0 m-0 flex-grow-1">
+
+                                            <li class="flex align-items-center mb-3"
+                                                *ngIf="sub.unlimitedPhishingSimulation">
+                                                <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                                    class="text-900">Unlimited Phishing Simulations</span>
+                                            </li>
+                                            <li class="flex align-items-center mb-3" *ngIf="sub.awarenessVideos">
+                                                <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                                    class="text-900">Awareness Videos</span>
+                                            </li>
+                                            <li class="flex align-items-center mb-3" *ngIf="sub.comicBooks">
+                                                <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                                    class="text-900">Comic Books</span>
+                                            </li>
+                                            <li class="flex align-items-center mb-3" *ngIf="sub.knowledgeQuiz">
+                                                <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                                    class="text-900">Knowledge Quiz</span>
+                                            </li>
+                                            <li class="flex align-items-center mb-3" *ngIf="sub.securityQuotesAndTips">
+                                                <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                                    class="text-900">Security Quotes & Tips</span>
+                                            </li>
+                                            <li class="flex align-items-center mb-3" *ngIf="sub.awarenessEmails">
+                                                <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                                    class="text-900">Awareness Emails</span>
+                                            </li>
+                                            <li class="flex align-items-center mb-3" *ngIf="sub.wallpapers">
+                                                <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                                    class="text-900">Wallpapers</span>
+                                            </li>
+                                            <li class="flex align-items-center mb-3" *ngIf="sub.screenSavers">
+                                                <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                                    class="text-900">Screen Savers</span>
+                                            </li>
+                                            <li class="flex align-items-center mb-3" *ngIf="sub.games">
+                                                <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                                    class="text-900">Games</span>
+                                            </li>
+                                            <li class="flex align-items-center mb-3" *ngIf="sub.vrGamesAndTraining">
+                                                <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                                    class="text-900">VR Games & Training</span>
+                                            </li>
+                                            <li class="flex align-items-center mb-3" *ngIf="sub.localization">
+                                                <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                                    class="text-900">Localization</span>
+                                            </li>
+                                            <li class="flex align-items-center mb-3" *ngIf="sub.onSiteDeployment">
+                                                <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                                    class="text-900">On-Site Deployment</span>
+                                            </li>
+                                            <li class="flex align-items-center mb-3" *ngIf="sub.iawareMobileApp">
+                                                <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                                    class="text-900">iAware Mobile App</span>
+                                            </li>
+                                            <li class="flex align-items-center mb-3"
+                                                *ngIf="sub.automatedTrainingCampaigns">
+                                                <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                                    class="text-900">Automated Training Campaigns</span>
+                                            </li>
+                                            <li class="flex align-items-center mb-3" *ngIf="sub.brandableContent">
+                                                <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                                    class="text-900">Brandable Content</span>
+                                            </li>
+                                            <li class="flex align-items-center mb-3" *ngIf="sub.phishAlertButton">
+                                                <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                                    class="text-900">Phish Alert Button</span>
+                                            </li>
+                                            <li class="flex align-items-center mb-3"
+                                                *ngIf="sub.userProvisioningViaActiveDirectory">
+                                                <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                                    class="text-900">User Provisioning via Active Directory</span>
+                                            </li>
+                                            <li class="flex align-items-center mb-3" *ngIf="sub.advancedReporting">
+                                                <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                                    class="text-900">Advanced Reporting</span>
+                                            </li>
+                                            <li class="flex align-items-center mb-3" *ngIf="sub.technicalSupport">
+                                                <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                                    class="text-900">Technical Support</span>
+                                            </li>
+                                            <li class="flex align-items-center mb-3" *ngIf="sub.smartGroups">
+                                                <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                                    class="text-900">Smart Groups</span>
+                                            </li>
+                                            <li class="flex align-items-center mb-3"
+                                                *ngIf="sub.customizedPhishingExperience">
+                                                <i class="pi pi-check-circle text-green-500 mr-2"></i><span
+                                                    class="text-900">Customized Phishing Experience</span>
+                                            </li>
+                                        </ul>
+
+                                        <hr class="mb-3 mx-0 border-top-1 border-none surface-border mt-auto" />
+                                        <button (click)="openGetAQuoteDialog(sub)" pbutton="" pripple=""
+                                            label="Request A Quote"
+                                            class="p-element p-ripple p-3 w-full mt-auto p-button p-component">
+                                            <span class="p-button-label text-xl">Request a Quote</span><span
+                                                class="p-ink"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div *ngIf="currentPage === 'getAQuote'" class="page-content bg-primary-reverse bg-primary-50" style="height: 100vh">
+    <div class="surface-card px-4 py-8 md:px-6 lg:px-8">
+        <div class="text-900 font-bold text-6xl mb-4 text-center">{{ quoteName }} Request</div>
+
+        <div class="invoice-card">
+            <div class="grid">
+                <div class="col-12">
+                    <form [formGroup]="registerForm" (ngSubmit)="submit()">
+                        <!-- <p-messages severity="info" [showTransitionOptions]="'500ms'" [hideTransitionOptions]="'500ms'"
+                [enableService]="false" [closable]="true">
+                <ng-template pTemplate>
+                    <div class="ml-1">
+                        <i class="pi pi-sun" style="color: rgb(255, 196, 0);font-size: 1.5rem"></i>
+
+                        You are eligible to subscribe to our limited plan for 14 days and #{{numOfUsers}} users. For
+                        assistance with
+                        the upgrade, please feel
+                        free to {{info}}.
+
+                    </div>
+                </ng-template>
+            </p-messages> -->
+                        <div class="grid">
+                            <div class="col-12">
+                                <div class="grid formgrid p-fluid">
+                                    <!-- First Name -->
+                                    <div class="field mb-4 col-12 md:col-6">
+                                        <label for="firstname" class="font-medium text-900">{{
+                                            'auth.register.fields.firstName' | translate
+                                            }}</label>
+                                        <input id="firstname" type="text" pInputText formControlName="firstname"
+                                            placeholder="{{ 'auth.register.fields.firstName' | translate }}" [ngClass]="{
+                                                'is-invalid':
+                                                    registerForm.controls['firstname'].invalid &&
+                                                    (registerForm.controls['firstname'].dirty ||
+                                                        registerForm.controls['firstname'].touched),
+                                                'is-valid': registerForm.controls['firstname'].valid
+                                            }" />
+                                        <ng-container *ngIf="
+                                                registerForm.controls['firstname'].invalid &&
+                                                (registerForm.controls['firstname'].dirty ||
+                                                    registerForm.controls['firstname'].touched)
+                                            ">
+                                            <div *ngIf="registerForm.controls['firstname'].errors?.['required']"
+                                                class="p-error">
+                                                {{ 'auth.register.validations.firstName' | translate }}
+                                            </div>
+                                            <div *ngIf="registerForm.controls['firstname'].errors?.['minlength']"
+                                                class="p-error">
+                                                {{ 'auth.register.validations.firstNameMinLength' | translate }}
+                                            </div>
+                                            <div *ngIf="registerForm.controls['firstname'].errors?.['maxlength']"
+                                                class="p-error">
+                                                {{ 'auth.register.validations.firstNameMaxLength' | translate }}
+                                            </div>
+                                        </ng-container>
+                                    </div>
+
+                                    <!-- Last Name -->
+                                    <div class="field mb-4 col-12 md:col-6">
+                                        <label for="lastname" class="font-medium text-900">{{
+                                            'auth.register.fields.lastName' | translate
+                                            }}</label>
+                                        <input id="lastname" type="text" pInputText formControlName="lastname"
+                                            placeholder="{{ 'auth.register.fields.lastName' | translate }}" [ngClass]="{
+                                                'is-invalid':
+                                                    registerForm.controls['lastname'].invalid &&
+                                                    (registerForm.controls['lastname'].dirty ||
+                                                        registerForm.controls['lastname'].touched),
+                                                'is-valid': registerForm.controls['lastname'].valid
+                                            }" />
+                                        <ng-container *ngIf="
+                                                registerForm.controls['lastname'].invalid &&
+                                                (registerForm.controls['lastname'].dirty ||
+                                                    registerForm.controls['lastname'].touched)
+                                            ">
+                                            <div *ngIf="registerForm.controls['lastname'].errors?.['required']"
+                                                class="p-error">
+                                                {{ 'auth.register.validations.lastName' | translate }}
+                                            </div>
+                                            <div *ngIf="registerForm.controls['lastname'].errors?.['minlength']"
+                                                class="p-error">
+                                                {{ 'auth.register.validations.lastNameMinLength' | translate }}
+                                            </div>
+                                            <div *ngIf="registerForm.controls['lastname'].errors?.['maxlength']"
+                                                class="p-error">
+                                                {{ 'auth.register.validations.lastNameMaxLength' | translate }}
+                                            </div>
+                                        </ng-container>
+                                    </div>
+
+                                    <!-- Company Name -->
+                                    <div class="field mb-4 col-12 md:col-6">
+                                        <label for="companyname" class="font-medium text-900">{{
+                                            'auth.register.fields.companyname' | translate
+                                            }}</label>
+                                        <input id="companyname" type="text" pInputText formControlName="companyname"
+                                            placeholder="{{ 'auth.register.fields.companyname' | translate }}"
+                                            [ngClass]="{
+                                                'is-invalid':
+                                                    registerForm.controls['companyname'].invalid &&
+                                                    (registerForm.controls['companyname'].dirty ||
+                                                        registerForm.controls['companyname'].touched),
+                                                'is-valid': registerForm.controls['companyname'].valid
+                                            }" />
+                                        <ng-container *ngIf="
+                                                registerForm.controls['companyname'].invalid &&
+                                                (registerForm.controls['companyname'].dirty ||
+                                                    registerForm.controls['companyname'].touched)
+                                            ">
+                                            <div *ngIf="registerForm.controls['companyname'].errors?.['required']"
+                                                class="p-error">
+                                                {{ 'auth.register.validations.companyname' | translate }}
+                                            </div>
+                                            <div *ngIf="registerForm.controls['companyname'].errors?.['minlength']"
+                                                class="p-error">
+                                                {{ 'auth.register.validations.companynameMinLength' | translate }}
+                                            </div>
+                                            <div *ngIf="registerForm.controls['companyname'].errors?.['maxlength']"
+                                                class="p-error">
+                                                {{ 'auth.register.validations.companynameMaxLength' | translate }}
+                                            </div>
+                                        </ng-container>
+                                    </div>
+
+                                    <!-- Email -->
+                                    <div class="field mb-4 col-12 md:col-6">
+                                        <label for="email" class="font-medium text-900">Business Email</label>
+                                        <input id="email" type="text" pInputText formControlName="email"
+                                            placeholder="{{ 'auth.register.fields.email' | translate }}" [ngClass]="{
+                                                'is-invalid':
+                                                    registerForm.controls['email'].invalid &&
+                                                    (registerForm.controls['email'].dirty ||
+                                                        registerForm.controls['email'].touched),
+                                                'is-valid': registerForm.controls['email'].valid
+                                            }" />
+                                        <ng-container *ngIf="
+                                                registerForm.controls['email'].invalid &&
+                                                (registerForm.controls['email'].dirty ||
+                                                    registerForm.controls['email'].touched)
+                                            ">
+                                            <div *ngIf="registerForm.controls['email'].errors?.['required']"
+                                                class="p-error">
+                                                {{ 'auth.register.validations.email' | translate }}
+                                            </div>
+                                            <div *ngIf="registerForm.controls['email'].errors?.['email']"
+                                                class="p-error">
+                                                {{ 'auth.register.validations.emailTaken' | translate }}
+                                            </div>
+                                            <div *ngIf="registerForm.controls['email'].errors?.['companyEmail']"
+                                                class="p-error">
+                                                {{ 'auth.register.validations.companyEmail' | translate }}
+                                            </div>
+                                        </ng-container>
+                                    </div>
+
+                                    <!-- Language -->
+                                    <div class="field mb-4 col-12 md:col-6">
+                                        <label for="language" class="font-medium text-900">{{
+                                            'auth.register.fields.language' | translate
+                                            }}</label>
+                                        <p-dropdown id="language" [options]="activeLanguages" optionLabel="name"
+                                            optionValue="id" [filter]="true" formControlName="language"
+                                            placeholder="{{ 'auth.register.placeholders.language' | translate }}"
+                                            [ngClass]="{
+                                                'is-invalid':
+                                                    registerForm.controls['language'].invalid &&
+                                                    (registerForm.controls['language'].dirty ||
+                                                        registerForm.controls['language'].touched),
+                                                'is-valid': registerForm.controls['language'].valid
+                                            }"></p-dropdown>
+                                        <ng-container *ngIf="
+                                                registerForm.controls['language'].invalid &&
+                                                (registerForm.controls['language'].dirty ||
+                                                    registerForm.controls['language'].touched)
+                                            ">
+                                            <div *ngIf="registerForm.controls['language'].errors?.['required']"
+                                                class="p-error">
+                                                {{ 'auth.register.validations.language' | translate }}
+                                            </div>
+                                        </ng-container>
+                                    </div>
+
+                                    <!-- Timezone -->
+                                    <div class="field mb-4 col-12 md:col-6">
+                                        <label class="font-medium text-900 " htmlFor="timeZone">
+
+                                            {{'account.profile-details.timeZone' | translate}}
+                                        </label>
+                                        <p-dropdown [options]="timeZonesList" optionLabel="name" optionValue="id"
+                                            placeholder="{{ 'auth.register.placeholders.timezone' | translate }}"
+                                            formControlName="timeZoneId" [filter]="true"></p-dropdown>
+
+                                        <ng-container *ngIf="
+                                            registerForm.controls['timeZoneId'].invalid &&
+                                            (registerForm.controls['timeZoneId'].dirty ||
+                                                registerForm.controls['timeZoneId'].touched)
+                                        ">
+                                            <div *ngIf="registerForm.controls['timeZoneId'].errors?.['required']"
+                                                class="p-error">
+                                                {{ 'auth.register.validations.timezone' | translate }}
+                                            </div>
+                                        </ng-container>
+
+                                    </div>
+                                    <!-- Phone -->
+
+                                    <!-- <div class="field mb-4 col-12 md:col-6">
+                                        <label for="phone" class="font-medium text-900">{{
+                                            'auth.register.fields.phone' | translate
+                                            }}</label>
+
+                                        <input formControlName="phone" type="text" pInputText />
+
+                                        <ng-container *ngIf="
+                                            registerForm.controls['phone'].invalid &&
+                                            (registerForm.controls['phone'].dirty ||
+                                                registerForm.controls['phone'].touched)
+                                        ">
+                                            <div *ngIf="registerForm.controls['phone'].errors?.['required']"
+                                                class="p-error">
+                                                {{ 'auth.register.validations.phone' | translate }}
+                                            </div>
+                                        </ng-container>
+                                    </div> -->
+
+                                    <div class="field mb-4 col-12 md:col-6">
+
+                                        <label for="phone" class="font-medium text-900">{{
+                                            'auth.register.fields.phone' | translate
+                                            }}</label>
+                                        <div class="p-fluid">
+                                            <ngx-intl-tel-input [cssClass]="'custom'" [preferredCountries]="[
+                                                    CountryISO.UnitedStates,
+                                                    CountryISO.UnitedKingdom
+                                                ]" [enableAutoCountrySelect]="false" [enablePlaceholder]="true"
+                                                [searchCountryFlag]="true" [searchCountryField]="[
+                                                    SearchCountryField.Iso2,
+                                                    SearchCountryField.Name
+                                                ]" [selectFirstCountry]="false"
+                                                [selectedCountryISO]="CountryISO.UnitedStates" [maxLength]="15"
+                                                [separateDialCode]="true" [phoneValidation]="false" name="phone"
+                                                formControlName="phone">
+                                            </ngx-intl-tel-input>
+                                        </div>
+
+                                        <ng-container *ngIf="
+                                                registerForm.controls['phone'].invalid &&
+                                                (registerForm.controls['phone'].dirty ||
+                                                    registerForm.controls['phone'].touched)
+                                            ">
+                                            <div *ngIf="registerForm.controls['phone'].errors?.['required']"
+                                                class="p-error">
+                                                {{ 'auth.register.validations.phone' | translate }}
+                                            </div>
+                                        </ng-container>
+                                    </div>
+
+                                    <!-- Country -->
+                                    <!-- <div class="field mb-4 col-12 md:col-6">
+                                        <label for="country" class="font-medium text-900">{{
+                                            'auth.register.fields.country' | translate
+                                            }}</label>
+                                        <p-dropdown id="country" [options]="countriesList" optionLabel="name"
+                                            optionValue="code" [filter]="true" formControlName="country"
+                                            placeholder="{{ 'auth.register.placeholders.country' | translate }}"
+                                            [ngClass]="{
+                                                'is-invalid':
+                                                    registerForm.controls['country'].invalid &&
+                                                    (registerForm.controls['country'].dirty ||
+                                                        registerForm.controls['country'].touched),
+                                                'is-valid': registerForm.controls['country'].valid
+                                            }"></p-dropdown>
+                                        <ng-container *ngIf="
+                                                registerForm.controls['country'].invalid &&
+                                                (registerForm.controls['country'].dirty ||
+                                                    registerForm.controls['country'].touched)
+                                            ">
+                                            <div *ngIf="registerForm.controls['country'].errors?.['required']"
+                                                class="p-error">
+                                                {{ 'auth.register.validations.country' | translate }}
+                                            </div>
+                                        </ng-container>
+                                    </div> -->
+
+                                    <!-- No. of users -->
+                                    <div class="field mb-4 col-12 md:col-6">
+                                        <label for="requestUserCount" class="font-medium text-900">Number of Employees
+                                        </label>
+                                        <input formControlName="requestUserCount" type="text" pInputText
+                                            [value]="numOfUsers" />
+                                    </div>
+
+
+
+                                    <!-- Agree to terms -->
+                                    <div class="field-checkbox mb-4 col-12 md:col-6 mt-2">
+                                        <!-- <input id="agree" type="checkbox" formControlName="agree"> -->
+                                        <p-checkbox formControlName="agree" [disabled]="true" [binary]="true"
+                                            label="{{ 'auth.register.termsAndConditions' | translate }}"></p-checkbox>
+                                        <!-- <label for="agree" class="font-medium text-900">{{ 'auth.register.termsAndConditions' |translate}}</label> -->
+                                    </div>
+
+                                    <div class="col-12">
+
+                                        <!-- <button type="submit" pButton pRipple [disabled]="registerForm.invalid"> -->
+                                        <button type="submit" pButton pRipple [disabled]="isPressed">
+                                            <ng-container *ngIf="isLoading$ | async">
+                                                <div class="m-auto">
+                                                    <span class="indicator-progress" [style.display]="'block'">
+                                                        {{ 'auth.register.pleaseWait' | translate }}
+                                                        <i class="pi pi-spin pi-spinner" style="font-size: 1rem"></i>
+                                                    </span>
+                                                </div>
+                                            </ng-container>
+                                            <ng-container *ngIf="(isLoading$ | async) === false">
+                                                <div class="m-auto">
+                                                    <span class="indicator-label">Submit</span>
+                                                </div>
+                                            </ng-container>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <button class="mb-3" pButton pRipple icon="pi pi-arrow-left" label="Back to Pricing Plans"
+                (click)="navigateBack('pricing')"></button>
+        </div>
+    </div>
+</div>
+
+
+<div *ngIf="currentPage === 'invoicePaymentRequest'" class="page-content bg-primary-reverse bg-primary-50">
+    <div class="px-4 py-8 md:px-6 lg:px-8">
+        <div class="text-900 font-bold text-6xl mb-4 text-center">Invoice</div>
+
+        <div class="grid">
+            <div class="col-12">
+                <!-- Invoice Details Card -->
+                <div class="invoice-card">
+                    <div class="card">
+                        <p-toast></p-toast>
+
+
+                        <p-table #dt [value]="generatedInvoice" responsiveLayout="scroll" [rows]="10"
+                            styleClass="p-datatable-striped">
+                            <ng-template pTemplate="caption">
+                                <div
+                                    class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                                    <h5 class="m-0">Invoice</h5>
+                                </div>
+                            </ng-template>
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th>Subscription Plan Name</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th class="text-center">User Count</th>
+                                    <th class="text-center">User Price</th>
+                                    <th class="text-center">Total Amount</th>
+                                </tr>
+                            </ng-template>
+
+                            <ng-template pTemplate="body" let-invoice>
+                                <tr>
+                                    <td>{{ invoice.subscriptionPlanName }}</td>
+                                    <td>{{ invoice.startDate | date :'MM/dd/yyyy' }}</td>
+                                    <td>{{ invoice.endDate | date :'MM/dd/yyyy' }}</td>
+                                    <td class="text-center">
+                                        {{ invoice.requestUserCount }} <i class="pi pi-user"></i>
+                                    </td>
+                                    <td class="text-center">{{ invoice.userPrice | currency }}</td>
+                                    <td class="text-center">{{ invoice.totalAmount | currency }}</td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+
+
+                    </div>
+
+                    <div class="ng-star-inserted">
+                        <div class="px-4 py-8 md:px-6 lg:px-8">
+                            <div class="text-900 text-xl font-medium mb-3 text-center">Payment Methods</div>
+                            <p class="text-700 mt-0 mb-4 text-center">
+                                Choose your preferred payment method from the options below. You can select Credit Card,
+                                PayPal, Wire Transfer, or Bitcoin. Your choice will determine how you will complete your
+                                payment.
+                            </p>
+
+                            <div class="grid">
+                                <!-- Credit Card -->
+                                <div class="col-12 lg:col-6 p-3"
+                                    (click)="selectPaymentMethod(PaymentTypeEnum.CreditCard)">
+                                    <div class="shadow-2 surface-card p-4 border-2 cursor-pointer"
+                                        [class.border-blue-500]="selectedPaymentMethod === PaymentTypeEnum.CreditCard"
+                                        style="border-radius: 10px">
+                                        <div class="flex align-items-center mb-4">
+                                            <div class="mr-3">
+                                                <span
+                                                    class="inline-flex justify-content-center align-items-center bg-indigo-100"
+                                                    style="border-radius: 4px; width: 45px; height: 45px">
+                                                    <i class="pi pi-credit-card text-2xl text-indigo-600"></i>
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span class="text-900 text-xl mb-2 font-medium">Credit Card</span>
+                                                <p class="m-0 text-600 font-medium text-sm">
+                                                    Pay securely using your Credit Card. Enjoy the convenience and
+                                                    safety of online payment with all major credit cards accepted.
+                                                </p>
+                                            </div>
+                                            <p-radioButton name="payment" class="p-element ml-auto"
+                                                [value]="PaymentTypeEnum.CreditCard"
+                                                [ngModel]="selectedPaymentMethod"></p-radioButton>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- PayPal -->
+                                <div class="col-12 lg:col-6 p-3" (click)="selectPaymentMethod(PaymentTypeEnum.PayPal)">
+                                    <div class="shadow-2 surface-card p-4 border-2 cursor-pointer"
+                                        [class.border-blue-500]="selectedPaymentMethod === PaymentTypeEnum.PayPal"
+                                        style="border-radius: 10px">
+                                        <div class="flex align-items-center mb-4">
+                                            <div class="mr-3">
+                                                <span
+                                                    class="inline-flex justify-content-center align-items-center bg-blue-100"
+                                                    style="border-radius: 4px; width: 45px; height: 45px">
+                                                    <img src="https://blocks.primeng.org/assets/images/blocks/logos/paypal.svg"
+                                                        style="height: 1.5rem" />
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span class="text-900 text-xl mb-2 font-medium">PayPal</span>
+                                                <p class="m-0 text-600 font-medium text-sm">
+                                                    Use PayPal for a quick and secure payment. Log in to your PayPal
+                                                    account to complete the transaction easily.
+                                                </p>
+                                            </div>
+                                            <p-radioButton name="payment" class="p-element ml-auto"
+                                                [value]="PaymentTypeEnum.PayPal"
+                                                [ngModel]="selectedPaymentMethod"></p-radioButton>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Transfer -->
+                                <div class="col-12 lg:col-6 p-3"
+                                    (click)="selectPaymentMethod(PaymentTypeEnum.Transfer)">
+                                    <div class="shadow-2 surface-card p-4 border-2 cursor-pointer"
+                                        [class.border-blue-500]="selectedPaymentMethod === PaymentTypeEnum.Transfer"
+                                        style="border-radius: 10px">
+                                        <div class="flex align-items-center mb-4">
+                                            <div class="mr-3">
+                                                <span
+                                                    class="inline-flex justify-content-center align-items-center bg-green-100"
+                                                    style="border-radius: 4px; width: 45px; height: 45px">
+                                                    <i class="pi pi-money-bill text-2xl text-green-600"></i>
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span class="text-900 text-xl mb-2 font-medium">Wire Transfer</span>
+                                                <p class="m-0 text-600 font-medium text-sm">
+                                                    Choose Wire Transfer to make a direct bank transfer. Follow the
+                                                    instructions provided to complete your payment securely.
+                                                </p>
+                                            </div>
+                                            <p-radioButton name="payment" class="p-element ml-auto"
+                                                [value]="PaymentTypeEnum.Transfer"
+                                                [ngModel]="selectedPaymentMethod"></p-radioButton>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- BitCoin -->
+                                <div class="col-12 lg:col-6 p-3" (click)="selectPaymentMethod(PaymentTypeEnum.BitCoin)">
+                                    <div class="shadow-2 surface-card p-4 border-2 cursor-pointer"
+                                        [class.border-blue-500]="selectedPaymentMethod === PaymentTypeEnum.BitCoin"
+                                        style="border-radius: 10px">
+                                        <div class="flex align-items-center mb-4">
+                                            <div class="mr-3">
+                                                <span
+                                                    class="inline-flex justify-content-center align-items-center bg-orange-100"
+                                                    style="border-radius: 4px; width: 45px; height: 45px">
+                                                    <img src="https://blocks.primeng.org/assets/images/blocks/logos/bitcoin.svg"
+                                                        style="height: 1.5rem" />
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span class="text-900 text-xl mb-2 font-medium">BitCoin</span>
+                                                <p class="m-0 text-600 font-medium text-sm">
+                                                    Pay with Bitcoin for a modern and innovative payment experience.
+                                                    Ensure you have a Bitcoin wallet set up for this method.
+                                                </p>
+                                            </div>
+                                            <p-radioButton name="payment" class="p-element ml-auto"
+                                                [value]="PaymentTypeEnum.BitCoin"
+                                                [ngModel]="selectedPaymentMethod"></p-radioButton>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Conditionally show the form -->
+                    <form class="coming-soonTransfer"
+                        *ngIf="selectedPaymentMethod !== null && selectedPaymentMethod == PaymentTypeEnum.Transfer"
+                        [formGroup]="addInvoicePaymentRequestForm" (ngSubmit)="saveAddInvoicePaymentRequest()">
+                        <div class="grid">
+                            <div class="col">
+                                <div class="p-3 border-round-sm font-bold">
+                                    <div class="field">
+                                        <label for="SubscriptionTenantInvoiceId">
+                                            Invoice Key : {{ currentInvoice }}</label>
+                                    </div>
+
+                                    <div class="field p-fluid">
+                                        <label for="RequestAmount"> Amount </label>
+                                        <p-inputNumber class="p-fluid" id="RequestAmount"
+                                            formControlName="RequestAmount"></p-inputNumber>
+                                    </div>
+
+                                    <div class="field">
+                                        <label for="RequestReferenceKey"> Request Reference Key </label>
+                                        <input type="text" pInputText id="RequestReferenceKey"
+                                            formControlName="RequestReferenceKey" required />
+                                    </div>
+
+                                    <div class="field">
+                                        <label for="RequestPaymentNote"> Request Payment Note </label>
+                                        <textarea id="RequestPaymentNote" pInputTextarea
+                                            formControlName="RequestPaymentNote" required rows="3" cols="20"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="text-center p-3 border-round-sm font-bold">
+                                    <div class="flex justify-content-center flex-wrap">
+                                        <div class="md:col-6 flex flex-column">
+                                            <div class="flex align-items-center justify-content-center">
+                                                <img [src]="imageUrl" alt="Avatar" class="avatar"
+                                                    style="cursor: pointer"
+                                                    (click)="onUploadPaymentReuqestImageClick()" />
+                                            </div>
+                                            <label class="flex justify-content-center">Payment Reuqest Image</label>
+                                            <div class="flex align-items-center justify-content-center mt-2"
+                                                style="display: none">
+                                                <p-button label="Upload" icon="pi pi-upload"
+                                                    (click)="onUploadPaymentReuqestImageClick()"></p-button>
+                                                <input type="file" id="PaymentReuqestImage" style="display: none"
+                                                    (change)="onPaymentReuqestImageSelected($event)" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <!-- <button type="submit" pButton pRipple [disabled]="registerForm.invalid"> -->
+                            <button type="submit" pButton pRipple>
+                                <ng-container *ngIf="(isLoading$ | async) === false">
+                                    <div class="m-auto">
+                                        <span class="indicator-label">Submit</span>
+                                    </div>
+                                </ng-container>
+                            </button>
+                        </div>
+                    </form>
+                    <div class="m-auto" style="width: 500px; height: 500px; margin: auto"
+                        *ngIf="selectedPaymentMethod !== null && selectedPaymentMethod == PaymentTypeEnum.BitCoin"
+                        class="coming-soon-container">
+                        <img src="assets/media/fe547d7e2f8ebf8722fdefd259f47e8d.jpg" alt="Coming Soon"
+                            class="coming-soon-image" />
+                    </div>
+
+                    <div class="m-auto" style="width: 500px; height: 500px; margin: auto"
+                        *ngIf="selectedPaymentMethod !== null && selectedPaymentMethod == PaymentTypeEnum.CreditCard"
+                        class="coming-soon-container">
+                        <img src="assets/media/fe547d7e2f8ebf8722fdefd259f47e8d.jpg" alt="Coming Soon"
+                            class="coming-soon-image" />
+                    </div>
+
+                    <div class="m-auto" style="width: 500px; height: 500px; margin: auto"
+                        *ngIf="selectedPaymentMethod !== null && selectedPaymentMethod == PaymentTypeEnum.PayPal"
+                        class="coming-soon-container">
+                        <img src="assets/media/fe547d7e2f8ebf8722fdefd259f47e8d.jpg" alt="Coming Soon"
+                            class="coming-soon-image" />
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+<div *ngIf="currentPage === 'finalStep'" class="page-content bg-primary-reverse bg-primary-50 final-step-page">
+    <div class="final-step-container">
+        <div class="text-900 font-bold text-6xl mb-4 text-center">Your Request Completed Successfully</div>
+
+        <div class="final-step-message-card">
+            <div class="final-step-message-icon">📧</div>
+            <div class="final-step-message">
+                You will receive an email within 48 hours once our accounting department completes their
+                verification. Please check your inbox for further updates.
+            </div>
+        </div>
+        <div class="m-4">
+            <p-button severity="info" label="Explore iAware"></p-button>
+        </div>
+    </div>
+</div>
+
+
+<p-dialog [(visible)]="addInvoicePaymentRequestDialog" [style]="{ width: '100%', heigth: '100vh' }"
+    header="Invoice Payment Request" [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <div class="ng-star-inserted">
+            <div class="surface-ground px-4 py-8 md:px-6 lg:px-8">
+                <div class="text-900 text-xl font-medium mb-3 text-center">Payment Methods</div>
+                <p class="text-700 mt-0 mb-4 text-center">
+                    Choose your preferred payment method from the options below. You can select Credit Card,
+                    PayPal, Wire Transfer, or Bitcoin. Your choice will determine how you will complete your
+                    payment.
+                </p>
+
+                <div class="grid">
+                    <!-- Credit Card -->
+                    <div class="col-12 lg:col-6 p-3" (click)="selectPaymentMethod(PaymentTypeEnum.CreditCard)">
+                        <div class="shadow-2 surface-card p-4 border-2 cursor-pointer"
+                            [class.border-blue-500]="selectedPaymentMethod === PaymentTypeEnum.CreditCard"
+                            style="border-radius: 10px">
+                            <div class="flex align-items-center mb-4">
+                                <div class="mr-3">
+                                    <span class="inline-flex justify-content-center align-items-center bg-indigo-100"
+                                        style="border-radius: 4px; width: 45px; height: 45px">
+                                        <i class="pi pi-credit-card text-2xl text-indigo-600"></i>
+                                    </span>
+                                </div>
+                                <div>
+                                    <span class="text-900 text-xl mb-2 font-medium">Credit Card</span>
+                                    <p class="m-0 text-600 font-medium text-sm">
+                                        Pay securely using your Credit Card. Enjoy the convenience and
+                                        safety of online payment with all major credit cards accepted.
+                                    </p>
+                                </div>
+                                <p-radioButton name="payment" class="p-element ml-auto"
+                                    [value]="PaymentTypeEnum.CreditCard"
+                                    [ngModel]="selectedPaymentMethod"></p-radioButton>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PayPal -->
+                    <div class="col-12 lg:col-6 p-3" (click)="selectPaymentMethod(PaymentTypeEnum.PayPal)">
+                        <div class="shadow-2 surface-card p-4 border-2 cursor-pointer"
+                            [class.border-blue-500]="selectedPaymentMethod === PaymentTypeEnum.PayPal"
+                            style="border-radius: 10px">
+                            <div class="flex align-items-center mb-4">
+                                <div class="mr-3">
+                                    <span class="inline-flex justify-content-center align-items-center bg-blue-100"
+                                        style="border-radius: 4px; width: 45px; height: 45px">
+                                        <img src="https://blocks.primeng.org/assets/images/blocks/logos/paypal.svg"
+                                            style="height: 1.5rem" />
+                                    </span>
+                                </div>
+                                <div>
+                                    <span class="text-900 text-xl mb-2 font-medium">PayPal</span>
+                                    <p class="m-0 text-600 font-medium text-sm">
+                                        Use PayPal for a quick and secure payment. Log in to your PayPal
+                                        account to complete the transaction easily.
+                                    </p>
+                                </div>
+                                <p-radioButton name="payment" class="p-element ml-auto" [value]="PaymentTypeEnum.PayPal"
+                                    [ngModel]="selectedPaymentMethod"></p-radioButton>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Transfer -->
+                    <div class="col-12 lg:col-6 p-3" (click)="selectPaymentMethod(PaymentTypeEnum.Transfer)">
+                        <div class="shadow-2 surface-card p-4 border-2 cursor-pointer"
+                            [class.border-blue-500]="selectedPaymentMethod === PaymentTypeEnum.Transfer"
+                            style="border-radius: 10px">
+                            <div class="flex align-items-center mb-4">
+                                <div class="mr-3">
+                                    <span class="inline-flex justify-content-center align-items-center bg-green-100"
+                                        style="border-radius: 4px; width: 45px; height: 45px">
+                                        <i class="pi pi-money-bill text-2xl text-green-600"></i>
+                                    </span>
+                                </div>
+                                <div>
+                                    <span class="text-900 text-xl mb-2 font-medium">Wire Transfer</span>
+                                    <p class="m-0 text-600 font-medium text-sm">
+                                        Choose Wire Transfer to make a direct bank transfer. Follow the
+                                        instructions provided to complete your payment securely.
+                                    </p>
+                                </div>
+                                <p-radioButton name="payment" class="p-element ml-auto"
+                                    [value]="PaymentTypeEnum.Transfer"
+                                    [ngModel]="selectedPaymentMethod"></p-radioButton>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BitCoin -->
+                    <div class="col-12 lg:col-6 p-3" (click)="selectPaymentMethod(PaymentTypeEnum.BitCoin)">
+                        <div class="shadow-2 surface-card p-4 border-2 cursor-pointer"
+                            [class.border-blue-500]="selectedPaymentMethod === PaymentTypeEnum.BitCoin"
+                            style="border-radius: 10px">
+                            <div class="flex align-items-center mb-4">
+                                <div class="mr-3">
+                                    <span class="inline-flex justify-content-center align-items-center bg-orange-100"
+                                        style="border-radius: 4px; width: 45px; height: 45px">
+                                        <img src="https://blocks.primeng.org/assets/images/blocks/logos/bitcoin.svg"
+                                            style="height: 1.5rem" />
+                                    </span>
+                                </div>
+                                <div>
+                                    <span class="text-900 text-xl mb-2 font-medium">BitCoin</span>
+                                    <p class="m-0 text-600 font-medium text-sm">
+                                        Pay with Bitcoin for a modern and innovative payment experience.
+                                        Ensure you have a Bitcoin wallet set up for this method.
+                                    </p>
+                                </div>
+                                <p-radioButton name="payment" class="p-element ml-auto"
+                                    [value]="PaymentTypeEnum.BitCoin" [ngModel]="selectedPaymentMethod"></p-radioButton>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conditionally show the form -->
+        <form class="coming-soonTransfer"
+            *ngIf="selectedPaymentMethod !== null && selectedPaymentMethod == PaymentTypeEnum.Transfer"
+            [formGroup]="addInvoicePaymentRequestForm" (ngSubmit)="saveAddInvoicePaymentRequest()">
+            <div class="field">
+                <label for="SubscriptionTenantInvoiceId"> Request Reference Key </label>
+                <input type="text" pInputText id="SubscriptionTenantInvoiceId"
+                    formControlName="SubscriptionTenantInvoiceId" readonly />
+            </div>
+
+            <div class="field">
+                <label for="RequestAmount"> Request Amount </label>
+                <p-inputNumber id="RequestAmount" formControlName="RequestAmount"></p-inputNumber>
+            </div>
+
+            <div class="field">
+                <label for="RequestReferenceKey"> Request Reference Key </label>
+                <input type="text" pInputText id="RequestReferenceKey" formControlName="RequestReferenceKey" required />
+            </div>
+
+            <div class="field">
+                <label for="RequestPaymentNote"> Request Payment Note </label>
+                <textarea id="RequestPaymentNote" pInputTextarea formControlName="RequestPaymentNote" required rows="3"
+                    cols="20"></textarea>
+            </div>
+
+            <div class="flex justify-content-center flex-wrap">
+                <div class="md:col-6 flex flex-column">
+                    <div class="flex align-items-center justify-content-center">
+                        <img [src]="imageUrl" alt="Avatar" class="avatar" style="cursor: pointer"
+                            (click)="onUploadPaymentReuqestImageClick()" />
+                    </div>
+                    <label class="flex justify-content-center">Payment Reuqest Image</label>
+                    <div class="flex align-items-center justify-content-center mt-2" style="display: none">
+                        <p-button label="Upload" icon="pi pi-upload"
+                            (click)="onUploadPaymentReuqestImageClick()"></p-button>
+                        <input type="file" id="PaymentReuqestImage" style="display: none"
+                            (change)="onPaymentReuqestImageSelected($event)" />
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="m-auto" style="width: 500px; height: 500px; margin: auto"
+            *ngIf="selectedPaymentMethod !== null && selectedPaymentMethod == PaymentTypeEnum.BitCoin"
+            class="coming-soon-container">
+            <img src="assets/media/fe547d7e2f8ebf8722fdefd259f47e8d.jpg" alt="Coming Soon" class="coming-soon-image" />
+        </div>
+
+        <div class="m-auto" style="width: 500px; height: 500px; margin: auto"
+            *ngIf="selectedPaymentMethod !== null && selectedPaymentMethod == PaymentTypeEnum.CreditCard"
+            class="coming-soon-container">
+            <img src="assets/media/fe547d7e2f8ebf8722fdefd259f47e8d.jpg" alt="Coming Soon" class="coming-soon-image" />
+        </div>
+
+        <div class="m-auto" style="width: 500px; height: 500px; margin: auto"
+            *ngIf="selectedPaymentMethod !== null && selectedPaymentMethod == PaymentTypeEnum.PayPal"
+            class="coming-soon-container">
+            <img src="assets/media/fe547d7e2f8ebf8722fdefd259f47e8d.jpg" alt="Coming Soon" class="coming-soon-image" />
+        </div>
+
+        <!-- Form fields here -->
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text"
+            (click)="declineAddPaymentReuqestDialog()"></button>
+        <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text"
+            (click)="saveAddInvoicePaymentRequest()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="getAQuoteDialog" [header]="quoteName" [modal]="true" [closable]="false"
+    [style]="{ width: '80%', height: '100vh' }">
+    <ng-template pTemplate="content">
+        <form [formGroup]="registerForm" (ngSubmit)="submit()">
+            <!-- <p-messages severity="info" [showTransitionOptions]="'500ms'" [hideTransitionOptions]="'500ms'"
+[enableService]="false" [closable]="true">
+<ng-template pTemplate>
+    <div class="ml-1">
+        <i class="pi pi-sun" style="color: rgb(255, 196, 0);font-size: 1.5rem"></i>
+
+        You are eligible to subscribe to our limited plan for 14 days and #{{numOfUsers}} users. For
+        assistance with
+        the upgrade, please feel
+        free to {{info}}.
+
+    </div>
+</ng-template>
+</p-messages> -->
+            <div class="grid">
+                <div class="col-12">
+                    <div class="grid formgrid p-fluid">
+                        <!-- First Name -->
+                        <div class="field mb-4 col-12 md:col-6">
+                            <label for="firstname" class="font-medium text-900">{{
+                                'auth.register.fields.firstName' | translate
+                                }}</label>
+                            <input id="firstname" type="text" pInputText formControlName="firstname"
+                                placeholder="{{ 'auth.register.fields.firstName' | translate }}" [ngClass]="{
+                                'is-invalid':
+                                    registerForm.controls['firstname'].invalid &&
+                                    (registerForm.controls['firstname'].dirty ||
+                                        registerForm.controls['firstname'].touched),
+                                'is-valid': registerForm.controls['firstname'].valid
+                            }" />
+                            <ng-container *ngIf="
+                                registerForm.controls['firstname'].invalid &&
+                                (registerForm.controls['firstname'].dirty ||
+                                    registerForm.controls['firstname'].touched)
+                            ">
+                                <div *ngIf="registerForm.controls['firstname'].errors?.['required']" class="p-error">
+                                    {{ 'auth.register.validations.firstName' | translate }}
+                                </div>
+                                <div *ngIf="registerForm.controls['firstname'].errors?.['minlength']" class="p-error">
+                                    {{ 'auth.register.validations.firstNameMinLength' | translate }}
+                                </div>
+                                <div *ngIf="registerForm.controls['firstname'].errors?.['maxlength']" class="p-error">
+                                    {{ 'auth.register.validations.firstNameMaxLength' | translate }}
+                                </div>
+                            </ng-container>
+                        </div>
+
+                        <!-- Last Name -->
+                        <div class="field mb-4 col-12 md:col-6">
+                            <label for="lastname" class="font-medium text-900">{{
+                                'auth.register.fields.lastName' | translate
+                                }}</label>
+                            <input id="lastname" type="text" pInputText formControlName="lastname"
+                                placeholder="{{ 'auth.register.fields.lastName' | translate }}" [ngClass]="{
+                                'is-invalid':
+                                    registerForm.controls['lastname'].invalid &&
+                                    (registerForm.controls['lastname'].dirty ||
+                                        registerForm.controls['lastname'].touched),
+                                'is-valid': registerForm.controls['lastname'].valid
+                            }" />
+                            <ng-container *ngIf="
+                                registerForm.controls['lastname'].invalid &&
+                                (registerForm.controls['lastname'].dirty ||
+                                    registerForm.controls['lastname'].touched)
+                            ">
+                                <div *ngIf="registerForm.controls['lastname'].errors?.['required']" class="p-error">
+                                    {{ 'auth.register.validations.lastName' | translate }}
+                                </div>
+                                <div *ngIf="registerForm.controls['lastname'].errors?.['minlength']" class="p-error">
+                                    {{ 'auth.register.validations.lastNameMinLength' | translate }}
+                                </div>
+                                <div *ngIf="registerForm.controls['lastname'].errors?.['maxlength']" class="p-error">
+                                    {{ 'auth.register.validations.lastNameMaxLength' | translate }}
+                                </div>
+                            </ng-container>
+                        </div>
+
+                        <!-- Company Name -->
+                        <div class="field mb-4 col-12 md:col-6">
+                            <label for="companyname" class="font-medium text-900">{{
+                                'auth.register.fields.companyname' | translate
+                                }}</label>
+                            <input id="companyname" type="text" pInputText formControlName="companyname"
+                                placeholder="{{ 'auth.register.fields.companyname' | translate }}" [ngClass]="{
+                                'is-invalid':
+                                    registerForm.controls['companyname'].invalid &&
+                                    (registerForm.controls['companyname'].dirty ||
+                                        registerForm.controls['companyname'].touched),
+                                'is-valid': registerForm.controls['companyname'].valid
+                            }" />
+                            <ng-container *ngIf="
+                                registerForm.controls['companyname'].invalid &&
+                                (registerForm.controls['companyname'].dirty ||
+                                    registerForm.controls['companyname'].touched)
+                            ">
+                                <div *ngIf="registerForm.controls['companyname'].errors?.['required']" class="p-error">
+                                    {{ 'auth.register.validations.companyname' | translate }}
+                                </div>
+                                <div *ngIf="registerForm.controls['companyname'].errors?.['minlength']" class="p-error">
+                                    {{ 'auth.register.validations.companynameMinLength' | translate }}
+                                </div>
+                                <div *ngIf="registerForm.controls['companyname'].errors?.['maxlength']" class="p-error">
+                                    {{ 'auth.register.validations.companynameMaxLength' | translate }}
+                                </div>
+                            </ng-container>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="field mb-4 col-12 md:col-6">
+                            <label for="email" class="font-medium text-900">Business Email</label>
+                            <input id="email" type="text" pInputText formControlName="email"
+                                placeholder="{{ 'auth.register.fields.email' | translate }}" [ngClass]="{
+                                'is-invalid':
+                                    registerForm.controls['email'].invalid &&
+                                    (registerForm.controls['email'].dirty ||
+                                        registerForm.controls['email'].touched),
+                                'is-valid': registerForm.controls['email'].valid
+                            }" />
+                            <ng-container *ngIf="
+                                registerForm.controls['email'].invalid &&
+                                (registerForm.controls['email'].dirty ||
+                                    registerForm.controls['email'].touched)
+                            ">
+                                <div *ngIf="registerForm.controls['email'].errors?.['required']" class="p-error">
+                                    {{ 'auth.register.validations.email' | translate }}
+                                </div>
+                                <div *ngIf="registerForm.controls['email'].errors?.['email']" class="p-error">
+                                    {{ 'auth.register.validations.emailTaken' | translate }}
+                                </div>
+                                <div *ngIf="registerForm.controls['email'].errors?.['companyEmail']" class="p-error">
+                                    {{ 'auth.register.validations.companyEmail' | translate }}
+                                </div>
+                            </ng-container>
+                        </div>
+
+                        <!-- Language -->
+                        <div class="field mb-4 col-12 md:col-6">
+                            <label for="language" class="font-medium text-900">{{
+                                'auth.register.fields.language' | translate
+                                }}</label>
+                            <p-dropdown id="language" [options]="activeLanguages" optionLabel="name" optionValue="id"
+                                [filter]="true" formControlName="language"
+                                placeholder="{{ 'auth.register.placeholders.language' | translate }}" [ngClass]="{
+                                'is-invalid':
+                                    registerForm.controls['language'].invalid &&
+                                    (registerForm.controls['language'].dirty ||
+                                        registerForm.controls['language'].touched),
+                                'is-valid': registerForm.controls['language'].valid
+                            }"></p-dropdown>
+                            <ng-container *ngIf="
+                                registerForm.controls['language'].invalid &&
+                                (registerForm.controls['language'].dirty ||
+                                    registerForm.controls['language'].touched)
+                            ">
+                                <div *ngIf="registerForm.controls['language'].errors?.['required']" class="p-error">
+                                    {{ 'auth.register.validations.language' | translate }}
+                                </div>
+                            </ng-container>
+                        </div>
+
+                        <!-- Phone -->
+
+                        <div class="field mb-4 col-12 md:col-6">
+                            <label for="phone" class="font-medium text-900">{{
+                                'auth.register.fields.phone' | translate
+                                }}</label>
+
+                            <input formControlName="phone" type="text" pInputText />
+                        </div>
+                        <ng-container *ngIf="
+                        registerForm.controls['phone'].invalid &&
+                        (registerForm.controls['phone'].dirty ||
+                            registerForm.controls['phone'].touched)
+                    ">
+                            <div *ngIf="registerForm.controls['phone'].errors?.['required']" class="p-error">
+                                {{ 'auth.register.validations.phone' | translate }}
+                            </div>
+                        </ng-container>
+
+                        <!-- <div class="field mb-4 col-12 md:col-6">
+                            <label for="phone" class="font-medium text-900">{{
+                                'auth.register.fields.phone' | translate
+                                }}</label>
+                            <div class="p-fluid">
+                                <ngx-intl-tel-input class="p-inputtext w-full telInput"
+                                    style="display: block; padding: 0px !important; border: 1px solid"
+                                    [preferredCountries]="[
+                                    CountryISO.UnitedStates,
+                                    CountryISO.UnitedKingdom
+                                ]" [enableAutoCountrySelect]="false" [enablePlaceholder]="true"
+                                    [searchCountryFlag]="true" [searchCountryField]="[
+                                    SearchCountryField.Iso2,
+                                    SearchCountryField.Name
+                                ]" [selectFirstCountry]="false" [selectedCountryISO]="CountryISO.UnitedStates"
+                                    [maxLength]="15" [separateDialCode]="true" [phoneValidation]="true" name="phone"
+                                    formControlName="phone">
+                                </ngx-intl-tel-input>
+                            </div>
+
+                            <ng-container *ngIf="
+                                registerForm.controls['phone'].invalid &&
+                                (registerForm.controls['phone'].dirty ||
+                                    registerForm.controls['phone'].touched)
+                            ">
+                                <div *ngIf="registerForm.controls['phone'].errors?.['required']" class="p-error">
+                                    {{ 'auth.register.validations.phone' | translate }}
+                                </div>
+                            </ng-container>
+                        </div> -->
+
+                        <!-- Country -->
+                        <div class="field mb-4 col-12 md:col-6">
+                            <label for="country" class="font-medium text-900">{{
+                                'auth.register.fields.country' | translate
+                                }}</label>
+                            <p-dropdown id="country" [options]="countriesList" optionLabel="name" optionValue="code"
+                                [filter]="true" formControlName="country"
+                                placeholder="{{ 'auth.register.placeholders.country' | translate }}" [ngClass]="{
+                                'is-invalid':
+                                    registerForm.controls['country'].invalid &&
+                                    (registerForm.controls['country'].dirty ||
+                                        registerForm.controls['country'].touched),
+                                'is-valid': registerForm.controls['country'].valid
+                            }"></p-dropdown>
+                            <ng-container *ngIf="
+                                registerForm.controls['country'].invalid &&
+                                (registerForm.controls['country'].dirty ||
+                                    registerForm.controls['country'].touched)
+                            ">
+                                <div *ngIf="registerForm.controls['country'].errors?.['required']" class="p-error">
+                                    {{ 'auth.register.validations.country' | translate }}
+                                </div>
+                            </ng-container>
+                        </div>
+
+                        <!-- No. of users -->
+                        <div class="field mb-4 col-12 md:col-6">
+                            <label for="requestUserCount" class="font-medium text-900">Number of Employees
+                            </label>
+                            <input formControlName="requestUserCount" type="text" pInputText [value]="numOfUsers" />
+                        </div>
+
+
+                        <!-- Agree to terms -->
+                        <div class="field-checkbox mb-4 col-12 md:col-6 mt-2">
+                            <!-- <input id="agree" type="checkbox" formControlName="agree"> -->
+                            <p-checkbox formControlName="agree" [disabled]="true" [binary]="true"
+                                label="{{ 'auth.register.termsAndConditions' | translate }}"></p-checkbox>
+                            <!-- <label for="agree" class="font-medium text-900">{{ 'auth.register.termsAndConditions' |translate}}</label> -->
+                        </div>
+
+                        <div class="col-12">
+                            <!-- <button type="submit" pButton pRipple [disabled]="registerForm.invalid"> -->
+                            <button type="submit" pButton pRipple>
+                                <ng-container *ngIf="isLoading$ | async">
+                                    <div class="m-auto">
+                                        <span class="indicator-progress" [style.display]="'block'">
+                                            {{ 'auth.register.pleaseWait' | translate }}
+                                            <i class="pi pi-spin pi-spinner" style="font-size: 1rem"></i>
+                                        </span>
+                                    </div>
+                                </ng-container>
+                                <ng-container *ngIf="(isLoading$ | async) === false">
+                                    <div class="m-auto">
+                                        <span class="indicator-label">Request</span>
+                                    </div>
+                                </ng-container>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <div class="flex flex-wrap justify-content-between">
+            <button pButton pRipple icon="pi pi-times" label="Cancel" (click)="close()"></button>
+        </div>
+    </ng-template>
+</p-dialog>

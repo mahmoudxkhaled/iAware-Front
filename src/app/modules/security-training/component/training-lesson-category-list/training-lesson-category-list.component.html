@@ -1,0 +1,338 @@
+<div class="card">
+    <p-toast></p-toast>
+
+    <div class="iAware-loading-table-container" style="position: relative">
+        <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+
+        <p-table
+            #dt
+            [value]="trainingLessonCategories"
+            dataKey="name"
+            [expandedRowKeys]="expandedRows"
+            [scrollable]="false"
+            [paginator]="true"
+            [rows]="pagination.size"
+            [lazy]="true"
+            [totalRecords]="totalRecords"
+            (onLazyLoad)="onLazyLoad($event)"
+            [rowsPerPageOptions]="[9, 25, 50]"
+            styleClass="p-datatable-striped"
+            [globalFilterFields]="['name']">
+            <ng-template pTemplate="caption">
+                <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                    <h5 class="m-0">Manage Training Categories</h5>
+                    <button
+                        pButton
+                        icon="pi pi-fw {{ isExpanded ? 'pi-minus' : 'pi-plus' }}"
+                        label="{{ isExpanded ? 'Collapse All' : 'Expand All' }}"
+                        (click)="expandAll()"></button>
+
+                    <button
+                        *ngIf="hasPermission(actions.add)"
+                        pButton
+                        pRipple
+                        label="Add New Category"
+                        icon="pi pi-plus"
+                        class="p-button-success mr-2"
+                        (click)="addNewCat()"></button>
+                    <span class="block mt-2 md:mt-0 p-input-icon-left">
+                        <i class="pi pi-search"></i>
+                        <input
+                            pInputText
+                            type="text"
+                            (input)="onGlobalFilter(dt, $event)"
+                            placeholder="Search..."
+                            class="w-full sm:w-auto" />
+                    </span>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="header">
+                <tr>
+                    <th style="width: 3rem"></th>
+                    <th pSortableColumn="name">
+                        Name <p-sortIcon field="name"></p-sortIcon
+                        ><p-columnFilter type="text" field="name" display="menu"></p-columnFilter>
+                    </th>
+                    <!-- <th pSortableColumn="description">Description <p-sortIcon field="description"></p-sortIcon></th>
+                    <th style="text-align: center;">Image </th>
+                    <th style="text-align: center;">Banner </th> -->
+                    <th style="text-align: center" pSortableColumn="lessonsCount">
+                        Lessons Count <p-sortIcon field="name"></p-sortIcon>
+                    </th>
+                    <!-- <th style="text-align: center;">Status </th> -->
+                    <th colspan="2" style="text-align: center">Actions</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-cat let-expanded="expanded">
+                <tr>
+                    <td>
+                        <button
+                            type="button"
+                            pButton
+                            pRipple
+                            [pRowToggler]="cat"
+                            class="p-button-text p-button-rounded p-button-plain"
+                            [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+                    </td>
+                    <!-- <td><a [routerLink]="['/Security-Training/catLangs', cat.id]">{{ cat.name }}</a></td> -->
+                    <td style="cursor: pointer">
+                        <a (click)="openCatLangs(cat.id)">{{ cat.name }}</a>
+                    </td>
+
+                    <!-- <td style="min-width: 7rem;">{{cat.description}}</td>
+                    <td style="text-align: center;"> <p-image [src]="cat.trainingCategoryImageUrl" alt="Image"
+                            width="100" height="100" [preview]="true" /> </td>
+                    <td style="text-align: center;"> <p-image [src]="cat.trainingCategoryBannerImageUrl" alt="Image"
+                            width="200" height="100" [preview]="true" /> </td> -->
+                    <td style="text-align: center">{{ cat.lessonsCount }}</td>
+                    <!-- <td style="text-align: center;">
+                        <p-inputSwitch *ngIf="hasPermission(actions.active)" [ngModel]="cat.isActive"
+                            (onChange)="switchActivation(cat)" />
+                    </td> -->
+                    <td style="text-align: center">
+                        <button
+                            *ngIf="hasPermission(actions.edit)"
+                            pButton
+                            pRipple
+                            icon="pi pi-pencil"
+                            class="p-button-rounded p-button-success mr-2"
+                            (click)="openCatLangs(cat.id)"></button>
+                    </td>
+                    <td style="text-align: center">
+                        <button
+                            *ngIf="hasPermission(actions.delete)"
+                            pButton
+                            pRipple
+                            icon="pi pi-trash"
+                            class="p-button-rounded p-button-danger"
+                            (click)="deleteTrainingLessonCategory(cat)"></button>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="rowexpansion" let-cat>
+                <tr>
+                    <td colspan="7">
+                        <div class="p-3">
+                            <p-table [value]="cat.lessons" dataKey="id">
+                                <ng-template pTemplate="header">
+                                    <tr>
+                                        <th style="width: 4rem"></th>
+
+                                        <th pSortableColumn="name">Name <p-sortIcon field="name"></p-sortIcon></th>
+                                        <th style="width: 4rem"></th>
+                                    </tr>
+                                </ng-template>
+                                <ng-template pTemplate="body" let-training>
+                                    <tr>
+                                        <td style="width: 4rem"></td>
+
+                                        <td>
+                                            <a [routerLink]="['/Security-Training', training.id]">{{
+                                                training.name
+                                            }}</a>
+                                        </td>
+                                        <td>
+                                            <a [routerLink]="['/Security-Training', training.id]">
+                                                <p-button type="button" icon="pi pi-search"></p-button>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </ng-template>
+                                <ng-template pTemplate="emptymessage">
+                                    <tr>
+                                        <td colspan="6">There are no order for this product yet.</td>
+                                    </tr>
+                                </ng-template>
+                            </p-table>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+
+<p-dialog
+    [(visible)]="trainingLessonCategoryDialog"
+    [style]="{ width: '800px', heigth: '900px' }"
+    header="Add Training Lesson"
+    [modal]="true"
+    class="p-fluid">
+    <ng-template pTemplate="content">
+        <span class="p-float-label">
+            <p-dropdown
+                [options]="defaultLanguage"
+                optionLabel="name"
+                optionValue="id"
+                placeholder="{{ 'phishing-category.phishing-category-language-list.languagePlaceholder' | translate }}">
+            </p-dropdown>
+        </span>
+
+        <div class="field">
+            <label for="name">Name</label>
+            <input
+                type="text"
+                pInputText
+                id="name"
+                [(ngModel)]="trainingLessonCategory.name"
+                required
+                autofocus
+                [ngClass]="{ 'ng-invalid ng-dirty': submitted && !trainingLessonCategory.name }" />
+            <small *ngIf="submitted && !trainingLessonCategory.name" class="text-red-500">Name is required.</small>
+        </div>
+
+        <div class="field">
+            <label for="description">Description</label>
+            <textarea
+                id="description"
+                [(ngModel)]="trainingLessonCategory.description"
+                pInputTextarea
+                required
+                [ngClass]="{ 'ng-invalid ng-dirty': submitted && !trainingLessonCategory.description }"
+                rows="3"
+                cols="20"></textarea>
+            <small *ngIf="submitted && !trainingLessonCategory.description" class="text-red-500"
+                >Description is required.</small
+            >
+        </div>
+
+        <div class="flex justify-content-center flex-wrap">
+            <div class="md:col-6">
+                <p-panel header="Category Image" class="mb-3">
+                    <div class="flex align-items-center justify-content-center">
+                        <img
+                            [src]="imageUrl1"
+                            alt="Avatar"
+                            class="avatar"
+                            style="width: 100%; max-width: 150px; border-radius: 8px; border: 1px solid #ccc"
+                            (click)="onUploadCategoryImageClick()" />
+                    </div>
+
+                                               <!-- Recommended Dimensions -->
+                                               <small class="text-center block m-2">{{ 'shared.messages.recommendedDimensions' | translate}} <strong>{{ 'shared.messages.800x449' | translate}}</strong> {{ 'shared.messages.pixels' | translate}}</small>
+
+                    <div class="flex align-items-center justify-content-center mt-2" style="display: none">
+                        <p-button label="Upload" icon="pi pi-upload" (click)="onUploadCategoryImageClick()"></p-button>
+                        <input
+                            type="file"
+                            id="myBackgroundImage"
+                            style="display: none"
+                            (change)="onCategoryImageSelected($event)" />
+                    </div>
+                </p-panel>
+            </div>
+
+            <!-- <div class="md:col-6 flex flex-column">
+                <div class="flex align-items-center justify-content-center">
+                    <img [src]="imageUrl2" alt="Avatar" class="avatar1" style="cursor: pointer"
+                        (click)="onUploadCategoryBannerImageClick()" />
+                </div>
+                <label class="flex justify-content-center">Banner Image 1200 x 200</label>
+
+                <div class="flex align-items-center justify-content-center mt-2" style="display: none">
+                    <p-button label="Upload" icon="pi pi-upload"
+                        (click)="onUploadCategoryBannerImageClick()"></p-button>
+                    <input type="file" id="myBackgroundBannerImage" style="display: none"
+                        (change)="onCategoryBannerImageSelected($event)" />
+                </div>
+            </div> -->
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button
+            pButton
+            pRipple
+            label="Cancel"
+            icon="pi pi-times"
+            class="p-button-text"
+            (click)="declineTrainingLessonCategory()"></button>
+        <button
+            pButton
+            pRipple
+            label="Save"
+            icon="pi pi-check"
+            class="p-button-text"
+            (click)="saveTrainingLessonCategory()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog
+    [(visible)]="deletionTrainingLessonCategoryDialog"
+    header="Delete Training Lesson"
+    [modal]="true"
+    [style]="{ width: '450px' }">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="trainingLessonCategory"
+            >Are you sure you want to delete <b>{{ trainingLessonCategory.name }}</b> ?</span
+        >
+    </div>
+    <ng-template pTemplate="footer">
+        <button
+            pButton
+            pRipple
+            icon="pi pi-times"
+            class="p-button-text"
+            label="No"
+            (click)="declineDeletion()"></button>
+        <button
+            pButton
+            pRipple
+            icon="pi pi-check"
+            class="p-button-text"
+            label="Yes"
+            (click)="confirmDeletion()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog
+    [(visible)]="switchActivationTrainingLessonCategoryDialog"
+    header="Activation Training Lesson"
+    [modal]="true"
+    [style]="{ width: '450px' }">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="trainingLessonCategory">
+            Are you sure you want to
+            <span style="color: red">{{ trainingLessonCategory.isActive ? 'Deactivate ' : 'Activate ' }}</span>
+            <b>{{ trainingLessonCategory.name }}</b
+            >?
+        </span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button
+            pButton
+            pRipple
+            icon="pi pi-times"
+            class="p-button-text"
+            label="No"
+            (click)="declineCatActivation()"></button>
+        <button
+            pButton
+            pRipple
+            icon="pi pi-check"
+            class="p-button-text"
+            label="Yes"
+            (click)="confirmtActivation()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog
+    [(visible)]="openTrainingLessonCategoryLanguagesDialog"
+    header="Training Category Languages"
+    [modal]="true"
+    [style]="{ width: '80%', height: '80vh' }">
+    <div *ngIf="selectedCategoryId">
+        <app-training-category-langs [trainigLessonCategoryId]="selectedCategoryId"></app-training-category-langs>
+    </div>
+    <ng-template pTemplate="footer">
+        <button
+            pButton
+            pRipple
+            icon="pi pi-times"
+            class="p-button-text"
+            label="Close"
+            (click)="closeTrainingCatLangsDialog()"></button>
+    </ng-template>
+</p-dialog>

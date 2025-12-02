@@ -1,0 +1,155 @@
+<div class="card">
+    <p-toast></p-toast>
+    <p-dataView #dv [value]="libraryBackgrounds" [paginator]="true" [rows]="12" layout="grid">
+        <ng-template pTemplate="header">
+            <div class="flex flex-column md:flex-row md:justify-content-between gap-2">
+                <h5>Background Library</h5>
+                <button *ngIf="hasPermission(actions.add)" pButton pRipple label="Add" icon="pi pi-plus"
+                    class="p-button mr-2" (click)="CreateLibraryBackground()"></button>
+            </div>
+        </ng-template>
+        <ng-template let-cats pTemplate="gridItem">
+            <div class="grid grid-nogutter">
+                <div class="col-12 md:col-3" *ngFor="let cat of cats">
+                    <div class="m-3" #img>
+                        <div class=" mb-3">
+                            <div class="flex flex-wrap justify-content-center">
+                                <img [src]="cat.backgroundImageUrl" class=" shadow-2 my-3 mx-0"
+                                    style="width: 200px; height: 200px; cursor: pointer;" />
+                                <button *ngIf="menuItems.length > 0" pButton pRipple type="button"
+                                    icon="pi pi-ellipsis-v" class="p-button-rounded p-button-text p-button-plain  "
+                                    (click)="menu.toggle($event); assigneCurrentSelect(cat)"></button>
+                                <p-menu #menu [model]="menuItems" [appendTo]="dv" [popup]="true"></p-menu>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+        <ng-template let-cats pTemplate="listItem">
+            <div class="grid grid-nogutter">
+                <div class="col-12">
+                    <p-table #dt [value]="libraryBackgrounds" [rows]="10" [showCurrentPageReport]="true"
+                        responsiveLayout="scroll">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th style="width: 25%" class="text-2xl font-bold"> Image</th>
+                                <th style="width: 25%" class="text-2xl font-bold"> Status</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-bg>
+                            <tr>
+                                <td style="cursor: pointer;">
+                                    <p-image [src]="bg.backgroundImageUrl" width='50' height='50' [preview]="true"
+                                        class="my-4 md:my-0 w-9  w-10rem shadow-2 mr-5"></p-image>
+                                </td>
+                                <td style="cursor: pointer;" class="text-1xl font-bold"> </td>
+                                <td> <p-inputSwitch *ngIf="hasPermission(actions.active)" [ngModel]="bg.isActive"
+                                        (onChange)="switchActivation(bg)"></p-inputSwitch></td>
+                                <td>
+                                    <div class="text-right">
+                                        <button *ngIf="menuItems.length > 0" pButton pRipple type="button"
+                                            icon="pi pi-ellipsis-v"
+                                            class="p-button-rounded p-button-text p-button-plain ml-3"
+                                            (click)="menu.toggle($event); assigneCurrentSelect(bg)"></button>
+                                        <p-menu #menu [model]="menuItems" [appendTo]="dv" [popup]="true"></p-menu>
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </div>
+        </ng-template>
+    </p-dataView>
+</div>
+
+<p-dialog [(visible)]="addLibraryBackgroundDialog" [style]="{width: '800px', heigth:'900px'}"
+    header="Add New Background" [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <form [formGroup]="addLibraryBackgroundForm" (ngSubmit)="saveAddLibraryBackground()">
+            <div class="flex justify-content-center flex-wrap">
+                <div class="md:col-6 flex flex-column">
+                    <div class="flex align-items-center justify-content-center">
+                        <img [src]="imageUrl1" alt="Avatar" class="avatar" style="cursor: pointer;"
+                            (click)="onUploadBackgroundImageClick()">
+                    </div>
+                    <label class="flex justify-content-center">Background Image</label>
+                    <div class="flex align-items-center justify-content-center mt-2" style="display: none;">
+                        <p-button label="Upload" icon="pi pi-upload"
+                            (click)="onUploadBackgroundImageClick()"></p-button>
+                        <input type="file" id="myBackgroundImage" style="display: none;"
+                            (change)="onBackgroundImageSelected($event)">
+                    </div>
+                </div>
+            </div>
+        </form>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text"
+            (click)="declineAddLibraryBackgroundDialog()"></button>
+        <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text"
+            (click)="saveAddLibraryBackground()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="deletionLibraryBackgroundDialog" header="Delete Background Image" [modal]="true"
+    [style]="{width:'450px'}">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="libraryBackground">Are you sure you want to delete the background?
+        </span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No"
+            (click)="declineDeletion()"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Yes"
+            (click)="confirmDeletion()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="editLibraryBackgroundDialog" [style]="{width: '500px', heigth:'900px'}"
+    header="Edit Background Image" [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <form [formGroup]="editLibraryBackgroundForm" (ngSubmit)="saveEditLibraryBackground()">
+            <div class="flex justify-content-center flex-wrap">
+                <div class="md:col-6 flex flex-column">
+                    <div class="flex align-items-center justify-content-center">
+                        <img [src]="imageUrl1" alt="Avatar" class="avatar" style="cursor: pointer;"
+                            (click)="onUploadBackgroundImageClick()">
+                    </div>
+                    <label class="flex justify-content-center">Background Image</label>
+                    <div class="flex align-items-center justify-content-center mt-2" style="display: none;">
+                        <p-button label="Upload" icon="pi pi-upload"
+                            (click)="onUploadBackgroundImageClick()"></p-button>
+                        <input type="file" id="myBackgroundImage" style="display: none;"
+                            (change)="onBackgroundImageSelected($event)">
+                    </div>
+                </div>
+            </div>
+        </form>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text"
+            (click)="declineEditLibraryBackground()"></button>
+        <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text"
+            (click)="saveEditLibraryBackground()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="switchActivationLibraryBackgroundDialog" header="Activation Training Lesson" [modal]="true"
+    [style]="{width:'450px'}">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="libraryBackground">
+            Are you sure you want to <span style=color:red>{{ libraryBackground.isActive ? 'Deactivate ' :
+                'Activate ' }}</span>
+        </span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No"
+            (click)="declineActivation()"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Yes"
+            (click)="confirmtActivation()"></button>
+    </ng-template>
+</p-dialog>

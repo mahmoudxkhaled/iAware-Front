@@ -1,0 +1,79 @@
+<div class="card">
+    <p-toast></p-toast>
+    <form [formGroup]="form" (ngSubmit)="saveSettings()">
+        <div class="col-12 md:flex md:justify-content-between">
+            <div class="col-12 md:col-6">
+                <h5 class="font-medium text-900 text-xl font-bold">{{'account.profile-details.title' | translate}}:</h5>
+                <div class="p-fluid p-formgrid grid">
+                    <div class="field col-12">
+                        <label class="font-medium text-900 " htmlFor="company">
+                            <i class="pi pi-building" style="font-size: 0.9rem;"></i>
+                            {{'account.profile-details.companyName' | translate}}
+                        </label>
+                        <input (input)="trimAndUpdateField('companyName')" pInputText id="company" type="text" formControlName="companyName" />
+
+                        <div *ngIf="companyName?.invalid && (companyName?.dirty || companyName?.touched)" class="p-error">
+                            <span *ngIf="companyName?.errors?.['required']">
+                                {{ 'account.profile-details.companyNameValidation' | translate }}
+                            </span>
+                            <span *ngIf="companyName?.errors?.['minlength']">
+                                {{ 'account.profile-details.minLengthValidation' | translate }}
+                            </span>
+                            <span *ngIf="companyName?.errors?.['maxlength']">
+                                {{ 'account.profile-details.maxLengthValidation' | translate }}
+                            </span>
+                            <span *ngIf="companyName?.errors?.['pattern']">
+                                {{ 'account.profile-details.onlyLettersValidation' | translate }}
+                            </span>
+                        </div>
+                    </div>
+                    <!-- <div class="field col-12">
+                        <label class="font-medium text-900 " htmlFor="country">
+                            <i class="pi pi-globe" style="font-size: 0.9rem;"></i>
+                            {{'account.profile-details.country' | translate}}
+                        </label>
+                        <p-dropdown [options]="countriesList" optionLabel="name" optionValue="code"
+                            formControlName="country" [filter]="true"></p-dropdown>
+                    </div> -->
+                    <div class="field col-12">
+                        <label class="font-medium text-900 " htmlFor="language">
+                            <i class="pi pi-language" style="font-size: 0.9rem;"></i>
+                            {{'account.profile-details.language' | translate}}
+                        </label>
+                        <p-dropdown [options]="languagesList" optionLabel="name" optionValue="id"
+                            formControlName="language" [filter]="true"></p-dropdown>
+                    </div>
+                    <div class="field col-12">
+                        <label class="font-medium text-900 " htmlFor="timeZone">
+                            <i class="pi pi-calendar-times" style="font-size: 0.9rem;"></i>
+                            {{'account.profile-details.timeZone' | translate}}
+                        </label>
+                        <p-dropdown [options]="timeZonesList" optionLabel="name" optionValue="id"
+                            formControlName="timeZone" [filter]="true"></p-dropdown>
+                    </div>
+                    <div class="col-12">
+                        <button pButton pRipple label="{{'shared.actions.saveChanges' | translate}}" class="w-auto mt-3"
+                            type="submit" [disabled]="!form.valid"></button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 md:col-6 flex flex-column align-items-center  justify-content-start ">
+                <div>
+                    <div class="logo-container">
+                        <img [src]="companyLogoeUrl" alt="Company Logo" class="avatar" (click)="onUploadClick()">
+                    </div>
+                    <div class="flex align-items-center justify-content-center mt-3">
+                        <p-button (click)="onUploadClick()" label="Upload Logo"></p-button>
+                    </div>
+                    <input #uploadLogo type="file" id="companyLogoeUrl" style="display: none;"
+                        (change)="onFileSelected($event)" accept="image/jpeg, image/png, image/webp">
+                    <small class="text-center block m-2">{{ 'shared.messages.recommendedDimensions' | translate}}
+                        <strong>{{ 'shared.messages.314x91' | translate}}</strong> {{ 'shared.messages.pixels' |
+                        translate}}</small>
+                    <p *ngIf="fileError" class="error-message">{{ fileError }}</p>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>

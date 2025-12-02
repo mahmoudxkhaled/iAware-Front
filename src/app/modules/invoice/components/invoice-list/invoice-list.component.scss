@@ -1,0 +1,31 @@
+.avatar {
+    vertical-align: middle;
+    width: 205px;
+    height: 255px;
+    border: 1px solid black;
+}
+
+input[type='file'] {
+    display: none;
+}
+
+/* Scale up the checkbox */
+.custom-checkbox .p-checkbox-box {
+    width: 25px;
+    height: 25px;
+    font-size: 200px; /* This scales the checkmark */
+}
+
+/* Scale up the checkbox icon */
+.custom-checkbox .p-checkbox-box .p-checkbox-icon {
+    font-size: 20px; /* Increase the size of the checkmark */
+}
+
+:host ::ng-deep .is-confirmed {
+    background-color: #d4edda !important;
+}
+
+.order-badge.order-pending {
+    background: #feedaf;
+    color: #8a5340;
+}

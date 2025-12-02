@@ -1,0 +1,279 @@
+<div *ngIf="currentPage !== 'finalStep'" class="page-content bg-primary-reverse bg-primary-50">
+    <div class="px-4 py-8 md:px-6 lg:px-8">
+        <div class="text-900 font-bold text-6xl mb-4 text-center">Invoice</div>
+
+        <div class="grid">
+            <div class="col-12">
+                <!-- Invoice Details Card -->
+                <div class="invoice-card">
+                    <div class="card">
+                        <p-toast></p-toast>
+                        <p-table #dt [value]="generatedInvoice" responsiveLayout="scroll" [rows]="10"
+                            styleClass="p-datatable-striped">
+                            <ng-template pTemplate="caption">
+                                <div
+                                    class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                                    <h5 class="m-0">Invoice</h5>
+                                </div>
+                            </ng-template>
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th>Subscription Plan</th>
+                                    <th class="text-center">User Count</th>
+                                    <th class="text-center">Price/User</th>
+                                    <th class="text-center">Total Amount</th>
+                                    <th class="text-center">Payments</th>
+                                    <th class="text-center">Amount Due</th>
+                                </tr>
+                            </ng-template>
+
+                            <ng-template pTemplate="body" let-invoice>
+                                <tr>
+                                    <td>{{ invoice.subscriptionPlanName }}</td>
+                                    <td class="text-center">
+                                        {{ invoice.userCount }} <i class="pi pi-user"></i>
+                                    </td>
+                                    <td class="text-center">{{ invoice.userPrice | currency }}</td>
+                                    <td class="text-center">{{ invoice.totalAmount | currency }}</td>
+                                    <td class="text-center">{{ invoice.totalPayments | currency }}</td>
+                                    <td class="text-center">{{ invoice.remainingAmount | currency }}</td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </div>
+
+                    <div class="ng-star-inserted">
+                        <div class="px-4 py-8 md:px-6 lg:px-8">
+                            <div class="text-900 text-xl font-medium mb-3 text-center">Payment Methods</div>
+                            <p class="text-700 mt-0 mb-4 text-center">
+                                Choose your preferred payment method from the options below. You can select Credit Card,
+                                PayPal, Wire Transfer, or Bitcoin. Your choice will determine how you will complete your
+                                payment.
+                            </p>
+
+                            <div class="grid">
+                                <!-- Credit Card -->
+                                <div class="col-12 lg:col-6 p-3"
+                                    (click)="selectPaymentMethod(PaymentTypeEnum.CreditCard)">
+                                    <div class="shadow-2 surface-card p-4 border-2 cursor-pointer"
+                                        [class.border-blue-500]="selectedPaymentMethod === PaymentTypeEnum.CreditCard"
+                                        style="border-radius: 10px">
+                                        <div class="flex align-items-center mb-4">
+                                            <div class="mr-3">
+                                                <span
+                                                    class="inline-flex justify-content-center align-items-center bg-indigo-100"
+                                                    style="border-radius: 4px; width: 45px; height: 45px">
+                                                    <i class="pi pi-credit-card text-2xl text-indigo-600"></i>
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span class="text-900 text-xl mb-2 font-medium">Credit Card</span>
+                                                <p class="m-0 text-600 font-medium text-sm">
+                                                    Pay securely using your Credit Card. Enjoy the convenience and
+                                                    safety of online payment with all major credit cards accepted.
+                                                </p>
+                                            </div>
+                                            <p-radioButton name="payment" class="p-element ml-auto"
+                                                [value]="PaymentTypeEnum.CreditCard"
+                                                [ngModel]="selectedPaymentMethod"></p-radioButton>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- PayPal -->
+                                <div class="col-12 lg:col-6 p-3" (click)="selectPaymentMethod(PaymentTypeEnum.PayPal)">
+                                    <div class="shadow-2 surface-card p-4 border-2 cursor-pointer"
+                                        [class.border-blue-500]="selectedPaymentMethod === PaymentTypeEnum.PayPal"
+                                        style="border-radius: 10px">
+                                        <div class="flex align-items-center mb-4">
+                                            <div class="mr-3">
+                                                <span
+                                                    class="inline-flex justify-content-center align-items-center bg-blue-100"
+                                                    style="border-radius: 4px; width: 45px; height: 45px">
+                                                    <img src="https://blocks.primeng.org/assets/images/blocks/logos/paypal.svg"
+                                                        style="height: 1.5rem" />
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span class="text-900 text-xl mb-2 font-medium">PayPal</span>
+                                                <p class="m-0 text-600 font-medium text-sm">
+                                                    Use PayPal for a quick and secure payment. Log in to your PayPal
+                                                    account to complete the transaction easily.
+                                                </p>
+                                            </div>
+                                            <p-radioButton name="payment" class="p-element ml-auto"
+                                                [value]="PaymentTypeEnum.PayPal"
+                                                [ngModel]="selectedPaymentMethod"></p-radioButton>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Transfer -->
+                                <div class="col-12 lg:col-6 p-3"
+                                    (click)="selectPaymentMethod(PaymentTypeEnum.Transfer)">
+                                    <div class="shadow-2 surface-card p-4 border-2 cursor-pointer"
+                                        [class.border-blue-500]="selectedPaymentMethod === PaymentTypeEnum.Transfer"
+                                        style="border-radius: 10px">
+                                        <div class="flex align-items-center mb-4">
+                                            <div class="mr-3">
+                                                <span
+                                                    class="inline-flex justify-content-center align-items-center bg-green-100"
+                                                    style="border-radius: 4px; width: 45px; height: 45px">
+                                                    <i class="pi pi-money-bill text-2xl text-green-600"></i>
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span class="text-900 text-xl mb-2 font-medium">Wire Transfer</span>
+                                                <p class="m-0 text-600 font-medium text-sm">
+                                                    Choose Wire Transfer to make a direct bank transfer. Follow the
+                                                    instructions provided to complete your payment securely.
+                                                </p>
+                                            </div>
+                                            <p-radioButton name="payment" class="p-element ml-auto"
+                                                [value]="PaymentTypeEnum.Transfer"
+                                                [ngModel]="selectedPaymentMethod"></p-radioButton>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- BitCoin -->
+                                <div class="col-12 lg:col-6 p-3" (click)="selectPaymentMethod(PaymentTypeEnum.BitCoin)">
+                                    <div class="shadow-2 surface-card p-4 border-2 cursor-pointer"
+                                        [class.border-blue-500]="selectedPaymentMethod === PaymentTypeEnum.BitCoin"
+                                        style="border-radius: 10px">
+                                        <div class="flex align-items-center mb-4">
+                                            <div class="mr-3">
+                                                <span
+                                                    class="inline-flex justify-content-center align-items-center bg-orange-100"
+                                                    style="border-radius: 4px; width: 45px; height: 45px">
+                                                    <img src="https://blocks.primeng.org/assets/images/blocks/logos/bitcoin.svg"
+                                                        style="height: 1.5rem" />
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span class="text-900 text-xl mb-2 font-medium">BitCoin</span>
+                                                <p class="m-0 text-600 font-medium text-sm">
+                                                    Pay with Bitcoin for a modern and innovative payment experience.
+                                                    Ensure you have a Bitcoin wallet set up for this method.
+                                                </p>
+                                            </div>
+                                            <p-radioButton name="payment" class="p-element ml-auto"
+                                                [value]="PaymentTypeEnum.BitCoin"
+                                                [ngModel]="selectedPaymentMethod"></p-radioButton>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Conditionally show the form -->
+                    <form class="coming-soonTransfer"
+                        *ngIf="selectedPaymentMethod !== null && selectedPaymentMethod == PaymentTypeEnum.Transfer"
+                        [formGroup]="addInvoicePaymentRequestForm" (ngSubmit)="saveAddInvoicePaymentRequest()">
+                        <div class="grid">
+                            <div class="col">
+                                <div class="p-3 border-round-sm font-bold">
+                                    <div class="field">
+                                        <label for="SubscriptionTenantInvoiceId">
+                                            Invoice Key : {{ currentInvoice }}</label>
+                                    </div>
+
+                                    <div class="field p-fluid">
+                                        <label for="RequestAmount"> Amount </label>
+                                        <p-inputNumber class="p-fluid" id="RequestAmount"
+                                            formControlName="RequestAmount"></p-inputNumber>
+                                    </div>
+
+                                    <div class="field">
+                                        <label for="RequestReferenceKey"> Request Reference Key </label>
+                                        <input type="text" pInputText id="RequestReferenceKey"
+                                            formControlName="RequestReferenceKey" required />
+                                    </div>
+
+                                    <div class="field">
+                                        <label for="RequestPaymentNote"> Request Payment Note </label>
+                                        <textarea id="RequestPaymentNote" pInputTextarea
+                                            formControlName="RequestPaymentNote" required rows="3" cols="20"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="text-center p-3 border-round-sm font-bold">
+                                    <div class="flex justify-content-center flex-wrap">
+                                        <div class="md:col-6 flex flex-column">
+                                            <div class="flex align-items-center justify-content-center">
+                                                <img [src]="imageUrl" alt="Avatar" class="avatar"
+                                                    style="cursor: pointer"
+                                                    (click)="onUploadPaymentReuqestImageClick()" />
+                                            </div>
+                                            <label class="flex justify-content-center">Payment Reuqest Image</label>
+                                            <div class="flex align-items-center justify-content-center mt-2"
+                                                style="display: none">
+                                                <p-button label="Upload" icon="pi pi-upload"
+                                                    (click)="onUploadPaymentReuqestImageClick()"></p-button>
+                                                <input type="file" id="PaymentReuqestImage" style="display: none"
+                                                    (change)="onPaymentReuqestImageSelected($event)" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <!-- <button type="submit" pButton pRipple [disabled]="registerForm.invalid"> -->
+                            <button type="submit" pButton pRipple>
+                                <ng-container *ngIf="(isLoading$ | async) === false">
+                                    <div class="m-auto">
+                                        <span class="indicator-label">Submit</span>
+                                    </div>
+                                </ng-container>
+                            </button>
+                        </div>
+                    </form>
+                    <div class="m-auto" style="width: 500px; height: 500px; margin: auto"
+                        *ngIf="selectedPaymentMethod !== null && selectedPaymentMethod == PaymentTypeEnum.BitCoin"
+                        class="coming-soon-container">
+                        <img src="assets/media/fe547d7e2f8ebf8722fdefd259f47e8d.jpg" alt="Coming Soon"
+                            class="coming-soon-image" />
+                    </div>
+
+                    <div class="m-auto" style="width: 500px; height: 500px; margin: auto"
+                        *ngIf="selectedPaymentMethod !== null && selectedPaymentMethod == PaymentTypeEnum.CreditCard"
+                        class="coming-soon-container">
+                        <img src="assets/media/fe547d7e2f8ebf8722fdefd259f47e8d.jpg" alt="Coming Soon"
+                            class="coming-soon-image" />
+                    </div>
+
+                    <div class="m-auto" style="width: 500px; height: 500px; margin: auto"
+                        *ngIf="selectedPaymentMethod !== null && selectedPaymentMethod == PaymentTypeEnum.PayPal"
+                        class="coming-soon-container">
+                        <img src="assets/media/fe547d7e2f8ebf8722fdefd259f47e8d.jpg" alt="Coming Soon"
+                            class="coming-soon-image" />
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+
+<div *ngIf="currentPage === 'finalStep'" class="page-content bg-primary-reverse bg-primary-50 final-step-page">
+    <div class="final-step-container">
+        <div class="text-900 font-bold text-6xl mb-4 text-center">Your Request Completed Successfully</div>
+
+        <div class="final-step-message-card">
+            <div class="final-step-message-icon">📧</div>
+            <div class="final-step-message">
+                You will receive an email within 48 hours once our accounting department completes their
+                verification. Please check your inbox for further updates.
+            </div>
+            <div class="m-4">
+                <p-button severity="info" label="Explore iAware"></p-button>
+            </div>
+        </div>
+    </div>
+</div>

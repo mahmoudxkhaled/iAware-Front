@@ -1,0 +1,129 @@
+<div class="card">
+    <span class="text-900 text-xl font-bold mb-4 block">Create Page</span>
+    <form #myForm="ngForm" (ngSubmit)="onSubmit(myForm)">
+        <div class="grid">
+            <div class="col-12">
+                <div class="grid formgrid p-fluid">
+                    <div class="field mb-4 col-12 md:col-6">
+                        <label for="pageNameEn" class="font-medium text-900">Page En-Name</label>
+                        <input
+                            id="pageNameEn"
+                            type="text"
+                            pInputText
+                            name="pageNameEn"
+                            #pageNameEn="ngModel"
+                            [(ngModel)]="pageModel.pageNameEn"
+                            required />
+                        <div *ngIf="myForm.submitted && myForm.invalid">
+                            <div *ngIf="pageNameEn.errors?.['required']" class="text-red-500">
+                                Page En-Name is required
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field mb-4 col-12 md:col-6">
+                        <label for="pageNameAr" class="font-medium text-900">Page Ar-Name</label>
+                        <input
+                            id="pageNameAr"
+                            type="text"
+                            pInputText
+                            name="pageNameAr"
+                            #pageNameAr="ngModel"
+                            [(ngModel)]="pageModel.pageNameAr"
+                            required />
+                        <div *ngIf="myForm.submitted && myForm.invalid">
+                            <div *ngIf="pageNameEn.errors?.['required']" class="text-red-500">
+                                Page Ar-Name is required
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field mb-4 col-12 md:col-6">
+                        <label for="applicationUrl" class="font-medium text-900">Application Url</label>
+                        <input
+                            id="applicationUrl"
+                            type="text"
+                            pInputText
+                            name="applicationUrl"
+                            #applicationUrl="ngModel"
+                            [(ngModel)]="pageModel.applicationUrl"
+                            required />
+                        <div *ngIf="myForm.submitted && myForm.invalid">
+                            <div *ngIf="applicationUrl.errors?.['required']" class="text-red-500">
+                                Application Url is required
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field mb-4 col-12 md:col-6">
+                        <label for="pageUrl" class="font-medium text-900">Page Url</label>
+                        <input
+                            id="pageUrl"
+                            type="text"
+                            pInputText
+                            name="pageUrl"
+                            #pageUrl="ngModel"
+                            [(ngModel)]="pageModel.pageUrl"
+                            required />
+                        <div *ngIf="myForm.submitted && myForm.invalid">
+                            <div *ngIf="pageUrl.errors?.['required']" class="text-red-500">Page Url is required</div>
+                        </div>
+                    </div>
+                    <div class="field mb-4 col-12 md:col-6">
+                        <label for="displayInMenu" class="font-medium text-900">Display in Menu</label>
+                        <input
+                            id="displayInMenu"
+                            type="text"
+                            pInputText
+                            name="displayInMenu"
+                            #displayInMenu
+                            [(ngModel)]="pageModel.displayInMenu"
+                            required />
+                    </div>
+                    <div class="field mb-4 col-12 md:col-6">
+                        <label for="orderNo" class="font-medium text-900">OrderNo</label>
+                        <input id="orderNo" type="number" pInputText name="orderNo" [(ngModel)]="pageModel.orderNo" />
+                    </div>
+
+                    <div class="field mb-4 col-12 md:col-6">
+                        <label for="helpTextAr" class="font-medium text-900">Help Ar-Text</label>
+                        <input
+                            id="helpTextAr"
+                            type="text"
+                            pInputText
+                            name="helpTextAr"
+                            [(ngModel)]="pageModel.helpTextAr" />
+                    </div>
+                    <div class="field mb-4 col-12 md:col-6">
+                        <label for="helpTextEn" class="font-medium text-900">Help En-Text</label>
+                        <input
+                            id="helpTextEn"
+                            type="text"
+                            pInputText
+                            name="helpTextEn"
+                            [(ngModel)]="pageModel.helpTextEn" />
+                    </div>
+                    <div class="field mb-4 col-12 md:col-6">
+                        <label for="fontIconCode" class="font-medium text-900">Font Icon Code</label>
+                        <input
+                            id="fontIconCode"
+                            type="text"
+                            pInputText
+                            name="fontIconCode"
+                            [(ngModel)]="pageModel.fontIconCode" />
+                    </div>
+                    <div class="field mb-4 col-12 md:col-6 flex flex-column align-items-start justify-content-end">
+                        <div class="field-checkbox">
+                            <p-checkbox
+                                name="isHeading"
+                                [(ngModel)]="pageModel.isHeading"
+                                [binary]="true"
+                                id="ny"></p-checkbox>
+                            <label for="ny">Set as Heading</label>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <button pButton pRipple label="Create Page" class="w-auto mt-3" type="submit"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

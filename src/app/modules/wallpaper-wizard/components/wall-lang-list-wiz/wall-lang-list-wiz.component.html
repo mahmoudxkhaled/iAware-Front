@@ -1,0 +1,667 @@
+<div class="card">
+    <p-toast></p-toast>
+    <h5>
+        <strong>{{ libraryWallpaperName.substring(0, 120) }} </strong> {{ 'wallpaper-wizard.wall-lang-list-wiz.title' |
+        translate }}
+    </h5>
+
+    <div class="iAware-loading-table-container" style="position: relative">
+        <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+        <p-dataView #dv [value]="libraryWallpaperLanguages" [rows]="12" layout="grid">
+            <ng-template pTemplate="header">
+                <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                    <button pButton pRipple icon="pi pi-arrow-left" label="{{ 'shared.actions.back' | translate }}"
+                        (click)="backToLanguages()"></button>
+
+                    <div class="my-1">
+                        <button [disabled]="!addDisable"
+                            *ngIf="hasPermission(actions.add) && !defaultWallpapers && !isIAwareTeamUser" pButton
+                            pRipple label="{{ 'wallpaper-wizard.wall-lang-list-wiz.actions.add1' | translate }}"
+                            icon="pi pi-plus" class="p-button mr-2"
+                            (click)="CreateNewLibraryWallpaperLanguage()"></button>
+
+                        <button [disabled]="!addDisable"
+                            *ngIf="hasPermission(actions.add) && defaultWallpapers && isIAwareTeamUser" pButton pRipple
+                            label="{{ 'wallpaper-wizard.wall-lang-list-wiz.actions.add1' | translate }}"
+                            icon="pi pi-plus" class="p-button mr-2"
+                            (click)="CreateNewLibraryWallpaperLanguage()"></button>
+
+                        <button [disabled]="!addDisable" *ngIf="hasPermission(actions.addDefaultWallpaper)" pButton
+                            pRipple label="{{ 'wallpaper-wizard.wall-lang-list-wiz.actions.add2' | translate }}"
+                            icon="pi pi-plus" class="p-button mr-2"
+                            (click)="openAddNewStandaloneWallpaperLangDialog()"></button>
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template let-walls pTemplate="gridItem">
+                <div class="grid grid-nogutter">
+                    <div class="col-12 md:col-4 wall-see-more" *ngFor="let wall of walls">
+                        <div class="p-3">
+                            <div
+                                class="surface-card shadow-3 border-round overflow-hidden hover:shadow-5 transition-all relative">
+                                <div class="wall-image-container relative object-cover">
+                                    <img [src]="wall.wallpaperImageThumbnailUrl" class="w-full border-round-top" />
+                                </div>
+
+                                <button *ngIf="normalMenuItems.length > 0 && !wall.canEdit" pButton pRipple
+                                    type="button" icon="pi pi-ellipsis-v"
+                                    class="p-button-rounded p-button-text p-button-plain absolute top-0 right-0 m-2 bg-gray-200 shadow-lg border border-gray-300"
+                                    (click)="normalMenu.toggle($event); assigneCurrentSelect(wall)"></button>
+
+                                <button *ngIf="ownerMenuItems.length > 0 && wall.canEdit" pButton pRipple type="button"
+                                    icon="pi pi-ellipsis-v"
+                                    class="p-button-rounded p-button-text p-button-plain absolute top-0 right-0 m-2 bg-gray-200 shadow-lg border border-gray-300"
+                                    (click)="ownerMenu.toggle($event); assigneCurrentSelect(wall)"></button>
+
+                                <p-menu #ownerMenu [model]="ownerMenuItems" [appendTo]="'body'" [popup]="true"></p-menu>
+
+                                <p-menu #normalMenu [model]="normalMenuItems" [appendTo]="'body'"
+                                    [popup]="true"></p-menu>
+
+                                <div class="text-center p-3">
+                                    <div style="cursor: pointer">
+                                        <h4>
+                                            {{ wall.wallpaperTitle }}
+                                        </h4>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="text-l">{{ wall.languageName }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </ng-template>
+        </p-dataView>
+    </div>
+</div>
+
+<p-dialog [(visible)]="addWallpaperDialog" [style]="{ width: '100%', height: '100vh' }"
+    header="{{ 'wallpaper-wizard.wall-lang-list-wiz.addDialog.header' | translate }}" [modal]="true"
+    [closeOnEscape]="false" class="p-fluid" [closable]="false">
+    <form [formGroup]="addWallpaperForm" (ngSubmit)="saveAddWallpaper()">
+        <div class="flex flex-wrap justify-content-center">
+            <div class="field mb-4 col-6">
+                <label for="wallpaperTitle" class="font-medium text-900">{{
+                    'wallpaper-wizard.wall-lang-list-wiz.addDialog.fields.title' | translate
+                    }}</label>
+                <input type="text" pInputText id="wallpaperTitle" formControlName="wallpaperTitle" required autofocus
+                    [ngClass]="{
+                        'ng-invalid ng-dirty': submitted && !addWallpaperForm.controls['wallpaperTitle'].valid
+                    }" />
+                <small *ngIf="submitted && !addWallpaperForm.controls['wallpaperTitle'].valid" class="text-red-500">{{
+                    'wallpaper-wizard.wall-lang-list-wiz.addDialog.fields.titleValidations' | translate
+                    }}</small>
+            </div>
+            <div class="field mb-4 col-6">
+                <label for="languageId" class="font-medium text-900">{{
+                    'wallpaper-wizard.wall-lang-list-wiz.addDialog.fields.language' | translate
+                    }}</label>
+                <span class="p-float-label">
+                    <p-dropdown formControlName="languageId" [options]="activeLanguage" optionLabel="name"
+                        optionValue="id" placeholder="{{
+                            'wallpaper-wizard.wall-lang-list-wiz.addDialog.fields.languagePlaceholder' | translate
+                        }}">
+                    </p-dropdown>
+                </span>
+            </div>
+        </div>
+        <div class="grid px-3">
+            <div class="card col-6 md:col-3"
+                style="display: flex; flex-direction: column; height: 100vh; overflow-y: hidden">
+                <div *ngIf="selectedBackground" class="grid-item background">
+                    <!-- <h3>Selected Background</h3> -->
+                    <img [src]="selectedBackground.backgroundImageUrl" class="shadow-2 my-3 mx-0"
+                        style="width: 150px; height: 150px; cursor: pointer" />
+                </div>
+                <div class="flex flex-wrap justify-content-center">
+                    <span class="mt-2 md:mt-0 p-input-icon-left">
+                        <i class="pi pi-search"></i>
+                        <input pInputText type="text" (input)="CharactersFilter($event)"
+                            placeholder="{{ 'shared.actions.search' | translate }}" />
+                    </span>
+                </div>
+                <!--  /////////////////////////////////////////// -->
+
+                <p-scrollPanel [style]="{ width: '100%', height: 'calc(100vh - 50px)' }">
+                    <p-dataView #dv [value]="backgrounds" [rows]="12" layout="grid">
+                        <ng-template let-backgrounds pTemplate="gridItem">
+                            <div class=" ">
+                                <div *ngFor="let background of backgrounds">
+                                    <div class="my-3" (click)="selectBackgroundAdd(background)">
+                                        <div class="flex flex-wrap justify-content-center">
+                                            <div class="mb-3 flex flex-column">
+                                                <div class="flex align-items-center justify-content-center">
+                                                    <p-radioButton name="libraryBackgroundId" [value]="background.id"
+                                                        formControlName="libraryBackgroundId"
+                                                        (click)="onRadioButtonClick($event, background)">
+                                                    </p-radioButton>
+                                                </div>
+                                                <div class="flex align-items-center justify-content-center">
+                                                    <img [src]="background.backgroundImageUrl"
+                                                        class="shadow-2 my-3 mx-0"
+                                                        style="width: 150px; height: 150px; cursor: pointer" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </p-dataView>
+                </p-scrollPanel>
+            </div>
+
+            <div class="card col-6 md:col-3"
+                style="display: flex; flex-direction: column; height: 100vh; overflow-y: hidden">
+                <div *ngIf="selectedCharacter" class="grid-item character">
+                    <!-- <h3>Selected Character</h3> -->
+                    <img [src]="selectedCharacter.characterImageUrl" class="shadow-2 my-3 mx-0"
+                        style="width: 150px; height: 150px; cursor: pointer" />
+                </div>
+                <div class="flex flex-wrap justify-content-center">
+                    <span class="mt-2 md:mt-0 p-input-icon-left">
+                        <i class="pi pi-search"></i>
+                        <input pInputText type="text" (input)="CharactersFilter($event)"
+                            placeholder="{{ 'shared.actions.search' | translate }}" />
+                    </span>
+                </div>
+
+                <!--  /////////////////////////////////////////// -->
+                <p-scrollPanel [style]="{ width: '100%', height: 'calc(100vh - 50px)' }">
+                    <p-dataView #dc [value]="characters" [rows]="12" layout="grid" filterBy="characterName">
+                        <ng-template let-characters pTemplate="gridItem">
+                            <div class=" ">
+                                <div *ngFor="let char of characters">
+                                    <div class="m-3" (click)="selectCharacterAdd(char)">
+                                        <div class="flex flex-wrap justify-content-center">
+                                            <div class="mb-3 flex flex-column">
+                                                <div class="flex align-items-center justify-content-center">
+                                                    <p-radioButton name="libraryLanguageCharacterId" [value]="char.id"
+                                                        formControlName="libraryLanguageCharacterId"
+                                                        (click)="onRadioButtonClick($event, char)">
+                                                    </p-radioButton>
+                                                </div>
+                                                <div class="flex align-items-center justify-content-center">
+                                                    <img [src]="char.characterImageUrl" class="shadow-2 my-3 mx-0"
+                                                        style="width: 150px; height: 150px; cursor: pointer" />
+                                                </div>
+                                                <div class="flex align-items-center justify-content-center">
+                                                    <div class="text-center ext-md">{{ char.languageName }}</div>
+                                                </div>
+                                                <div class="lex align-items-center justify-content-center my-3">
+                                                    <div class="text-center text-2xl font-bold">
+                                                        {{ char.characterName }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </p-dataView>
+                </p-scrollPanel>
+            </div>
+
+            <div class="card col-12 md:col-6"
+                style="display: flex; flex-direction: column; height: 100vh; overflow-y: hidden">
+                <div *ngIf="selectedQuote" class="grid-item quote">
+                    <!-- <h3>Selected Quote</h3> -->
+                    <div class="card shadow-2 my-3 mx-0" style="
+                            min-width: 100%;
+                            min-height: 150px;
+                            cursor: pointer;
+                            align-items: center;
+                            vertical-align: middle;
+                            display: flex;
+                            justify-content: center;
+                        ">
+                        <div class="text-center mb-2">
+                            <strong [innerHTML]="selectedQuote.quoteText" class="text-l"></strong>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex flex-wrap justify-content-center">
+                    <span class="mt-2 md:mt-0 p-input-icon-left">
+                        <i class="pi pi-search"></i>
+                        <input pInputText type="text" (input)="QuotesFilter($event)"
+                            placeholder="{{ 'shared.actions.search' | translate }}" />
+                    </span>
+                </div>
+
+                <p-scrollPanel [style]="{ width: '100%', height: 'calc(100vh - 50px)' }">
+                    <!--  /////////////////////////////////////////// -->
+                    <p-dataView #dq [value]="quotes" [rows]="12" layout="grid" filterBy="quoteText">
+                        <ng-template let-quotes pTemplate="gridItem">
+                            <div class=" ">
+                                <div *ngFor="let quote of quotes">
+                                    <div class="m-3" (click)="selectQuoteAdd(quote)">
+                                        <div class="flex flex-wrap justify-content-center">
+                                            <div class="mb-3 flex flex-column" style="min-width: 100%">
+                                                <div class="flex align-items-center justify-content-center"
+                                                    style="min-width: 100%">
+                                                    <p-radioButton name="libraryLanguageQuoteId" [value]="quote.id"
+                                                        formControlName="libraryLanguageQuoteId"
+                                                        (click)="onRadioButtonClick($event, quote)">
+                                                    </p-radioButton>
+                                                </div>
+                                                <div class="mb-3 my-3 flex align-items-center justify-content-center"
+                                                    style="cursor: pointer; min-width: 100%">
+                                                    <div class="shadow-2 my-3 mx-0 card"
+                                                        style="min-width: 100%; cursor: pointer">
+                                                        <div class="text-center mb-2">
+                                                            <strong [innerHTML]="quote.quoteText"
+                                                                class="text-l"></strong>
+                                                        </div>
+                                                        <div class="text-center">
+                                                            <div class="text-md">{{ quote.languageName }}</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </p-dataView>
+                </p-scrollPanel>
+            </div>
+        </div>
+    </form>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+            class="p-button-text" (click)="declineAddWallpaper()"></button>
+        <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check" class="p-button-text"
+            (click)="saveAddWallpaper()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="editWallpaperDialog" [style]="{ width: '100%', height: '100vh' }"
+    header="{{ 'wallpaper-wizard.wall-lang-list-wiz.editDialog.header' | translate }}" [modal]="true"
+    [closeOnEscape]="false" class="p-fluid" [closable]="false">
+    <form [formGroup]="editWallpaperForm" (ngSubmit)="saveEditLibraryWallpaperLanguage()">
+        <div class="flex flex-wrap justify-content-center">
+            <div class="field mb-4 col-6">
+                <label for="wallpaperTitle" class="font-medium text-900">{{
+                    'wallpaper-wizard.wall-lang-list-wiz.editDialog.fields.title' | translate
+                    }}</label>
+                <input type="text" pInputText id="wallpaperTitle" formControlName="wallpaperTitle" required autofocus
+                    [ngClass]="{
+                        'ng-invalid ng-dirty': submitted && !editWallpaperForm.controls['wallpaperTitle'].valid
+                    }" />
+                <small *ngIf="submitted && !editWallpaperForm.controls['wallpaperTitle'].valid" class="text-red-500">{{
+                    'wallpaper-wizard.wall-lang-list-wiz.editDialog.fields.titleValidations' | translate
+                    }}</small>
+            </div>
+            <div class="field mb-4 col-6">
+                <label for="languageId" class="font-medium text-900">{{
+                    'wallpaper-wizard.wall-lang-list-wiz.editDialog.fields.language' | translate
+                    }}</label>
+                <span class="p-float-label">
+                    <p-dropdown formControlName="languageId" [options]="activeLanguage" optionLabel="name"
+                        optionValue="id" placeholder="{{
+                            'wallpaper-wizard.wall-lang-list-wiz.editDialog.fields.languagePlaceholder' | translate
+                        }}">
+                    </p-dropdown>
+                </span>
+            </div>
+        </div>
+        <div class="grid px-3">
+            <div class="card col-6 md:col-3"
+                style="display: flex; flex-direction: column; height: 100vh; overflow-y: hidden">
+                <div *ngIf="selectedBackground" class="grid-item background">
+                    <!-- <h3>Selected Background</h3> -->
+                    <img [src]="selectedBackground.backgroundImageUrl" class="shadow-2 my-3 mx-0"
+                        style="width: 150px; height: 150px; cursor: pointer" />
+                </div>
+                <div class="flex flex-wrap justify-content-center">
+                    <span class="mt-2 md:mt-0 p-input-icon-left">
+                        <i class="pi pi-search"></i>
+                        <input pInputText type="text" (input)="CharactersFilter($event)"
+                            placeholder="{{ 'shared.actions.search' | translate }}" />
+                    </span>
+                </div>
+
+                <!--  /////////////////////////////////////////// -->
+
+                <p-scrollPanel [style]="{ width: '100%', height: 'calc(100vh - 50px)' }">
+                    <p-dataView #dv [value]="backgrounds" [rows]="12" layout="grid">
+                        <ng-template let-backgrounds pTemplate="gridItem">
+                            <div class=" ">
+                                <div *ngFor="let background of backgrounds">
+                                    <div class="my-3" (click)="selectBackgroundEdit(background)">
+                                        <div class="flex flex-wrap justify-content-center">
+                                            <div class="mb-3 flex flex-column">
+                                                <div class="flex align-items-center justify-content-center">
+                                                    <p-radioButton name="libraryBackgroundId" [value]="background.id"
+                                                        formControlName="libraryBackgroundId"
+                                                        (click)="onRadioButtonClick($event, background)">
+                                                    </p-radioButton>
+                                                </div>
+                                                <div class="flex align-items-center justify-content-center">
+                                                    <img [src]="background.backgroundImageUrl"
+                                                        class="shadow-2 my-3 mx-0"
+                                                        style="width: 150px; height: 150px; cursor: pointer" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </p-dataView>
+                </p-scrollPanel>
+            </div>
+
+            <div class="card col-6 md:col-3"
+                style="display: flex; flex-direction: column; height: 100vh; overflow-y: hidden">
+                <div *ngIf="selectedCharacter" class="grid-item character">
+                    <!-- <h3>Selected Character</h3> -->
+                    <img [src]="selectedCharacter.characterImageUrl" class="shadow-2 my-3 mx-0"
+                        style="width: 150px; height: 150px; cursor: pointer" />
+                </div>
+                <div class="flex flex-wrap justify-content-center">
+                    <span class="mt-2 md:mt-0 p-input-icon-left">
+                        <i class="pi pi-search"></i>
+                        <input pInputText type="text" (input)="CharactersFilter($event)"
+                            placeholder="{{ 'shared.actions.search' | translate }}" />
+                    </span>
+                </div>
+
+                <!--  /////////////////////////////////////////// -->
+                <p-scrollPanel [style]="{ width: '100%', height: 'calc(100vh - 50px)' }">
+                    <p-dataView #dc [value]="characters" [rows]="12" layout="grid" filterBy="characterName">
+                        <ng-template let-characters pTemplate="gridItem">
+                            <div class=" ">
+                                <div *ngFor="let char of characters">
+                                    <div class="m-3" (click)="selectCharacterEdit(char)">
+                                        <div class="flex flex-wrap justify-content-center">
+                                            <div class="mb-3 flex flex-column">
+                                                <div class="flex align-items-center justify-content-center">
+                                                    <p-radioButton name="libraryLanguageCharacterId" [value]="char.id"
+                                                        formControlName="libraryLanguageCharacterId"
+                                                        (click)="onRadioButtonClick($event, char)">
+                                                    </p-radioButton>
+                                                </div>
+                                                <div class="flex align-items-center justify-content-center">
+                                                    <img [src]="char.characterImageUrl" class="shadow-2 my-3 mx-0"
+                                                        style="width: 150px; height: 150px; cursor: pointer" />
+                                                </div>
+                                                <div class="flex align-items-center justify-content-center">
+                                                    <div class="text-center ext-md">{{ char.languageName }}</div>
+                                                </div>
+                                                <div class="lex align-items-center justify-content-center my-3">
+                                                    <div class="text-center text-2xl font-bold">
+                                                        {{ char.characterName }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </p-dataView>
+                </p-scrollPanel>
+            </div>
+            <div class="card col-12 md:col-6"
+                style="display: flex; flex-direction: column; height: 100vh; overflow-y: hidden">
+                <div *ngIf="selectedQuote" class="grid-item quote">
+                    <!-- <h3>Selected Quote</h3> -->
+                    <div class="card shadow-2 my-3 mx-0" style="
+                            min-width: 100%;
+                            min-height: 150px;
+                            cursor: pointer;
+                            align-items: center;
+                            vertical-align: middle;
+                            display: flex;
+                            justify-content: center;
+                        ">
+                        <div class="text-center mb-2">
+                            <strong [innerHTML]="selectedQuote.quoteText" class="text-l"></strong>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex flex-wrap justify-content-center">
+                    <span class="mt-2 md:mt-0 p-input-icon-left">
+                        <i class="pi pi-search"></i>
+                        <input pInputText type="text" (input)="QuotesFilter($event)"
+                            placeholder="{{ 'shared.actions.search' | translate }}" />
+                    </span>
+                </div>
+
+                <p-scrollPanel [style]="{ width: '100%', height: 'calc(100vh - 50px)' }">
+                    <!--  /////////////////////////////////////////// -->
+                    <p-dataView #dq [value]="quotes" [rows]="12" layout="grid" filterBy="quoteText">
+                        <ng-template let-quotes pTemplate="gridItem">
+                            <div class=" ">
+                                <div *ngFor="let quote of quotes">
+                                    <div class="m-3" (click)="selectQuoteEdit(quote)">
+                                        <div class="flex flex-wrap justify-content-center">
+                                            <div class="mb-3 flex flex-column" style="min-width: 100%">
+                                                <div class="flex align-items-center justify-content-center"
+                                                    style="min-width: 100%">
+                                                    <p-radioButton name="libraryLanguageQuoteId" [value]="quote.id"
+                                                        formControlName="libraryLanguageQuoteId"
+                                                        (click)="onRadioButtonClick($event, quote)">
+                                                    </p-radioButton>
+                                                </div>
+                                                <div class="mb-3 my-3 flex align-items-center justify-content-center"
+                                                    style="cursor: pointer; min-width: 100%">
+                                                    <div class="shadow-2 my-3 mx-0 card"
+                                                        style="min-width: 100%; cursor: pointer">
+                                                        <div class="text-center mb-2">
+                                                            <strong [innerHTML]="quote.quoteText"
+                                                                class="text-l"></strong>
+                                                        </div>
+                                                        <div class="text-center">
+                                                            <div class="text-md">{{ quote.languageName }}</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </p-dataView>
+                </p-scrollPanel>
+            </div>
+        </div>
+    </form>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+            class="p-button-text" (click)="declineEditLibraryWallpaperLanguage()"></button>
+        <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check" class="p-button-text"
+            (click)="saveEditLibraryWallpaperLanguage()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="deletionLibraryWallpaperLanguageDialog" header="{{ 'shared.header.delete' | translate }}"
+    [modal]="true" [style]="{ width: '450px' }">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="libraryWallpaperLanguage">{{ 'shared.messages.delete' | translate }}
+            <b>{{ libraryWallpaperLanguage.wallpaperTitle }} / {{ libraryWallpaperLanguage.languageName }}</b></span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text"
+            label="{{ 'shared.actions.cancel' | translate }}" (click)="declineDeletion()"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="{{ 'shared.actions.save' | translate }}"
+            (click)="confirmDeletion()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog header="{{ 'wallpaper-wizard.wallpaper-list-wizard.actions.add2' | translate }}"
+    [(visible)]="addNewStandaloneWallpaperDialog" [modal]="true" [style]="{ width: '50%', height: '81%' }">
+    <ng-template pTemplate="content">
+        <div class="grid p-fluid">
+            <div class="col-12 md:col-6 field">
+                <label for="languageId" class="font-medium text-900">{{
+                    'wallpaper-wizard.wallpaper-list-wizard.library-character-wizard.addDialog.language' | translate
+                    }}</label>
+                <p-dropdown [(ngModel)]="selectedLang" [options]="activeLanguage" optionLabel="name"
+                    placeholder="{{ 'wallpaper-wizard.wallpaper-list-wizard.library-character-wizard.addDialog.languagePlaceholder' | translate }}"
+                    optionValue="id" [ngClass]="{ 'p-invalid': submitted && !selectedLang }">
+                </p-dropdown>
+                <small *ngIf="submitted && !selectedLang" class="p-error">{{
+                    'wallpaper-wizard.wallpaper-list-wizard.library-character-wizard.addDialog.fields.languageValidation'
+                    | translate }}</small>
+            </div>
+
+            <div class="col-12 md:col-6 field">
+                <label for="name" class="font-medium text-900">{{ 'wallpaper-wizard.wallpaper-list-wizard.actions.title'
+                    | translate }}</label>
+                <input type="text" pInputText id="name" [(ngModel)]="imageTitle" required
+                    [ngClass]="{ 'p-invalid': submitted && !imageTitle }" />
+                <small *ngIf="submitted && !imageTitle" class="p-error">{{
+                    'wallpaper-wizard.wallpaper-list-wizard.actions.titleisrequired' | translate }}</small>
+            </div>
+
+            <!-- Wallpaper Image Section -->
+            <div class="col-12 md:col-6">
+                <p-panel header="{{ 'wallpaper-wizard.wallpaper-list-wizard.actions.wallpaperImage' | translate }}"
+                    class="mb-3">
+                    <!-- Image Preview -->
+                    <div class="flex align-items-center justify-content-center mb-2">
+                        <img [src]="wallUrl || 'placeholder.jpg'" alt="Wallpaper Preview" class="avatar"
+                            style="width: 100%; max-width: 300px; border-radius: 8px; border: 1px solid #ccc;"
+                            (click)="onUploadWallpaperImageClick()" />
+                    </div>
+                    <!-- Recommended Dimensions -->
+
+                    <small class="text-center block m-2">{{ 'shared.messages.recommendedDimensions' | translate}}
+                        <strong>{{ 'shared.messages.1920x1080' | translate}}</strong> {{ 'shared.messages.pixels' |
+                        translate}}</small>
+                    <!-- Upload Button -->
+                    <div class="flex justify-content-center">
+                        <p-button label="{{ 'shared.actions.upload' | translate }}" icon="pi pi-upload"
+                            (click)="onUploadWallpaperImageClick()"></p-button>
+                        <input type="file" id="addWallpaperImage" style="display: none"
+                            (change)="onImageSelected($event)" />
+                    </div>
+                    <small *ngIf="submitted && !selectedImage" class="p-error"> {{
+                        'wallpaper-wizard.wallpaper-list-wizard.actions.wallpaperImageValidation' | translate }}
+                    </small>
+                </p-panel>
+            </div>
+
+            <!-- Thumbnail Image Section -->
+            <div class="col-12 md:col-6">
+                <p-panel
+                    header="{{ 'wallpaper-wizard.wallpaper-list-wizard.actions.wallpaperThumbnailImage' | translate }}"
+                    class="mb-3">
+                    <!-- Image Preview -->
+                    <div class="flex align-items-center justify-content-center mb-2">
+                        <img [src]="wallThumbnailUrl || '../../../../../assets/media/upload-photo.jpg'"
+                            alt="Thumbnail Preview" class="avatar"
+                            style="width: 100%; max-width: 150px; border-radius: 8px; border: 1px solid #ccc;"
+                            (click)="onUploadWallpaperImageThumbnailClick()" />
+                    </div>
+                    <!-- Recommended Dimensions -->
+                    <small class="text-center block m-2">{{ 'shared.messages.recommendedDimensions' | translate}}
+                        <strong>{{ 'shared.messages.300x300' | translate}}</strong> {{ 'shared.messages.pixels' |
+                        translate}}</small>
+                    <!-- Upload Button -->
+                    <div class="flex justify-content-center">
+                        <p-button label="{{ 'shared.actions.upload' | translate }}" icon="pi pi-upload"
+                            (click)="onUploadWallpaperImageThumbnailClick()"></p-button>
+                        <input type="file" id="addWallpaperImageThumbnail" style="display: none"
+                            (change)="onThumbnailImageSelected($event)" />
+                    </div>
+                </p-panel>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+            class="p-button-text" (click)="declineAddSingleWallpaper()"></button>
+        <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check" class="p-button-text"
+            (click)="confirmAddSingleWallpaper()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog header="Edit Default Wallpaper langauge" [(visible)]="editSingleWallpaperDialog" [modal]="true"
+    [style]="{ width: '700px' }">
+    <ng-template pTemplate="content">
+        <div class="card flex flex-column p-fluid">
+            <div class="field">
+                <label for="languageId" class="font-medium text-900">{{
+                    'wallpaper-wizard.wallpaper-list-wizard.library-character-wizard.addDialog.language' | translate
+                    }}</label>
+
+                <p-dropdown [(ngModel)]="selectedLang" [options]="activeLanguage" optionLabel="name" placeholder="{{
+                        'wallpaper-wizard.wallpaper-list-wizard.library-character-wizard.addDialog.languagePlaceholder'
+                            | translate
+                    }}" optionValue="id" [ngClass]="{ 'p-invalid': submitted && !selectedLang }"
+                    [disabled]="isDropdownDisabled">
+                    >
+                </p-dropdown>
+                <small *ngIf="submitted && !selectedLang" class="p-error">Language is required.</small>
+            </div>
+
+            <div class="field">
+                <label for="name" class="font-medium text-900">Title</label>
+                <input type="text" pInputText id="name" [(ngModel)]="imageTitle" required
+                    [ngClass]="{ 'p-invalid': submitted && !imageTitle }" />
+                <small *ngIf="submitted && !imageTitle" class="p-error">Title is required.</small>
+            </div>
+
+            <!-- Image Preview and Upload Section -->
+            <div class="flex flex-column align-items-center mt-2">
+                <!-- Image Preview -->
+                <div class="flex align-items-center justify-content-center mb-2">
+                    <img [src]="wallUrl || '../../../../../assets/media/upload-photo.jpg'" alt="Wallpaper Preview"
+                        class="avatar" style="cursor: pointer" (click)="onUploadWallpaperImageClick()" />
+                </div>
+                <label class="flex justify-content-center">Wallpaper Image</label>
+
+                <!-- Upload Button -->
+                <div class="flex align-items-center justify-content-center mt-2">
+                    <p-button label="Upload" icon="pi pi-upload" (click)="onUploadWallpaperImageClick()"></p-button>
+                    <input type="file" id="addWallpaperImage" style="display: none"
+                        (change)="onImageSelected($event)" />
+                </div>
+            </div>
+
+            <!-- Image Preview and Upload Section -->
+            <div class="flex flex-column align-items-center mt-2">
+                <!-- Image Preview -->
+                <div class="flex align-items-center justify-content-center mb-2">
+                    <img [src]="wallThumbnailUrl || '../../../../../assets/media/upload-photo.jpg'"
+                        alt="Wallpaper Preview" class="avatar" style="cursor: pointer"
+                        (click)="onUploadWallpaperImageThumbnailClick()" />
+                </div>
+                <label class="flex justify-content-center">Wallpaper Thumbnail Image</label>
+
+                <!-- Upload Button -->
+                <div class="flex align-items-center justify-content-center mt-2">
+                    <p-button label="Upload" icon="pi pi-upload"
+                        (click)="onUploadWallpaperImageThumbnailClick()"></p-button>
+                    <input type="file" id="addWallpaperImageThumbnail" style="display: none"
+                        (change)="onThumbnailImageSelected($event)" />
+                </div>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="{{ 'shared.actions.cancel' | translate }}" icon="pi pi-times"
+            class="p-button-text" (click)="declineAddSingleWallpaper()"></button>
+        <button pButton pRipple label="{{ 'shared.actions.save' | translate }}" icon="pi pi-check" class="p-button-text"
+            (click)="confirmAddSingleWallpaper()"></button>
+    </ng-template>
+</p-dialog>
+
+
+<p-dialog [(visible)]="displayImageDialog" [showHeader]="false" [dismissableMask]="true" [modal]="true"
+    [style]="{ border: 'none', width: '70vw', height: '90vh', 'background-color': 'transparent' }"
+    [contentStyle]="{ 'background-color': 'transparent', 'text-align': 'center', 'box-shadow': 'none' }">
+    <img *ngIf="currentImage" [src]="currentImage" alt="Wallpaper Preview" style="max-width: 100%; max-height: 100%;" />
+</p-dialog>
